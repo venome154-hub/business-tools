@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import InvoiceGenerator from "@/components/InvoiceGenerator";
 
 export const metadata: Metadata = {
@@ -17,8 +18,8 @@ export default function InvoicePage() {
   return (
     <main className="page">
       <div className="topbar">
-        <a href="/" className="brand">BusinessTools</a>
-        <span>Free Invoice Generator</span>
+        <Link href="/" className="brand">BusinessTools</Link>
+        <Link href="/quote-generator">Preparing a quote first? Create an estimate →</Link>
       </div>
       <InvoiceGenerator />
       <section className="seo-content" aria-labelledby="invoice-guide-title">
