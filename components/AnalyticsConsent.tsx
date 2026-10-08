@@ -9,27 +9,36 @@ type ConsentChoice = "accepted" | "declined" | null;
 
 declare global {
   interface Window {
-    dataLayer: unknown[][];
+    dataLayer: unknown[];
     gtag?: (...args: unknown[]) => void;
+    biztoolsboxAnalyticsConfigured?: boolean;
   }
 }
 
 function startAnalytics() {
   if (typeof window === "undefined") return;
-  if (window.gtag) {
+  if (!window.gtag) {
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+  }
+  if (window.biztoolsboxAnalyticsConfigured) {
     window.gtag("consent", "update", { analytics_storage: "granted" });
     return;
   }
-  window.dataLayer = window.dataLayer || [];
-  window.gtag = (...args: unknown[]) => window.dataLayer.push(args);
+
   window.gtag("js", new Date());
   window.gtag("config", MEASUREMENT_ID);
+  window.biztoolsboxAnalyticsConfigured = true;
 
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
-  script.dataset.googleAnalytics = "true";
-  document.head.appendChild(script);
+  if (!document.querySelector(`script[data-google-analytics="${MEASUREMENT_ID}"]`)) {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
+    script.dataset.googleAnalytics = MEASUREMENT_ID;
+    document.head.appendChild(script);
+  }
 }
 
 export default function AnalyticsConsent() {
