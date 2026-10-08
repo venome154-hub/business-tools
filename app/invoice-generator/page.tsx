@@ -4,11 +4,11 @@ import InvoiceGenerator from "@/components/InvoiceGenerator";
 
 export const metadata: Metadata = {
   title: "Free Invoice Generator — Create & Download PDF Invoices",
-  description: "Create a professional invoice online for free. Add line items, tax, and a discount, then download a polished PDF. No signup required.",
+  description: "Create a detailed PDF invoice with client details, a due date, payment instructions, line items, tax, and discounts. Free and no signup.",
   alternates: { canonical: "/invoice-generator" },
   openGraph: {
     title: "Free Invoice Generator — Create & Download PDF Invoices",
-    description: "Create a professional invoice online for free and download it as a PDF. No signup required.",
+    description: "Create a detailed invoice with payment instructions, then download a PDF for free. No signup required.",
     type: "website",
     url: "/invoice-generator",
   },
@@ -18,20 +18,21 @@ export default function InvoicePage() {
   return (
     <main className="page">
       <div className="topbar">
-        <Link href="/" className="brand">BusinessTools</Link>
+        <Link href="/" className="brand">BizToolsBox</Link>
         <Link href="/quote-generator">Preparing a quote first? Create an estimate →</Link>
       </div>
       <InvoiceGenerator />
       <section className="seo-content" aria-labelledby="invoice-guide-title">
         <h2 id="invoice-guide-title">Create a free invoice online</h2>
-        <p>Use this free invoice generator to prepare a clear, professional invoice for your client. Enter your business and client details, add the services or products you supplied, choose a currency, and include tax or a discount when needed. Your totals update automatically as you edit.</p>
+        <p>Use this free invoice generator to prepare a clear invoice for your client. Add business and client contact details, an issue date and optional due date, list the supplied products or services, and include payment instructions. Totals update as you edit, and the document is created as a PDF in your browser.</p>
 
         <h2>How to make an invoice</h2>
         <ol>
-          <li>Enter your company name, client name, invoice number, and date.</li>
+          <li>Enter your business and client names and optional contact details.</li>
+          <li>Add the invoice number, issue date, and optional payment due date.</li>
           <li>Add each product or service with its quantity and price.</li>
           <li>Select a currency and enter any applicable tax or discount.</li>
-          <li>Review the invoice preview, then select <strong>Download PDF</strong>.</li>
+          <li>Add optional payment instructions or a note, review the preview, and select <strong>Download PDF</strong>.</li>
         </ol>
         <p>The invoice is created in your browser and downloaded as a PDF. You can review the details before sharing it with your client.</p>
 
@@ -50,11 +51,20 @@ export default function InvoicePage() {
             <p>Yes. Enter tax and discount percentages and the invoice preview will update the subtotal and total.</p>
           </details>
           <details>
+            <summary>Can I add a due date and payment instructions?</summary>
+            <p>Yes. Set an optional due date and include payment instructions in the invoice and PDF.</p>
+          </details>
+          <details>
+            <summary>Are my invoice details uploaded?</summary>
+            <p>The generator uses your entries in this browser to update the preview and create your PDF. See our <Link href="/privacy">privacy and data page</Link> for details.</p>
+          </details>
+          <details>
             <summary>Do I need to sign up?</summary>
             <p>No account or signup is required to use the generator.</p>
           </details>
         </div>
       </section>
+      <footer className="home-footer"><Link href="/guides">Guides</Link><Link href="/privacy">Privacy & data</Link></footer>
     </main>
   );
 }

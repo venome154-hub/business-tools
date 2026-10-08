@@ -1,12 +1,19 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Free Invoice & Quote Generators for Small Business",
+  description: "Create a clear project quote or invoice and download it as a PDF. Free online business document tools with no signup.",
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   return (
     <main className="landing">
       <div className="hero">
-        <span className="badge">FREE BUSINESS TOOLS</span>
-        <h1>Simple tools for your business.</h1>
-        <p>Create useful business documents without registration. Build an invoice or prepare a project quote in minutes.</p>
+        <span className="badge">FREE INVOICE & QUOTE TOOLS</span>
+        <h1>Create a clear invoice or project quote in minutes.</h1>
+        <p>Prepare a PDF for your client, check every line and total, then download it. Free to use. No account needed.</p>
         <div className="tool-cards">
           <Link className="tool-card" href="/invoice-generator"><strong>Free Invoice Generator</strong><span>Create and download a PDF invoice →</span></Link>
           <Link className="tool-card" href="/quote-generator"><strong>Free Quote Generator</strong><span>Prepare and download a project estimate →</span></Link>
@@ -14,7 +21,7 @@ export default function Home() {
       </div>
       <section className="home-section">
         <h2>Business documents, made simple</h2>
-        <p>BusinessTools helps freelancers and small businesses prepare everyday client documents. Create a project quote before work begins, then make an invoice when it is time to request payment. Your details stay in your browser while you work, and you can download a PDF when the document is ready.</p>
+        <p>BizToolsBox helps freelancers and small businesses prepare everyday client documents. Create a project quote before work begins, then make an invoice when it is time to request payment. Invoice details are processed in your browser by the generator and are not sent to an account on this site.</p>
         <div className="home-columns">
           <article><h3>1. Prepare a quote</h3><p>Describe the work, quantities, prices, optional tax, and how long your estimate is valid. Share the PDF with your client for review.</p><Link href="/quote-generator">Make a free quote →</Link></article>
           <article><h3>2. Send an invoice</h3><p>After the client approves the work, list the completed products or services, set the invoice date, and download a payment request.</p><Link href="/invoice-generator">Make a free invoice →</Link></article>
@@ -29,7 +36,7 @@ export default function Home() {
           <Link href="/guides">Browse all business guides →</Link>
         </div>
       </section>
-      <footer className="home-footer"><Link href="/guides">Guides</Link><span>Free tools and straightforward guidance for small businesses.</span></footer>
+      <footer className="home-footer"><div><Link href="/guides">Guides</Link><Link href="/privacy">Privacy & data</Link></div><span>Free tools and straightforward guidance for small businesses.</span></footer>
     </main>
   );
 }

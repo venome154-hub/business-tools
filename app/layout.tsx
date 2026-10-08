@@ -5,10 +5,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: "Free Invoice Generator | BusinessTools",
-    template: "%s | BusinessTools",
+    default: "Free Invoice & Quote Generators | BizToolsBox",
+    template: "%s | BizToolsBox",
   },
-  description: "Create professional invoices online for free. No registration required. Download your invoice as a PDF.",
+  description: "Create a client-ready invoice or project quote, preview it, and download a PDF for free. No account required.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

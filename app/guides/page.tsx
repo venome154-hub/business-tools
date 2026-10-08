@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function GuidesPage() {
   return (
     <main className="page">
-      <nav className="topbar" aria-label="Main navigation"><Link href="/" className="brand">BusinessTools</Link><Link href="/invoice-generator">Invoice Generator</Link></nav>
+      <nav className="topbar" aria-label="Main navigation"><Link href="/" className="brand">BizToolsBox</Link><Link href="/invoice-generator">Invoice Generator</Link></nav>
       <section className="guide-index">
         <span className="badge">SMALL BUSINESS GUIDES</span>
         <h1>Clear paperwork for client work</h1>
@@ -25,6 +25,7 @@ export default function GuidesPage() {
         </Link>
         <p>Ready to create a document? Try the <Link href="/quote-generator">free quote generator</Link> or <Link href="/invoice-generator">free invoice generator</Link>.</p>
       </section>
+      <footer className="home-footer"><Link href="/">Home</Link><Link href="/privacy">Privacy & data</Link></footer>
     </main>
   );
 }

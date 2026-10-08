@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function HowToWriteInvoicePage() {
   return (
     <main className="page">
-      <nav className="topbar" aria-label="Main navigation"><Link href="/" className="brand">BusinessTools</Link><Link href="/guides">All guides</Link></nav>
+      <nav className="topbar" aria-label="Main navigation"><Link href="/" className="brand">BizToolsBox</Link><Link href="/guides">All guides</Link></nav>
       <article className="seo-content">
         <span className="badge">INVOICING BASICS</span>
         <h1>How to write an invoice: a simple checklist</h1>
@@ -41,6 +41,7 @@ export default function HowToWriteInvoicePage() {
         </ul>
         <p>Use the <Link href="/invoice-generator">free invoice generator</Link> to add items, calculate the total, review the preview, and download a PDF. If the client has not approved the work or its price yet, prepare a <Link href="/quote-generator">quote first</Link>.</p>
       </article>
+      <footer className="home-footer"><Link href="/guides">All guides</Link><Link href="/privacy">Privacy & data</Link></footer>
     </main>
   );
 }

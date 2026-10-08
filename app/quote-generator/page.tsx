@@ -18,7 +18,7 @@ export default function QuotePage() {
   return (
     <main className="page">
       <nav className="topbar" aria-label="Main navigation">
-        <Link href="/" className="brand">BusinessTools</Link>
+        <Link href="/" className="brand">BizToolsBox</Link>
         <Link href="/invoice-generator">Need to bill a client? Create an invoice →</Link>
       </nav>
       <QuoteGenerator />
@@ -43,6 +43,7 @@ export default function QuotePage() {
           <details><summary>Is a quote the same as an invoice?</summary><p>No. A quote is a proposed price for approval. An invoice requests payment. You can create one after the client approves the quote.</p></details>
         </div>
       </section>
+      <footer className="home-footer"><Link href="/guides">Guides</Link><Link href="/privacy">Privacy & data</Link></footer>
     </main>
   );
 }
