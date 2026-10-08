@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy & Data Practices",
-  description: "Learn how BizToolsBox handles information entered into its free invoice and quote generators.",
+  description: "Learn how BizToolsBox handles information entered into its free invoice, quote, and receipt generators.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         <span className="badge">PRIVACY & DATA</span>
         <h1>How BizToolsBox handles your information</h1>
         <p><strong>Last updated: October 8, 2026</strong></p>
-        <p>This page describes the current behavior of the invoice and quote tools on BizToolsBox. The tools do not require an account.</p>
+        <p>This page describes the current behavior of the invoice, quote, and receipt tools on BizToolsBox. The tools do not require an account.</p>
 
         <h2>Information you enter into a document</h2>
         <p>Business, client, line item, tax, discount, and payment details are used in your browser to update the preview and generate a PDF. The current tools do not send those document fields to a BizToolsBox database or account, and do not save them on our application server. The PDF is created in your browser and downloaded through your browser.</p>

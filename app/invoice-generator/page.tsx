@@ -34,7 +34,7 @@ export default function InvoicePage() {
           <li>Select a currency and enter any applicable tax or discount.</li>
           <li>Add optional payment instructions or a note, review the preview, and select <strong>Download PDF</strong>.</li>
         </ol>
-        <p>The invoice is created in your browser and downloaded as a PDF. You can review the details before sharing it with your client.</p>
+        <p>The invoice is created in your browser and downloaded as a PDF. You can review the details before sharing it with your client. After a payment arrives, record it with the <Link href="/receipt-generator">free receipt generator</Link>.</p>
 
         <h2>Frequently asked questions</h2>
         <div className="faq-list">
