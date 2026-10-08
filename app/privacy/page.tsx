@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AnalyticsSettingsButton } from "@/components/AnalyticsConsent";
 
 export const metadata: Metadata = {
   title: "Privacy & Data Practices",
@@ -24,14 +25,18 @@ export default function PrivacyPage() {
         <h2>Information processed to host the website</h2>
         <p>The site is hosted by Vercel. Like other hosting providers, Vercel may process technical request information such as IP addresses, log data, and device or usage information to operate and protect its services. Read the <a href="https://vercel.com/legal/privacy-notice" target="_blank" rel="noreferrer">Vercel Privacy Notice</a> for details about Vercel’s processing.</p>
 
-        <h2>Analytics, advertising, and accounts</h2>
-        <p>BizToolsBox currently does not offer user accounts, accept payments, or include an advertising pixel or a site analytics script. We do not use the document contents to create an advertising profile.</p>
+        <h2>Google Analytics</h2>
+        <p>If you allow analytics, Google Analytics collects information about site visits and usage, including page views, browser and device information, and approximate location. It uses first-party cookies, such as the _ga cookie, to distinguish visits. Analytics is not loaded unless you select “Allow analytics.” You can change your choice at any time below. Google explains its default data collection in the <a href="https://support.google.com/analytics/answer/11593727" target="_blank" rel="noreferrer">Google Analytics data collection guide</a>.</p>
+        <p><AnalyticsSettingsButton /></p>
+
+        <h2>Advertising and accounts</h2>
+        <p>BizToolsBox currently does not offer user accounts, accept payments, or include an advertising pixel. We do not use document contents to create an advertising profile.</p>
 
         <h2>Third-party services</h2>
         <p>The site links to external services and resources, including Vercel. When you follow an external link, that service’s privacy practices apply to your visit there.</p>
 
         <h2>Changes to this page</h2>
-        <p>If the tools begin storing document data, adding accounts, analytics, or other data uses, this page will be updated to describe the change.</p>
+        <p>If the tools begin storing document data, adding accounts, or changing other data uses, this page will be updated to describe the change.</p>
         <p>Return to the <Link href="/">BizToolsBox home page</Link> or open the <Link href="/invoice-generator">invoice generator</Link>.</p>
       </article>
       <footer className="home-footer"><Link href="/">Home</Link><Link href="/guides">Guides</Link></footer>

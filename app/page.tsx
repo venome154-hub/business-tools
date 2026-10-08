@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { AnalyticsSettingsButton } from "@/components/AnalyticsConsent";
 
 export const metadata: Metadata = {
   title: "Free Invoice, Quote & Receipt Generators for Small Business",
@@ -38,7 +39,7 @@ export default function Home() {
           <Link href="/guides">Browse all business guides →</Link>
         </div>
       </section>
-      <footer className="home-footer"><div><Link href="/guides">Guides</Link><Link href="/privacy">Privacy & data</Link></div><span>Free tools and straightforward guidance for small businesses.</span></footer>
+      <footer className="home-footer"><div><Link href="/guides">Guides</Link><Link href="/privacy">Privacy & data</Link><AnalyticsSettingsButton /></div><span>Free tools and straightforward guidance for small businesses.</span></footer>
     </main>
   );
 }
