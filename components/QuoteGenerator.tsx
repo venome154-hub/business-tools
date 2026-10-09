@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
+import { trackEvent } from "@/lib/analytics";
 
 type Item = { description: string; quantity: number; price: number };
 
@@ -87,6 +88,7 @@ export default function QuoteGenerator() {
     doc.setFontSize(9);
     doc.text("This quote is an estimate and is not an invoice.", 20, 280);
     doc.save(`${quoteNo || "quote"}.pdf`);
+    trackEvent("document_download", { tool_name: "quote" });
   }
 
   return (

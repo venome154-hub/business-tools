@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
+import { trackEvent } from "@/lib/analytics";
 
 type Item = { description: string; quantity: number; price: number };
 
@@ -162,6 +163,7 @@ export default function InvoiceGenerator() {
     doc.setTextColor(100, 116, 139);
     doc.text("Thank you for your business.", left, Math.min(y + 8, pageHeight - 10));
     doc.save(`${invoiceNo || "invoice"}.pdf`);
+    trackEvent("document_download", { tool_name: "invoice" });
   }
 
   return (

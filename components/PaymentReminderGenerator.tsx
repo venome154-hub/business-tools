@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 type Tone = "friendly" | "professional" | "firm";
 
@@ -66,6 +67,7 @@ export default function PaymentReminderGenerator() {
   async function copyEmail() {
     try {
       await navigator.clipboard.writeText(`Subject: ${email.subject}\n\n${email.body}`);
+      trackEvent("reminder_copy", { tool_name: "payment_reminder" });
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2200);
     } catch {

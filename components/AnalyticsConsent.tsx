@@ -7,14 +7,6 @@ const CONSENT_KEY = "biztoolsbox-analytics-consent";
 
 type ConsentChoice = "accepted" | "declined" | null;
 
-declare global {
-  interface Window {
-    dataLayer: unknown[];
-    gtag?: (...args: unknown[]) => void;
-    biztoolsboxAnalyticsConfigured?: boolean;
-  }
-}
-
 function startAnalytics() {
   if (typeof window === "undefined") return;
   if (!window.gtag) {

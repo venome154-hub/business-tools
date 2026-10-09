@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
+import { trackEvent } from "@/lib/analytics";
 
 type Item = { description: string; quantity: number; price: number };
 
@@ -72,6 +73,7 @@ export default function ReceiptGenerator() {
     doc.setFontSize(9);
     doc.text("This receipt records a payment reported as received by the business. It does not process or verify payment.", 20, 280);
     doc.save(`${receiptNo || "receipt"}.pdf`);
+    trackEvent("document_download", { tool_name: "receipt" });
   }
 
   return (
