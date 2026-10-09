@@ -18,8 +18,8 @@ export default function PrivacyPage() {
         <p><strong>Last updated: October 8, 2026</strong></p>
         <p>This page describes the current behavior of the invoice, quote, and receipt tools on BizToolsBox. The tools do not require an account.</p>
 
-        <h2>Information you enter into a document</h2>
-        <p>Business, client, line item, tax, discount, and payment details are used in your browser to update the preview and generate a PDF. The current tools do not send those document fields to a BizToolsBox database or account, and do not save them on our application server. The PDF is created in your browser and downloaded through your browser.</p>
+        <h2>Information you enter into a document or draft</h2>
+        <p>Business, client, line item, tax, discount, payment, and reminder details are processed in your browser to update a preview, generate a PDF, or prepare an email draft. The current tools do not send those fields to a BizToolsBox database or account, and do not save them on our application server. PDFs are created in your browser; reminder emails are copied by you into your email app.</p>
         <p>Because the details remain visible in the browser while you use the tool, avoid entering information you do not need in the document. Once downloaded, the file is handled by your device and browser.</p>
 
         <h2>Information processed to host the website</h2>

@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { AnalyticsSettingsButton } from "@/components/AnalyticsConsent";
 
 export const metadata: Metadata = {
-  title: "Free Invoice, Quote & Receipt Generators for Small Business",
-  description: "Create a project quote, invoice, or payment receipt and download it as a PDF. Free online business document tools with no signup.",
+  title: "Free Invoice, Quote, Receipt & Payment Tools | BizToolsBox",
+  description: "Create a quote, invoice, receipt, or payment reminder for your small business. Free online tools with no signup.",
   alternates: { canonical: "/" },
 };
 
@@ -13,21 +13,23 @@ export default function Home() {
     <main className="landing">
       <div className="hero">
         <span className="badge">FREE BUSINESS DOCUMENT TOOLS</span>
-        <h1>Create a quote, invoice, or receipt in minutes.</h1>
+        <h1>Simple tools for quotes, invoices, and getting paid.</h1>
         <p>Prepare a PDF for your client, check every line and total, then download it. Free to use. No account needed.</p>
         <div className="tool-cards">
           <Link className="tool-card" href="/invoice-generator"><strong>Free Invoice Generator</strong><span>Create and download a PDF invoice →</span></Link>
           <Link className="tool-card" href="/quote-generator"><strong>Free Quote Generator</strong><span>Prepare and download a project estimate →</span></Link>
           <Link className="tool-card" href="/receipt-generator"><strong>Free Receipt Generator</strong><span>Record a payment and download a PDF receipt →</span></Link>
+          <Link className="tool-card" href="/payment-reminder-generator"><strong>Free Payment Reminder</strong><span>Write and copy a reminder email →</span></Link>
         </div>
       </div>
       <section className="home-section">
         <h2>Business documents, made simple</h2>
-        <p>BizToolsBox helps freelancers and small businesses prepare everyday client documents. Create a project quote before work begins, make an invoice when it is time to request payment, then issue a receipt after payment. Document details are processed in your browser by the generators and are not sent to an account on this site.</p>
+        <p>BizToolsBox helps freelancers and small businesses prepare everyday client documents. Create a project quote before work begins, make an invoice when it is time to request payment, send a reminder if payment is late, then issue a receipt after payment. Details entered into the tools are processed in your browser and are not saved to an account on this site.</p>
         <div className="home-columns">
           <article><h3>1. Prepare a quote</h3><p>Describe the work, quantities, prices, optional tax, and how long your estimate is valid. Share the PDF with your client for review.</p><Link href="/quote-generator">Make a free quote →</Link></article>
           <article><h3>2. Send an invoice</h3><p>After the client approves the work, list the completed products or services, set the invoice date, and download a payment request.</p><Link href="/invoice-generator">Make a free invoice →</Link></article>
-          <article><h3>3. Record a payment</h3><p>After payment arrives, create a receipt showing the amount received, payment method, and any remaining balance.</p><Link href="/receipt-generator">Make a free receipt →</Link></article>
+          <article><h3>3. Follow up if needed</h3><p>If an invoice is still unpaid, prepare a clear reminder that matches the situation and copy it into your email app.</p><Link href="/payment-reminder-generator">Write a free reminder →</Link></article>
+          <article><h3>4. Record a payment</h3><p>After payment arrives, create a receipt showing the amount received, payment method, and any remaining balance.</p><Link href="/receipt-generator">Make a free receipt →</Link></article>
         </div>
       </section>
       <section className="home-section">
