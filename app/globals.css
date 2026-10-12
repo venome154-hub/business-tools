@@ -23,6 +23,8 @@ a { color:inherit; text-decoration:none; }
 .home-columns article p { margin:0 0 14px; font-size:15px; }
 .home-columns article a,.guide-links a,.seo-content a { color:#1d4ed8; text-decoration:underline; text-underline-offset:3px; }
 .guide-links { display:grid; gap:12px; margin-top:18px; }
+.csv-tools-section { margin-top:-34px; }
+.csv-home-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:22px; text-align:left; }
 .home-footer { display:flex; justify-content:space-between; gap:20px; max-width:850px; margin:70px auto 10px; padding:20px 8px; border-top:1px solid var(--line); color:var(--muted); font-size:14px; }
 .home-footer div { display:flex; gap:20px; }
 .home-footer a { color:var(--text); font-weight:700; }
@@ -38,7 +40,7 @@ a { color:inherit; text-decoration:none; }
 .brand { color:var(--text); font-weight:800; }
 .invoice-layout { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(320px,.8fr); gap:28px; align-items:start; }
 .editor,.preview { background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; }
-.heading { display:flex; justify-content:space-between; gap:20px; align-items:start; margin-bottom:25px; }
+.heading { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:25px; }
 h1 { margin:8px 0; font-size:36px; letter-spacing:-1px; }
 h2 { font-size:18px; margin:28px 0 12px; }
 p { color:var(--muted); }
@@ -87,6 +89,53 @@ textarea { resize:vertical; line-height:1.45; }
 .reminder-subject { margin-top:26px; font-size:14px; line-height:1.5; }
 .reminder-subject div { margin-top:5px; }
 .reminder-body { margin:24px 0 0; color:var(--text); font:14px/1.7 Arial,Helvetica,sans-serif; white-space:pre-wrap; overflow-wrap:anywhere; }
+.csv-page { max-width:1120px; }
+.csv-tool-layout { display:grid; grid-template-columns:minmax(320px,.88fr) minmax(0,1.12fr); gap:22px; align-items:start; }
+.csv-tool-panel,.csv-preview { min-width:0; padding:28px; border:1px solid var(--line); border-radius:16px; background:#fff; }
+.csv-tool-panel h1 { margin:20px 0 10px; font-size:clamp(30px,4vw,42px); line-height:1.1; }
+.csv-tool-intro { line-height:1.6; margin:0 0 22px; }
+.csv-upload { display:flex; flex-direction:column; gap:8px; padding:18px; border:1px dashed #94a3b8; border-radius:12px; background:#f8fafc; }
+.csv-upload>span { font-weight:800; }
+.csv-upload>small,.csv-file-row small { color:var(--muted); }
+.csv-upload input { padding:9px; background:#fff; font-size:14px; }
+.csv-file-list { display:grid; gap:8px; margin-top:14px; }
+.csv-file-row { display:flex; justify-content:space-between; gap:12px; align-items:center; padding:12px; border:1px solid var(--line); border-radius:10px; }
+.csv-file-row>span { display:grid; gap:4px; min-width:0; }
+.csv-file-row strong { overflow-wrap:anywhere; font-size:14px; }
+.csv-remove { flex-shrink:0; border:0; background:none; color:#b91c1c; text-decoration:underline; cursor:pointer; }
+.csv-options { display:grid; gap:12px; margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+.csv-options>strong { margin-bottom:2px; }
+.csv-options label:not(.csv-field-label) { display:flex; flex-direction:row; align-items:flex-start; gap:9px; font-size:14px; font-weight:400; line-height:1.4; }
+.csv-options input[type=checkbox] { width:17px; height:17px; flex-shrink:0; margin:0; accent-color:#111827; }
+.csv-options select { margin-top:-5px; }
+.csv-field-label { font-size:13px; font-weight:700; }
+.csv-note { margin-top:20px; padding:15px; border-radius:10px; background:#f1f5f9; font-size:14px; }
+.csv-note p { margin:6px 0 0; font-size:13px; line-height:1.5; }
+.csv-result-count { display:grid; gap:5px; margin:20px 0 0; color:var(--text); font-size:14px; }
+.csv-result-count span { color:var(--muted); }
+.csv-download-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+.csv-download-actions .primary,.csv-download-actions .secondary { margin:0; }
+.csv-download-actions .secondary { border:1px solid var(--line); background:#fff; border-radius:9px; padding:13px 16px; font-weight:700; cursor:pointer; }
+.csv-error { padding:12px 14px; border-radius:9px; background:#fef2f2; color:#991b1b; font-size:14px; }
+.csv-preview { overflow:hidden; }
+.csv-preview-heading { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:18px; }
+.csv-preview-heading h2 { margin:0 0 5px; }
+.csv-preview-heading p { margin:0; font-size:13px; }
+.csv-preview-heading>span { flex-shrink:0; padding:5px 9px; border-radius:99px; background:#f1f5f9; font-size:12px; font-weight:700; }
+.csv-table-wrap { max-width:100%; overflow:auto; border:1px solid var(--line); border-radius:10px; }
+.csv-table-wrap table { width:100%; border-collapse:collapse; font-size:13px; text-align:left; }
+.csv-table-wrap th,.csv-table-wrap td { max-width:240px; padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.csv-table-wrap th { background:#f8fafc; font-weight:700; }
+.csv-table-wrap tr:last-child td { border-bottom:0; }
+.csv-empty { margin:0; padding:18px; font-size:14px; }
+.csv-duplicate-list { margin:16px 0; padding:14px; border:1px solid var(--line); border-radius:10px; }
+.csv-duplicate-list>strong { font-size:14px; }
+.csv-duplicate-list ul { display:grid; gap:7px; margin:12px 0 0; padding:0; list-style:none; }
+.csv-duplicate-list li { display:flex; justify-content:space-between; gap:10px; font-size:13px; }
+.csv-duplicate-list code { overflow-wrap:anywhere; }
+.csv-duplicate-list li span { color:var(--muted); white-space:nowrap; }
+.csv-duplicate-list p,.csv-privacy-note { font-size:13px; }
+.csv-privacy-note { max-width:850px; margin:14px auto; text-align:center; }
 @media (max-width: 850px) {
   .tool-cards { grid-template-columns:1fr 1fr; }
   .home-columns { grid-template-columns:1fr; }
@@ -94,6 +143,8 @@ textarea { resize:vertical; line-height:1.45; }
   .preview { position:static; }
   .heading { flex-direction:column; }
   .hero { margin-top:7vh; }
+  .csv-home-cards { grid-template-columns:1fr; }
+  .csv-tool-layout { grid-template-columns:1fr; }
 }
 @media (max-width: 560px) {
   .tool-cards { grid-template-columns:1fr; }

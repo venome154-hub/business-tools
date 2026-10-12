@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { AnalyticsSettingsButton } from "@/components/AnalyticsConsent";
 
 export const metadata: Metadata = {
-  title: "Free Invoice, Quote, Receipt & Payment Tools | BizToolsBox",
-  description: "Create a quote, invoice, receipt, or payment reminder for your small business. Free online tools with no signup.",
+  title: "Free Business Tools: Invoices, Quotes & CSV Utilities | BizToolsBox",
+  description: "Create business documents, clean and merge CSV files, or find duplicate SKUs with free online tools. No account required.",
   alternates: { canonical: "/" },
 };
 
@@ -12,9 +12,9 @@ export default function Home() {
   return (
     <main className="landing">
       <div className="hero">
-        <span className="badge">FREE BUSINESS DOCUMENT TOOLS</span>
-        <h1>Simple tools for quotes, invoices, and getting paid.</h1>
-        <p>Prepare a PDF for your client, check every line and total, then download it. Free to use. No account needed.</p>
+        <span className="badge">FREE BUSINESS TOOLS</span>
+        <h1>Simple tools for documents and spreadsheets.</h1>
+        <p>Create client-ready paperwork or tidy a CSV export in your browser. Free to use. No account needed.</p>
         <div className="tool-cards">
           <Link className="tool-card" href="/invoice-generator"><strong>Free Invoice Generator</strong><span>Create and download a PDF invoice →</span></Link>
           <Link className="tool-card" href="/quote-generator"><strong>Free Quote Generator</strong><span>Prepare and download a project estimate →</span></Link>
@@ -22,6 +22,15 @@ export default function Home() {
           <Link className="tool-card" href="/payment-reminder-generator"><strong>Free Payment Reminder</strong><span>Write and copy a reminder email →</span></Link>
         </div>
       </div>
+      <section className="home-section csv-tools-section">
+        <h2>Free CSV and spreadsheet tools</h2>
+        <p>Clean up spreadsheet exports, combine CSV files, or check product data for repeated SKUs. Your files stay on your device while you work.</p>
+        <div className="csv-home-cards">
+          <Link className="tool-card" href="/csv-cleaner"><strong>CSV Cleaner</strong><span>Remove blank rows, empty columns, and repeated records →</span></Link>
+          <Link className="tool-card" href="/csv-merger"><strong>CSV Merger</strong><span>Combine CSV files and match columns by header name →</span></Link>
+          <Link className="tool-card" href="/duplicate-sku-finder"><strong>Duplicate SKU Finder</strong><span>Find repeated product codes in a CSV export →</span></Link>
+        </div>
+      </section>
       <section className="home-section">
         <h2>Business documents, made simple</h2>
         <p>BizToolsBox helps freelancers and small businesses prepare everyday client documents. Create a project quote before work begins, make an invoice when it is time to request payment, send a reminder if payment is late, then issue a receipt after payment. Details entered into the tools are processed in your browser and are not saved to an account on this site.</p>
