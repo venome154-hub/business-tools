@@ -3,5 +3,6 @@
 /out/
 /build/
 /.vercel/
+*.tsbuildinfo
 .env*
 !.env.example

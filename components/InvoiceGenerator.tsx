@@ -1,25 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { jsPDF } from "jspdf";
 import { trackEvent } from "@/lib/analytics";
-
-type Item = { description: string; quantity: number; price: number };
-
-const money = (n: number, currency: string) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency }).format(n);
-
-function localDate() {
-  const now = new Date();
-  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
-}
-
-function displayDate(value: string) {
-  if (!value) return "";
-  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
-    month: "short", day: "numeric", year: "numeric",
-  });
-}
+import { applyTaxAndDiscount, decimalLabel, displayDate, formatMoney, localDate, priceLines, sanitizeDecimal, sanitizePercent, type DecimalItem } from "@/lib/format";
+import { downloadBusinessPdf } from "@/lib/pdf";
 
 export default function InvoiceGenerator() {
   const [company, setCompany] = useState("");
@@ -32,138 +16,77 @@ export default function InvoiceGenerator() {
   const [date, setDate] = useState(localDate);
   const [dueDate, setDueDate] = useState("");
   const [currency, setCurrency] = useState("USD");
-  const [tax, setTax] = useState(0);
-  const [discount, setDiscount] = useState(0);
+  const [tax, setTax] = useState("0");
+  const [discount, setDiscount] = useState("0");
   const [paymentInfo, setPaymentInfo] = useState("");
   const [notes, setNotes] = useState("");
-  const [items, setItems] = useState<Item[]>([
-    { description: "Service", quantity: 1, price: 100 },
+  const [pdfError, setPdfError] = useState("");
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const [items, setItems] = useState<DecimalItem[]>([
+    { description: "Service", quantity: "1", price: "100" },
   ]);
 
-  const subtotal = useMemo(
-    () => items.reduce((sum, item) => sum + item.quantity * item.price, 0),
-    [items],
+  const priced = useMemo(() => priceLines(items), [items]);
+  const totals = useMemo(
+    () => ({ ...priced, ...applyTaxAndDiscount(priced.subtotal, tax, discount) }),
+    [priced, tax, discount],
   );
-  const discountAmount = subtotal * (discount / 100);
-  const taxable = Math.max(0, subtotal - discountAmount);
-  const taxAmount = taxable * (tax / 100);
-  const total = taxable + taxAmount;
 
-  function updateItem(index: number, field: keyof Item, value: string) {
-    setItems(current => current.map((item, i) => {
-      if (i !== index) return item;
+  function updateItem(index: number, field: keyof DecimalItem, value: string) {
+    setItems((current) => current.map((item, itemIndex) => {
+      if (itemIndex !== index) return item;
       if (field === "description") return { ...item, description: value };
-      const numericValue = Number(value);
-      return { ...item, [field]: Number.isFinite(numericValue) ? Math.max(0, numericValue) : 0 };
+      return { ...item, [field]: sanitizeDecimal(value) };
     }));
   }
 
-  function downloadPDF() {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const left = 18;
-    const right = pageWidth - 18;
-    const descriptionWidth = 98;
-    let y = 20;
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(24);
-    doc.text("INVOICE", left, y);
-    doc.setFontSize(10);
-    doc.text(`Invoice #: ${invoiceNo || "—"}`, right, y - 2, { align: "right" });
-    doc.setFont("helvetica", "normal");
-    doc.text(`Issue date: ${displayDate(date) || "—"}`, right, y + 5, { align: "right" });
-    if (dueDate) doc.text(`Due date: ${displayDate(dueDate)}`, right, y + 11, { align: "right" });
-
-    y += 18;
-    doc.setFont("helvetica", "bold");
-    doc.text("FROM", left, y);
-    doc.text("BILL TO", 112, y);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    y += 6;
-    const supplierLines = [company, ...companyAddress.split(/\r?\n/), companyEmail].filter(Boolean);
-    const clientLines = [client, ...clientAddress.split(/\r?\n/), clientEmail].filter(Boolean);
-    const supplierWrapped = supplierLines.flatMap(line => doc.splitTextToSize(line, 78));
-    const clientWrapped = clientLines.flatMap(line => doc.splitTextToSize(line, 78));
-    supplierWrapped.forEach((line: string, index: number) => doc.text(line, left, y + index * 5));
-    clientWrapped.forEach((line: string, index: number) => doc.text(line, 112, y + index * 5));
-    y += Math.max(supplierWrapped.length, clientWrapped.length, 1) * 5 + 12;
-
-    const drawTableHeader = () => {
-      doc.setFillColor(241, 245, 249);
-      doc.rect(left, y - 5, right - left, 10, "F");
-      doc.setFont("helvetica", "bold");
-      doc.text("Description", left + 2, y + 1);
-      doc.text("Qty", 132, y + 1, { align: "right" });
-      doc.text("Price", 158, y + 1, { align: "right" });
-      doc.text("Amount", right - 2, y + 1, { align: "right" });
-      doc.setFont("helvetica", "normal");
-      y += 12;
-    };
-
-    drawTableHeader();
-    for (const item of items) {
-      const descriptionLines: string[] = doc.splitTextToSize(item.description || "—", descriptionWidth);
-      const rowHeight = Math.max(descriptionLines.length * 5, 7) + 4;
-      if (y + rowHeight > pageHeight - 35) {
-        doc.addPage();
-        y = 20;
-        drawTableHeader();
-      }
-      descriptionLines.forEach((line, index) => doc.text(line, left + 2, y + index * 5));
-      doc.text(String(item.quantity), 132, y, { align: "right" });
-      doc.text(money(item.price, currency), 158, y, { align: "right" });
-      doc.text(money(item.quantity * item.price, currency), right - 2, y, { align: "right" });
-      y += rowHeight;
-      doc.setDrawColor(226, 232, 240);
-      doc.line(left, y - 2, right, y - 2);
+  async function downloadPDF() {
+    if (pdfBusy) return;
+    setPdfBusy(true);
+    setPdfError("");
+    try {
+      await downloadBusinessPdf({
+        filename: invoiceNo || "invoice",
+        title: "INVOICE",
+        meta: [
+          `Invoice #: ${invoiceNo || "—"}`,
+          `Issue date: ${displayDate(date) || "—"}`,
+          ...(dueDate ? [`Due date: ${displayDate(dueDate)}`] : []),
+        ],
+        blocks: [
+          { title: "FROM", lines: [company, companyAddress, companyEmail] },
+          { title: "BILL TO", lines: [client, clientAddress, clientEmail] },
+        ],
+        columns: [
+          { header: "Description", width: 0.52, align: "left" },
+          { header: "Qty", width: 0.12, align: "right" },
+          { header: "Price", width: 0.18, align: "right" },
+          { header: "Amount", width: 0.18, align: "right" },
+        ],
+        rows: totals.lines.map((line) => [
+          line.description,
+          line.quantityLabel,
+          formatMoney(line.price, currency),
+          formatMoney(line.amount, currency),
+        ]),
+        totals: [
+          { label: "Subtotal", value: formatMoney(totals.subtotal, currency) },
+          ...(totals.discountRate > 0 ? [{ label: `Discount (${decimalLabel(discount)}%)`, value: `-${formatMoney(totals.discountAmount, currency)}` }] : []),
+          ...(totals.taxRate > 0 ? [{ label: `Tax (${decimalLabel(tax)}%)`, value: formatMoney(totals.taxAmount, currency) }] : []),
+          { label: "TOTAL DUE", value: formatMoney(totals.total, currency), emphasize: true },
+        ],
+        notes: [
+          { title: "Payment instructions", text: paymentInfo },
+          { title: "Notes", text: notes },
+        ],
+        footer: "Thank you for your business.",
+      });
+      trackEvent("document_download", { tool_name: "invoice" });
+    } catch {
+      setPdfError("The PDF could not be created. Check the details and try again.");
+    } finally {
+      setPdfBusy(false);
     }
-
-    y += 5;
-    if (y > pageHeight - 60) {
-      doc.addPage();
-      y = 22;
-    }
-    const drawTotal = (label: string, value: string, bold = false) => {
-      doc.setFont("helvetica", bold ? "bold" : "normal");
-      doc.text(label, 125, y);
-      doc.text(value, right - 2, y, { align: "right" });
-      y += 7;
-    };
-    drawTotal("Subtotal", money(subtotal, currency));
-    if (discount > 0) drawTotal(`Discount (${discount}%)`, `-${money(discountAmount, currency)}`);
-    if (tax > 0) drawTotal(`Tax (${tax}%)`, money(taxAmount, currency));
-    y += 1;
-    doc.setDrawColor(15, 23, 42);
-    doc.line(125, y - 3, right, y - 3);
-    drawTotal("TOTAL DUE", money(total, currency), true);
-
-    const addSection = (title: string, value: string) => {
-      if (!value.trim()) return;
-      const lines: string[] = doc.splitTextToSize(value.trim(), right - left);
-      const required = 7 + lines.length * 5;
-      if (y + required > pageHeight - 18) {
-        doc.addPage();
-        y = 22;
-      }
-      y += 5;
-      doc.setFont("helvetica", "bold");
-      doc.text(title, left, y);
-      doc.setFont("helvetica", "normal");
-      y += 6;
-      lines.forEach((line, index) => doc.text(line, left, y + index * 5));
-      y += lines.length * 5;
-    };
-    addSection("Payment instructions", paymentInfo);
-    addSection("Notes", notes);
-
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    doc.text("Thank you for your business.", left, Math.min(y + 8, pageHeight - 10));
-    doc.save(`${invoiceNo || "invoice"}.pdf`);
-    trackEvent("document_download", { tool_name: "invoice" });
   }
 
   return (
@@ -175,8 +98,9 @@ export default function InvoiceGenerator() {
             <h1>Invoice Generator</h1>
             <p>Create a detailed PDF invoice. Your entries stay in this browser.</p>
           </div>
-          <button className="download" onClick={downloadPDF}>Download PDF</button>
+          <button className="download" onClick={downloadPDF} disabled={pdfBusy}>{pdfBusy ? "Preparing PDF…" : "Download PDF"}</button>
         </div>
+        {pdfError && <p className="form-error" role="alert">{pdfError}</p>}
 
         <h2>Your business</h2>
         <div className="grid two">
@@ -209,17 +133,17 @@ export default function InvoiceGenerator() {
           {items.map((item, i) => (
             <div className="item" key={i}>
               <input aria-label={`Description for item ${i + 1}`} value={item.description} onChange={e => updateItem(i, "description", e.target.value)} />
-              <input aria-label={`Quantity for item ${i + 1}`} type="number" min="0" step="any" value={item.quantity} onChange={e => updateItem(i, "quantity", e.target.value)} />
-              <input aria-label={`Price for item ${i + 1}`} type="number" min="0" step="0.01" value={item.price} onChange={e => updateItem(i, "price", e.target.value)} />
+              <input aria-label={`Quantity for item ${i + 1}`} inputMode="decimal" value={item.quantity} onChange={e => updateItem(i, "quantity", e.target.value)} />
+              <input aria-label={`Price for item ${i + 1}`} inputMode="decimal" value={item.price} onChange={e => updateItem(i, "price", e.target.value)} />
               <button className="icon" onClick={() => setItems(current => current.filter((_, index) => index !== i))} aria-label="Remove item">×</button>
             </div>
           ))}
         </div>
-        <button className="secondary" onClick={() => setItems(current => [...current, { description: "New item", quantity: 1, price: 0 }])}>+ Add item</button>
+        <button className="secondary" onClick={() => setItems(current => [...current, { description: "New item", quantity: "1", price: "0" }])}>+ Add item</button>
 
         <div className="grid two totals-inputs">
-          <label>Tax %<input type="number" min="0" value={tax} onChange={e => setTax(Math.max(0, Number(e.target.value) || 0))} /></label>
-          <label>Discount %<input type="number" min="0" max="100" value={discount} onChange={e => setDiscount(Math.min(100, Math.max(0, Number(e.target.value) || 0)))} /></label>
+          <label>Tax %<input inputMode="decimal" value={tax} onChange={e => setTax(sanitizeDecimal(e.target.value))} /></label>
+          <label>Discount %<input inputMode="decimal" value={discount} onChange={e => setDiscount(sanitizePercent(e.target.value))} /></label>
         </div>
         <div className="grid two invoice-extra">
           <label className="full-field">Payment instructions (optional)<textarea rows={3} placeholder="Bank transfer, payment link, or other agreed method" value={paymentInfo} onChange={e => setPaymentInfo(e.target.value)} /></label>
@@ -241,14 +165,14 @@ export default function InvoiceGenerator() {
             {dueDate && <div>Due: {displayDate(dueDate)}</div>}
           </div>
           <hr />
-          {items.map((item, i) => (
-            <div className="paper-row" key={i}><span>{item.description || "Item"} × {item.quantity}</span><b>{money(item.quantity * item.price, currency)}</b></div>
+          {totals.lines.map((line, i) => (
+            <div className="paper-row" key={i}><span>{line.description || "Item"} × {line.quantityLabel}</span><b>{formatMoney(line.amount, currency)}</b></div>
           ))}
           <div className="summary">
-            <div>Subtotal <span>{money(subtotal, currency)}</span></div>
-            {discount > 0 && <div>Discount ({discount}%) <span>-{money(discountAmount, currency)}</span></div>}
-            {tax > 0 && <div>Tax ({tax}%) <span>{money(taxAmount, currency)}</span></div>}
-            <div className="grand">Total due <span>{money(total, currency)}</span></div>
+            <div>Subtotal <span>{formatMoney(totals.subtotal, currency)}</span></div>
+            {totals.discountRate > 0 && <div>Discount ({decimalLabel(discount)}%) <span>-{formatMoney(totals.discountAmount, currency)}</span></div>}
+            {totals.taxRate > 0 && <div>Tax ({decimalLabel(tax)}%) <span>{formatMoney(totals.taxAmount, currency)}</span></div>}
+            <div className="grand">Total due <span>{formatMoney(totals.total, currency)}</span></div>
           </div>
           {paymentInfo && <div className="invoice-preview-extra"><b>Payment instructions</b><p>{paymentInfo}</p></div>}
           {notes && <div className="invoice-preview-extra"><b>Notes</b><p>{notes}</p></div>}

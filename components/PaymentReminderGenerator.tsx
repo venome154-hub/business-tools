@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { sanitizeDecimal } from "@/lib/format";
 
 type Tone = "friendly" | "professional" | "firm";
 
@@ -29,7 +30,7 @@ export default function PaymentReminderGenerator() {
   const [tone, setTone] = useState<Tone>("friendly");
   const [paymentLink, setPaymentLink] = useState("");
   const [note, setNote] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
 
   const email = useMemo(() => {
     const due = displayDate(dueDate);
@@ -64,15 +65,41 @@ export default function PaymentReminderGenerator() {
     };
   }, [amount, business, client, currency, dueDate, invoiceNo, note, paymentLink, tone]);
 
+  function copyWithTextarea(text: string) {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "0";
+    area.style.left = "0";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    const copied = document.execCommand("copy");
+    area.remove();
+    return copied;
+  }
+
   async function copyEmail() {
-    try {
-      await navigator.clipboard.writeText(`Subject: ${email.subject}\n\n${email.body}`);
-      trackEvent("reminder_copy", { tool_name: "payment_reminder" });
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2200);
-    } catch {
-      setCopied(false);
+    const text = `Subject: ${email.subject}\n\n${email.body}`;
+    let copied = false;
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        copied = true;
+      } catch {
+        copied = false;
+      }
     }
+    if (!copied) copied = copyWithTextarea(text);
+    if (!copied) {
+      setCopyState("failed");
+      return;
+    }
+    trackEvent("reminder_copy", { tool_name: "payment_reminder" });
+    setCopyState("copied");
+    window.setTimeout(() => setCopyState("idle"), 2200);
   }
 
   return (
@@ -84,14 +111,15 @@ export default function PaymentReminderGenerator() {
             <h1>Payment Reminder Generator</h1>
             <p>Draft a courteous email about an unpaid invoice. Review it, then copy it into your email app.</p>
           </div>
-          <button className="download" onClick={copyEmail}>{copied ? "Copied!" : "Copy email"}</button>
+          <button className="download" type="button" onClick={copyEmail}>{copyState === "copied" ? "Copied!" : "Copy email"}</button>
         </div>
+        {copyState === "failed" && <p className="form-error" role="alert">The email could not be copied. Select the preview and copy it manually.</p>}
 
         <div className="grid two">
           <label>Your business name<input value={business} onChange={e => setBusiness(e.target.value)} /></label>
           <label>Client name<input value={client} onChange={e => setClient(e.target.value)} /></label>
           <label>Invoice number<input value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} /></label>
-          <label>Outstanding amount<input type="number" min="0" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} /></label>
+          <label>Outstanding amount<input inputMode="decimal" value={amount} onChange={e => setAmount(sanitizeDecimal(e.target.value))} /></label>
           <label>Currency<select value={currency} onChange={e => setCurrency(e.target.value)}><option>USD</option><option>EUR</option><option>GBP</option><option>CAD</option><option>AUD</option></select></label>
           <label>Due date<input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} /></label>
           <label>Email tone<select value={tone} onChange={e => setTone(e.target.value as Tone)}><option value="friendly">Friendly</option><option value="professional">Professional</option><option value="firm">Firm</option></select></label>

@@ -84,6 +84,8 @@ textarea { resize:vertical; line-height:1.45; }
 .faq-list summary { font-weight:700; cursor:pointer; }
 .faq-list p { margin-bottom:0; }
 .quote-note { margin-top:20px; font-size:13px; }
+.form-error { margin:0 0 16px; padding:12px 14px; border-radius:9px; background:#fef2f2; color:#991b1b; font-size:14px; }
+button:disabled { opacity:.65; cursor:progress; }
 .quote-paper-note { margin-top:70px; padding-top:12px; border-top:1px solid var(--line); font-size:11px; }
 .reminder-paper { white-space:normal; }
 .reminder-subject { margin-top:26px; font-size:14px; line-height:1.5; }
@@ -132,7 +134,7 @@ textarea { resize:vertical; line-height:1.45; }
 .csv-duplicate-list>strong { font-size:14px; }
 .csv-duplicate-list ul { display:grid; gap:7px; margin:12px 0 0; padding:0; list-style:none; }
 .csv-duplicate-list li { display:flex; justify-content:space-between; gap:10px; font-size:13px; }
-.csv-duplicate-list code { overflow-wrap:anywhere; }
+.csv-duplicate-list code { overflow-wrap:anywhere; white-space:pre-wrap; }
 .csv-duplicate-list li span { color:var(--muted); white-space:nowrap; }
 .csv-duplicate-list p,.csv-privacy-note { font-size:13px; }
 .csv-privacy-note { max-width:850px; margin:14px auto; text-align:center; }

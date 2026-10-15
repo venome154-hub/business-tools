@@ -3,11 +3,11 @@
 import { useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
 import Link from "next/link";
-import { cleanCsvRows, downloadCsv, findDuplicateSkus, isBlankRow, mergeCsvFiles, parseCsv, type CsvRow } from "@/lib/csv";
+import { cleanCsvRows, downloadCsv, findDuplicateSkus, mergeCsvFiles, parseCsv, preferredDelimiter, type CsvRow } from "@/lib/csv";
 import { trackEvent } from "@/lib/analytics";
 
 type ToolMode = "cleaner" | "merger" | "sku-finder";
-type CsvDocument = { name: string; rows: CsvRow[] };
+type CsvDocument = { name: string; rows: CsvRow[]; delimiter: "," | ";" | "\t" };
 
 const TOOL_COPY: Record<ToolMode, { title: string; description: string; button: string }> = {
   cleaner: {
@@ -60,10 +60,10 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
 
   const duplicateData = useMemo(() => {
     if (mode !== "sku-finder" || !firstDocument || firstDocument.rows.length < 2) {
-      return { rows: [] as CsvRow[], summary: [] as CsvRow[], duplicates: [] as { sku: string; count: number }[], blankSkus: 0 };
+      return { rows: [] as CsvRow[], summary: [] as CsvRow[], duplicates: [] as { id: string; sku: string; count: number }[], blankSkus: 0 };
     }
     return findDuplicateSkus(firstDocument.rows, Number(selectedSkuColumn), normalizeSku);
-  }, [mode, firstDocument, firstHeaders, selectedSkuColumn, normalizeSku]);
+  }, [mode, firstDocument, selectedSkuColumn, normalizeSku]);
 
   async function handleFiles(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
@@ -72,7 +72,10 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
     setBusy(true);
     setError("");
     try {
-      const parsed = await Promise.all(files.map(async (file) => ({ name: file.name, rows: parseCsv(await file.text()) })));
+      const parsed = await Promise.all(files.map(async (file) => {
+        const result = parseCsv(await file.text());
+        return { name: file.name, rows: result.rows, delimiter: result.delimiter };
+      }));
       if (parsed.some((document) => document.rows.length === 0)) {
         setError("At least one selected file is empty or could not be read as CSV. Please choose valid CSV files.");
         return;
@@ -101,7 +104,10 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
   }
 
   function save(rows: CsvRow[], filename: string, toolName: string) {
-    downloadCsv(filename, rows);
+    const delimiter = mode === "merger"
+      ? preferredDelimiter(documents.map((document) => document.delimiter))
+      : (documents[0]?.delimiter ?? ",");
+    downloadCsv(filename, rows, delimiter);
     trackEvent("csv_download", { tool_name: toolName });
   }
 
@@ -172,7 +178,7 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
           <div className="csv-preview-heading"><div><h2>{mode === "cleaner" ? "Cleaned preview" : mode === "merger" ? "Merged preview" : "Duplicate rows"}</h2><p>Showing up to 8 rows · preview stays in your browser</p></div><span>{Math.max(outputRows.length - 1, 0).toLocaleString()} rows</span></div>
           {mode === "sku-finder" && duplicateData.duplicates.length > 0 && <div className="csv-duplicate-list">
             <strong>Repeated SKU values</strong>
-            <ul>{duplicateData.duplicates.slice(0, 8).map(({ sku, count }) => <li key={sku}><code>{sku}</code><span>{count} rows</span></li>)}</ul>
+            <ul>{duplicateData.duplicates.slice(0, 8).map(({ id, sku, count }) => <li key={id}><code>{sku}</code><span>{count} rows</span></li>)}</ul>
             {duplicateData.duplicates.length > 8 && <p>Plus {(duplicateData.duplicates.length - 8).toLocaleString()} more. Download the SKU summary to see all duplicates.</p>}
           </div>}
           <div className="csv-table-wrap">
@@ -187,5 +193,5 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
 }
 
 export function CsvOutputNote() {
-  return <p className="csv-privacy-note">Your CSV is read and processed in this browser. BizToolsBox does not upload or save the file. Use the preview to check the output before downloading.</p>;
+  return <p className="csv-privacy-note">Your CSV is read and processed in this browser. BizToolsBox does not upload or save the file. Use the preview to check the output before downloading. The download keeps the separator from your file. When merged files use different separators, the most common one is used.</p>;
 }

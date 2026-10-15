@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { AnalyticsSettingsButton } from "@/components/AnalyticsConsent";
 
 export const metadata: Metadata = {
-  title: "Free Business Tools: Invoices, Quotes & CSV Utilities | BizToolsBox",
+  title: { absolute: "Free Business Tools: Invoices, Quotes & CSV Utilities | BizToolsBox" },
   description: "Create business documents, clean and merge CSV files, or find duplicate SKUs with free online tools. No account required.",
   alternates: { canonical: "/" },
 };

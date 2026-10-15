@@ -1,79 +1,79 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { jsPDF } from "jspdf";
 import { trackEvent } from "@/lib/analytics";
-
-type Item = { description: string; quantity: number; price: number };
-
-const today = () => {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-};
-
-const money = (amount: number, currency: string) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
+import { formatMoney, localDate, displayDate, parseDecimal, priceLines, roundMoney, sanitizeDecimal, type DecimalItem } from "@/lib/format";
+import { downloadBusinessPdf } from "@/lib/pdf";
 
 export default function ReceiptGenerator() {
   const [company, setCompany] = useState("Your Company");
   const [client, setClient] = useState("Client Name");
   const [receiptNo, setReceiptNo] = useState("RCP-001");
   const [invoiceNo, setInvoiceNo] = useState("");
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState(localDate);
   const [method, setMethod] = useState("Bank transfer");
   const [reference, setReference] = useState("");
   const [currency, setCurrency] = useState("USD");
   const [receivedInput, setReceivedInput] = useState("");
-  const [items, setItems] = useState<Item[]>([{ description: "Service payment", quantity: 1, price: 100 }]);
+  const [pdfError, setPdfError] = useState("");
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const [items, setItems] = useState<DecimalItem[]>([{ description: "Service payment", quantity: "1", price: "100" }]);
 
-  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.quantity * item.price, 0), [items]);
-  const received = receivedInput === "" ? subtotal : Math.max(0, Number(receivedInput) || 0);
-  const balance = Math.max(0, subtotal - received);
-  const overpayment = Math.max(0, received - subtotal);
+  const priced = useMemo(() => priceLines(items), [items]);
+  const subtotal = priced.subtotal;
+  const received = receivedInput.trim() === "" ? subtotal : roundMoney(parseDecimal(receivedInput));
+  const balance = roundMoney(Math.max(0, subtotal - received));
+  const overpayment = roundMoney(Math.max(0, received - subtotal));
 
-  function updateItem(index: number, field: keyof Item, value: string) {
-    setItems(current => current.map((item, i) => i === index
-      ? { ...item, [field]: field === "description" ? value : Math.max(0, Number(value) || 0) }
-      : item));
+  function updateItem(index: number, field: keyof DecimalItem, value: string) {
+    setItems((current) => current.map((item, itemIndex) => {
+      if (itemIndex !== index) return item;
+      if (field === "description") return { ...item, description: value };
+      return { ...item, [field]: sanitizeDecimal(value) };
+    }));
   }
 
-  function downloadPDF() {
-    const doc = new jsPDF();
-    doc.setFontSize(24);
-    doc.text("PAYMENT RECEIPT", 20, 25);
-    doc.setFontSize(11);
-    doc.text(company.slice(0, 75), 20, 37);
-    doc.text(`Receipt: ${receiptNo}`.slice(0, 70), 140, 37);
-    doc.text(`Date received: ${date}`, 140, 44);
-    doc.text(`Received from: ${client}`.slice(0, 90), 20, 54);
-    if (invoiceNo.trim()) doc.text(`Related invoice: ${invoiceNo}`.slice(0, 85), 20, 61);
-    doc.text(`Payment method: ${method}`.slice(0, 80), 20, invoiceNo.trim() ? 68 : 61);
-    if (reference.trim()) doc.text(`Payment reference: ${reference}`.slice(0, 90), 20, invoiceNo.trim() ? 75 : 68);
-
-    let y = 91;
-    doc.setFont("helvetica", "bold");
-    doc.text("Description", 20, y);
-    doc.text("Qty", 120, y);
-    doc.text("Amount", 175, y);
-    doc.setFont("helvetica", "normal");
-    for (const item of items) {
-      y += 9;
-      if (y > 260) { doc.addPage(); y = 25; }
-      doc.text((item.description || "Item").slice(0, 42), 20, y);
-      doc.text(String(item.quantity), 120, y);
-      doc.text(money(item.quantity * item.price, currency), 175, y);
+  async function downloadPDF() {
+    if (pdfBusy) return;
+    setPdfBusy(true);
+    setPdfError("");
+    try {
+      await downloadBusinessPdf({
+        filename: receiptNo || "receipt",
+        title: "PAYMENT RECEIPT",
+        meta: [
+          `Receipt: ${receiptNo || "—"}`,
+          `Date received: ${displayDate(date) || "—"}`,
+        ],
+        blocks: [{
+          lines: [
+            company,
+            client ? `Received from: ${client}` : "",
+            invoiceNo.trim() ? `Related invoice: ${invoiceNo.trim()}` : "",
+            `Payment method: ${method}`,
+            reference.trim() ? `Payment reference: ${reference.trim()}` : "",
+          ],
+        }],
+        columns: [
+          { header: "Description", width: 0.62, align: "left" },
+          { header: "Qty", width: 0.14, align: "right" },
+          { header: "Amount", width: 0.24, align: "right" },
+        ],
+        rows: priced.lines.map((line) => [line.description, line.quantityLabel, formatMoney(line.amount, currency)]),
+        totals: [
+          { label: "Listed total", value: formatMoney(subtotal, currency) },
+          { label: "Amount received", value: formatMoney(received, currency), emphasize: true },
+          ...(balance > 0 ? [{ label: "Balance remaining", value: formatMoney(balance, currency) }] : []),
+          ...(overpayment > 0 ? [{ label: "Amount above listed total", value: formatMoney(overpayment, currency) }] : []),
+        ],
+        footer: "This receipt records a payment reported as received by the business. It does not process or verify payment.",
+      });
+      trackEvent("document_download", { tool_name: "receipt" });
+    } catch {
+      setPdfError("The PDF could not be created. Check the details and try again.");
+    } finally {
+      setPdfBusy(false);
     }
-    y += 15;
-    if (y > 265) { doc.addPage(); y = 25; }
-    doc.setFont("helvetica", "bold");
-    doc.text(`Amount received: ${money(received, currency)}`, 120, y);
-    doc.setFont("helvetica", "normal");
-    if (balance > 0) doc.text(`Balance remaining: ${money(balance, currency)}`, 120, y + 8);
-    if (overpayment > 0) doc.text(`Amount above listed total: ${money(overpayment, currency)}`, 120, y + 8);
-    doc.setFontSize(9);
-    doc.text("This receipt records a payment reported as received by the business. It does not process or verify payment.", 20, 280);
-    doc.save(`${receiptNo || "receipt"}.pdf`);
-    trackEvent("document_download", { tool_name: "receipt" });
   }
 
   return (
@@ -85,8 +85,9 @@ export default function ReceiptGenerator() {
             <h1>Receipt Generator</h1>
             <p>Record a payment you have received and download a clear receipt PDF.</p>
           </div>
-          <button className="download" onClick={downloadPDF}>Download PDF</button>
+          <button className="download" onClick={downloadPDF} disabled={pdfBusy}>{pdfBusy ? "Preparing PDF…" : "Download PDF"}</button>
         </div>
+        {pdfError && <p className="form-error" role="alert">{pdfError}</p>}
 
         <div className="grid two">
           <label>Business name<input value={company} onChange={e => setCompany(e.target.value)} /></label>
@@ -104,15 +105,15 @@ export default function ReceiptGenerator() {
           {items.map((item, i) => (
             <div className="item" key={i}>
               <input aria-label={`Description for item ${i + 1}`} value={item.description} onChange={e => updateItem(i, "description", e.target.value)} />
-              <input aria-label={`Quantity for item ${i + 1}`} type="number" min="0" value={item.quantity} onChange={e => updateItem(i, "quantity", e.target.value)} />
-              <input aria-label={`Price for item ${i + 1}`} type="number" min="0" step="0.01" value={item.price} onChange={e => updateItem(i, "price", e.target.value)} />
+              <input aria-label={`Quantity for item ${i + 1}`} inputMode="decimal" value={item.quantity} onChange={e => updateItem(i, "quantity", e.target.value)} />
+              <input aria-label={`Price for item ${i + 1}`} inputMode="decimal" value={item.price} onChange={e => updateItem(i, "price", e.target.value)} />
               <button className="icon" onClick={() => setItems(current => current.filter((_, index) => index !== i))} aria-label="Remove item">×</button>
             </div>
           ))}
         </div>
-        <button className="secondary" onClick={() => setItems(current => [...current, { description: "New item", quantity: 1, price: 0 }])}>+ Add item</button>
+        <button className="secondary" onClick={() => setItems(current => [...current, { description: "New item", quantity: "1", price: "0" }])}>+ Add item</button>
         <div className="grid totals-inputs">
-          <label>Amount received<input type="number" min="0" step="0.01" value={receivedInput} placeholder={subtotal.toFixed(2)} onChange={e => setReceivedInput(e.target.value)} /></label>
+          <label>Amount received<input inputMode="decimal" value={receivedInput} placeholder={subtotal.toFixed(2)} onChange={e => setReceivedInput(sanitizeDecimal(e.target.value))} /></label>
         </div>
         <p className="quote-note">Leave amount received blank to record the full listed amount. This tool creates a document only; it does not take or verify payments.</p>
       </div>
@@ -120,14 +121,14 @@ export default function ReceiptGenerator() {
       <aside className="preview">
         <div className="paper">
           <div className="paper-top"><strong>PAYMENT RECEIPT</strong><span>{receiptNo}</span></div>
-          <div className="paper-meta"><div><b>{company}</b></div><div>Received from: {client}</div><div>Date received: {date}</div>{invoiceNo && <div>Invoice: {invoiceNo}</div>}<div>Payment method: {method}</div>{reference && <div>Reference: {reference}</div>}</div>
+          <div className="paper-meta"><div><b>{company}</b></div><div>Received from: {client}</div><div>Date received: {displayDate(date) || "—"}</div>{invoiceNo && <div>Invoice: {invoiceNo}</div>}<div>Payment method: {method}</div>{reference && <div>Reference: {reference}</div>}</div>
           <hr />
-          {items.map((item, i) => <div className="paper-row" key={i}><span>{item.description} × {item.quantity}</span><b>{money(item.quantity * item.price, currency)}</b></div>)}
+          {priced.lines.map((line, i) => <div className="paper-row" key={i}><span>{line.description} × {line.quantityLabel}</span><b>{formatMoney(line.amount, currency)}</b></div>)}
           <div className="summary">
-            <div>Listed total <span>{money(subtotal, currency)}</span></div>
-            <div className="grand">Amount received <span>{money(received, currency)}</span></div>
-            {balance > 0 && <div>Balance remaining <span>{money(balance, currency)}</span></div>}
-            {overpayment > 0 && <div>Above listed total <span>{money(overpayment, currency)}</span></div>}
+            <div>Listed total <span>{formatMoney(subtotal, currency)}</span></div>
+            <div className="grand">Amount received <span>{formatMoney(received, currency)}</span></div>
+            {balance > 0 && <div>Balance remaining <span>{formatMoney(balance, currency)}</span></div>}
+            {overpayment > 0 && <div>Above listed total <span>{formatMoney(overpayment, currency)}</span></div>}
           </div>
           <p className="quote-paper-note">Payment receipt · Records payment reported as received</p>
         </div>
