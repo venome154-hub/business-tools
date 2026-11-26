@@ -5,6 +5,7 @@ import { trackEvent } from "@/lib/analytics";
 import CurrencyField from "@/components/CurrencyField";
 import MobileToolBar from "@/components/MobileToolBar";
 import { takeHandoff } from "@/lib/document-model";
+import { isCurrencyCode } from "@/lib/locales";
 import { acceptDecimal } from "@/lib/format";
 import { readProfile } from "@/lib/profile";
 
@@ -38,6 +39,7 @@ export default function PaymentReminderGenerator() {
   const [paymentLink, setPaymentLink] = useState("");
   const [note, setNote] = useState("");
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
+  const [currencyValid, setCurrencyValid] = useState(true);
 
   useEffect(() => {
     setToday(localDate(0));
@@ -49,7 +51,7 @@ export default function PaymentReminderGenerator() {
       setClient(handoff.reminder.client);
       setInvoiceNo(handoff.reminder.invoiceNo);
       setAmount(handoff.reminder.amount);
-      setCurrency(handoff.reminder.currency || "USD");
+      setCurrency(isCurrencyCode(handoff.reminder.currency || "") ? handoff.reminder.currency : "USD");
       setDueDate(handoff.reminder.dueDate || localDate(-7));
     } else {
       setDueDate(localDate(-7));
@@ -105,6 +107,7 @@ export default function PaymentReminderGenerator() {
   }
 
   async function copyEmail() {
+    if (!currencyValid) return;
     const text = `Subject: ${email.subject}\n\n${email.body}`;
     let copied = false;
     if (navigator.clipboard?.writeText) {
@@ -134,7 +137,7 @@ export default function PaymentReminderGenerator() {
             <h1>Payment Reminder Generator</h1>
             <p>Draft a courteous email about an unpaid invoice. Review it, then copy it into your email app.</p>
           </div>
-          <button className="download" type="button" onClick={copyEmail}>{copyState === "copied" ? "Copied!" : "Copy email"}</button>
+          <button className="download" type="button" onClick={copyEmail} disabled={!currencyValid}>{copyState === "copied" ? "Copied!" : "Copy email"}</button>
         </div>
         {copyState === "failed" && <p className="form-error" role="alert">The email could not be copied. Select the preview and copy it manually.</p>}
 
@@ -144,7 +147,7 @@ export default function PaymentReminderGenerator() {
           <label>Invoice number<input value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} /></label>
           <label>Outstanding amount<input inputMode="decimal" value={amount} onChange={e => { const next = acceptDecimal(e.target.value); if (next.value === undefined) { setAmountError(next.error); return; } setAmountError(next.error); setAmount(next.value); }} /></label>
           {amountError && <p className="field-error" role="alert">{amountError}</p>}
-          <CurrencyField value={currency} onChange={setCurrency} />
+          <CurrencyField value={currency} onChange={setCurrency} onValidChange={setCurrencyValid} />
           <label>Due date<input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} /></label>
           <label>Email tone<select value={tone} onChange={e => setTone(e.target.value as Tone)}><option value="friendly">Friendly</option><option value="professional">Professional</option><option value="firm">Firm</option></select></label>
           <label>Payment link (optional)<input type="url" value={paymentLink} onChange={e => setPaymentLink(e.target.value)} placeholder="https://..." /></label>
@@ -161,7 +164,7 @@ export default function PaymentReminderGenerator() {
           <pre className="reminder-body">{email.body}</pre>
         </div>
       </aside>
-      <MobileToolBar primaryLabel={copyState === "copied" ? "Copied!" : "Copy email"} onPrimary={copyEmail} previewOpen={previewOpen} onPreview={() => setPreviewOpen((open) => !open)} />
+      <MobileToolBar primaryLabel={copyState === "copied" ? "Copied!" : "Copy email"} onPrimary={copyEmail} previewOpen={previewOpen} onPreview={() => setPreviewOpen((open) => !open)} disabled={!currencyValid} />
     </section>
   );
 }

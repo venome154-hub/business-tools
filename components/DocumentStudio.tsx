@@ -9,7 +9,7 @@ import { KIND_CONFIG } from "@/lib/document-kinds";
 import { blankDocument, blankLine, DOC_PATHS, takeHandoff, writeHandoff, type DocumentKind, type DocumentState, type LineItem } from "@/lib/document-model";
 import { saveDocument } from "@/lib/drafts";
 import { acceptDecimal, decimalLabel, displayDate, formatMoney, localDate, parseDecimal, roundMoney } from "@/lib/format";
-import { addDays, LOCALES } from "@/lib/locales";
+import { addDays, isCurrencyCode, LOCALES } from "@/lib/locales";
 import { readLogoFile } from "@/lib/logo";
 import { commitNumber, peekNumber } from "@/lib/numbers";
 import { downloadBusinessPdf } from "@/lib/pdf";
@@ -58,6 +58,7 @@ export default function DocumentStudio({
   const [draftId, setDraftId] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [currencyValid, setCurrencyValid] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [qr, setQr] = useState("");
@@ -93,6 +94,7 @@ export default function DocumentStudio({
       Object.assign(next, handoff.payload);
       next.previouslyPaid = handoff.payload.previouslyPaid ?? "";
     }
+    if (!isCurrencyCode(next.currency)) next.currency = "USD";
     if (!next.date) next.date = localDate();
     if (!next.number) next.number = peekNumber(config.prefix);
     if (handoff?.draftId) setDraftId(handoff.draftId);
@@ -186,7 +188,7 @@ export default function DocumentStudio({
   }
 
   async function downloadPDF() {
-    if (pdfBusy) return;
+    if (pdfBusy || !currencyValid) return;
     setPdfBusy(true);
     setError("");
     try {
@@ -305,7 +307,7 @@ export default function DocumentStudio({
             <HeadingTag>{config.heading}</HeadingTag>
             <p>{config.lede}</p>
           </div>
-          <button className="download" type="button" onClick={downloadPDF} disabled={pdfBusy}>{pdfBusy ? "Preparing PDF…" : "Download PDF"}</button>
+          <button className="download" type="button" onClick={downloadPDF} disabled={pdfBusy || !currencyValid}>{pdfBusy ? "Preparing PDF…" : "Download PDF"}</button>
         </div>
         {error && <p className="form-error" role="alert">{error}</p>}
         {notice && <p className="field-note">{notice}</p>}
@@ -338,7 +340,7 @@ export default function DocumentStudio({
           {config.validity && <label>Valid until<input type="date" value={state.validUntil} onChange={(event) => patch({ validUntil: event.target.value })} /></label>}
           {config.related && <label>Related invoice<input value={state.relatedNumber} onChange={(event) => patch({ relatedNumber: event.target.value })} /></label>}
           {config.po && <label>PO number<input value={state.poNumber} onChange={(event) => patch({ poNumber: event.target.value })} /></label>}
-          <CurrencyField value={state.currency} onChange={(currency) => patch({ currency })} />
+          <CurrencyField value={state.currency} onChange={(currency) => patch({ currency })} onValidChange={setCurrencyValid} />
           <label>Number and date format
             <select value={state.locale} onChange={(event) => patch({ locale: event.target.value })}>
               {LOCALES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
@@ -474,7 +476,7 @@ export default function DocumentStudio({
           {(state.signature || state.acceptedBy) && <p className="sign-line">{state.acceptedBy ? "Accepted by" : "Signature"}: {state.signature || state.acceptedBy}</p>}
         </div>
       </aside>
-      <MobileToolBar primaryLabel={pdfBusy ? "Preparing PDF…" : "Download PDF"} onPrimary={downloadPDF} previewOpen={previewOpen} onPreview={() => setPreviewOpen((open) => !open)} disabled={pdfBusy} />
+      <MobileToolBar primaryLabel={pdfBusy ? "Preparing PDF…" : "Download PDF"} onPrimary={downloadPDF} previewOpen={previewOpen} onPreview={() => setPreviewOpen((open) => !open)} disabled={pdfBusy || !currencyValid} />
     </section>
   );
 }

@@ -20,10 +20,67 @@ export const LOCALES: [string, string][] = [
   ["zh-CN", "Chinese (Simplified)"],
 ];
 
+export type CurrencyOption = { code: string; name: string; label: string };
+
+const FALLBACK_CURRENCY_CODES = ["USD", "EUR", "GBP", "CAD", "AUD", "NZD", "CHF", "JPY", "INR", "AED", "ZAR", "UZS"];
+
 export function currencyCodes() {
   const intl = Intl as typeof Intl & { supportedValuesOf?: (key: string) => string[] };
   if (typeof intl.supportedValuesOf === "function") return intl.supportedValuesOf("currency");
-  return ["USD", "EUR", "GBP", "CAD", "AUD", "NZD", "CHF", "JPY", "INR", "AED", "ZAR"];
+  return FALLBACK_CURRENCY_CODES;
+}
+
+export function currencyOptions(): CurrencyOption[] {
+  let names: Intl.DisplayNames | null = null;
+  try {
+    names = new Intl.DisplayNames(["en"], { type: "currency" });
+  } catch {
+    names = null;
+  }
+  return currencyCodes().map((code) => {
+    let name = code;
+    if (names) {
+      try {
+        const display = names.of(code);
+        if (display) name = display;
+      } catch {
+        name = code;
+      }
+    }
+    return { code, name, label: `${code} — ${name}` };
+  });
+}
+
+export function isCurrencyCode(value: string) {
+  return currencyCodes().includes(value.trim().toUpperCase());
+}
+
+function foldCurrencySearch(value: string) {
+  return value.toLowerCase().replace(/sum/g, "som");
+}
+
+export function matchCurrencies(options: CurrencyOption[], raw: string, limit = 12) {
+  const query = raw.trim().toLowerCase();
+  if (!query) return options.slice(0, limit);
+  const foldedQuery = foldCurrencySearch(query);
+  return options
+    .map((option) => {
+      const code = option.code.toLowerCase();
+      const name = foldCurrencySearch(option.name);
+      const words = name.split(/[^a-z0-9]+/);
+      let rank = 6;
+      if (code === query) rank = 0;
+      else if (code.startsWith(query)) rank = 1;
+      else if (name.startsWith(foldedQuery)) rank = 2;
+      else if (words.some((word) => word === foldedQuery)) rank = 3;
+      else if (words.some((word) => word.startsWith(foldedQuery))) rank = 4;
+      else if (code.includes(query) || name.includes(foldedQuery)) rank = 5;
+      return { option, rank };
+    })
+    .filter((item) => item.rank < 6)
+    .sort((a, b) => a.rank - b.rank || a.option.code.localeCompare(b.option.code))
+    .slice(0, limit)
+    .map((item) => item.option);
 }
 
 export function addDays(iso: string, days: number) {
