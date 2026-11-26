@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --experimental-strip-types --test tests/locales.test.ts tests/sitemap.test.ts tests/embed-snippet.test.ts tests/related.test.ts tests/office-export.test.ts tests/format-templates.test.ts && playwright test",
+    "type-check": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/locales.test.ts tests/sitemap.test.ts tests/embed-snippet.test.ts tests/related.test.ts tests/office-export.test.ts tests/format-templates.test.ts tests/estimate-handoff.test.ts tests/estimate-overlap.test.ts && playwright test",
     "seo:check": "node --experimental-strip-types scripts/seo-check.ts"
   },
   "dependencies": {

@@ -57,6 +57,7 @@ export const articles: GuideArticle[] = [
       "An estimate is an early figure when the scope is still loose. A quote is a price you are willing to stand behind for a described scope, usually until a validity date. A proposal is the story around the work: approach, timeline, and price. People use the words loosely, so the document should say which one it is.",
       "If you need the price to be the part the client accepts, use a quote and list the lines, the exclusions, and the date it expires. A proposal that hides the price in a paragraph is harder to turn into an invoice later.",
       "When the client accepts, the invoice should reuse the same line descriptions. New work found later is a variation, not a silent change to the old total. The quote generator can pass the lines into the invoice generator on this device.",
+      "When the figure is still a bracket, the estimate generator keeps a low and a high price on each line and can hand those lines to the quote generator on this device.",
       "None of these documents signs a contract by itself. If you need a signature with legal effect, use the process your agreement requires. The Accepted by line is a name on the PDF.",
     ],
   },

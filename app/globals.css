@@ -303,6 +303,7 @@ input[type=checkbox],input[type=radio] { width:18px; height:18px; accent-color:v
 .line-head { color:var(--ink-500); font-size:13px; font-weight:500; margin-bottom:6px; }
 .line-head span:not(:first-child), .line-amount { text-align:right; }
 .item.with-tax { grid-template-columns:1fr 80px 90px 70px 90px 40px; }
+.line-head.with-range,.item.with-range { grid-template-columns:1fr 72px 100px 100px 150px 40px; }
 .balance-due { margin-top:8px; padding:10px 12px; border-radius:var(--r-sm); background:var(--brand-50); font-weight:700; }
 .calc-layout { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
 .calc-result-panel { padding:24px; border-radius:var(--r-lg); background:var(--brand-50); }
@@ -333,5 +334,5 @@ input[type=checkbox],input[type=radio] { width:18px; height:18px; accent-color:v
   .mobile-doc-bar { min-height:48px; padding-bottom:max(10px, env(safe-area-inset-bottom)); }
   .mobile-doc-bar .download,.mobile-doc-bar .secondary { height:48px; }
   .line-head { display:none; }
-  .item,.item.with-tax { grid-template-columns:1fr 72px 36px; }
+  .item,.item.with-tax,.item.with-range { grid-template-columns:1fr 72px 36px; }
 }

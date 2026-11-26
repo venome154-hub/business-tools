@@ -7,6 +7,7 @@ import LogoMark from "@/components/LogoMark";
 const documents = [
   { href: "/invoice-generator", label: "Invoice" },
   { href: "/quote-generator", label: "Quote" },
+  { href: "/estimate-generator", label: "Estimate" },
   { href: "/receipt-generator", label: "Receipt" },
   { href: "/payment-reminder-generator", label: "Payment reminder" },
   { href: "/purchase-order", label: "Purchase order" },
@@ -43,9 +44,9 @@ const calculators = [
 ];
 
 export default function SiteHeader() {
-  const [open, setOpen] = useState<"documents" | "csv" | "calculators" | "mobile" | null>(null);
+  const [open, setOpen] = useState<"documents" | "csv" | "calculators" | "templates" | "mobile" | null>(null);
 
-  function toggle(next: "documents" | "csv" | "calculators" | "mobile") {
+  function toggle(next: "documents" | "csv" | "calculators" | "templates" | "mobile") {
     setOpen((current) => current === next ? null : next);
   }
 
@@ -78,6 +79,18 @@ export default function SiteHeader() {
               </div>
             )}
           </div>
+          <div className="nav-drop">
+            <button type="button" aria-expanded={open === "templates"} onClick={() => toggle("templates")}>Templates</button>
+            {open === "templates" && (
+              <div className="nav-menu" role="menu">
+                <Link href="/invoice-template" onClick={() => setOpen(null)}>Invoice templates</Link>
+                <Link href="/quote-template" onClick={() => setOpen(null)}>Quote templates</Link>
+                <Link href="/estimate-template" onClick={() => setOpen(null)}>Estimate templates</Link>
+                <Link href="/receipt-template" onClick={() => setOpen(null)}>Receipt templates</Link>
+                <Link href="/invoice-requirements" onClick={() => setOpen(null)}>Invoice requirements</Link>
+              </div>
+            )}
+          </div>
           <Link href="/guides">Guides</Link>
         </nav>
         <button className="menu-button" type="button" aria-expanded={open === "mobile"} aria-label="Open menu" onClick={() => toggle("mobile")}>Menu</button>
@@ -93,6 +106,7 @@ export default function SiteHeader() {
           <strong>Templates</strong>
           <Link href="/invoice-template" onClick={() => setOpen(null)}>Invoice templates</Link>
           <Link href="/quote-template" onClick={() => setOpen(null)}>Quote templates</Link>
+          <Link href="/estimate-template" onClick={() => setOpen(null)}>Estimate templates</Link>
           <Link href="/receipt-template" onClick={() => setOpen(null)}>Receipt templates</Link>
           <Link href="/invoice-requirements" onClick={() => setOpen(null)}>Invoice requirements</Link>
           <Link href="/guides" onClick={() => setOpen(null)}>Guides</Link>

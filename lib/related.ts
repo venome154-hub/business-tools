@@ -48,6 +48,7 @@ const freelanceInvoice = link("/guides/how-to-invoice-as-a-freelancer", "How to 
 
 const invoiceTool = link("/invoice-generator", "Invoice generator");
 const quoteTool = link("/quote-generator", "Quote generator");
+const estimateTool = link("/estimate-generator", "Estimate generator");
 const receiptTool = link("/receipt-generator", "Receipt generator");
 const reminderTool = link("/payment-reminder-generator", "Payment reminder");
 const poTool = link("/purchase-order", "Purchase order");
@@ -71,6 +72,14 @@ const skuTool = link("/duplicate-sku-finder", "Duplicate SKU finder");
 const productTool = link("/product-csv-checker", "Product CSV checker");
 const invoiceTemplates = link("/invoice-template", "Invoice templates");
 const quoteTemplates = link("/quote-template", "Quote templates");
+const estimateTemplates = link("/estimate-template", "Estimate templates");
+
+export const ESTIMATE_TRADE_SLUGS_FOR_TEST = [
+  "contractor", "plumber", "electrician", "hvac", "painter",
+  "landscaping", "cleaning", "handyman", "carpenter", "web-developer",
+];
+
+const ESTIMATE_TRADE_SLUGS = new Set(ESTIMATE_TRADE_SLUGS_FOR_TEST);
 const receiptTemplates = link("/receipt-template", "Receipt templates");
 const requirements = link("/invoice-requirements", "Invoice requirements");
 
@@ -92,7 +101,8 @@ const pages: Record<string, Draft> = {
   "/credit-note": { guides: [creditGuide], tools: [invoiceTool, receiptTool, quoteTool] },
   "/delivery-note": { guides: [deliveryGuide], tools: [poTool, invoiceTool, quoteTool] },
   "/timesheet-invoice": { guides: [timesheetGuide, rateGuide], tools: [rateTool, invoiceTool, quoteTool] },
-  "/quote-generator": { guides: [quoteBelongs, quoteCompare, invoiceVsQuote], tools: [invoiceTool, receiptTool, poTool], templates: [quoteTemplates] },
+  "/quote-generator": { guides: [quoteBelongs, quoteCompare, invoiceVsQuote], tools: [invoiceTool, receiptTool, poTool], templates: [quoteTemplates, estimateTemplates] },
+  "/estimate-generator": { guides: [quoteCompare, quoteBelongs], tools: [quoteTool, invoiceTool, receiptTool], templates: [estimateTemplates] },
   "/invoice-generator": { guides: [writeInvoice, invoiceNumbers, freelanceInvoice], tools: [quoteTool, receiptTool, reminderTool, timesheetTool], templates: [invoiceTemplates, requirements] },
   "/payment-reminder-generator": { guides: [lateEmail, lateFeeGuide, net30], tools: [invoiceTool, lateFeeTool, dueDateTool] },
   "/csv-cleaner": { guides: [merging, cleanShopify], tools: [] },
@@ -121,19 +131,20 @@ const pages: Record<string, Draft> = {
   "/guides/delivery-note-and-packing-slip": { guides: [poGuide, writeInvoice, creditGuide], tools: [deliveryTool, poTool, invoiceTool] },
   "/guides/billing-hours-on-a-timesheet-invoice": { guides: [rateGuide, freelanceInvoice, writeInvoice], tools: [timesheetTool, rateTool, invoiceTool] },
   "/guides/what-belongs-on-a-quote": { guides: [quoteCompare, invoiceVsQuote, writeInvoice], tools: [quoteTool, invoiceTool], templates: [quoteTemplates] },
-  "/guides/quote-vs-estimate-vs-proposal": { guides: [quoteBelongs, invoiceVsQuote, writeInvoice], tools: [quoteTool, invoiceTool], templates: [quoteTemplates] },
+  "/guides/quote-vs-estimate-vs-proposal": { guides: [quoteBelongs, invoiceVsQuote, writeInvoice], tools: [quoteTool, estimateTool, invoiceTool], templates: [quoteTemplates, estimateTemplates] },
   "/guides/how-to-write-an-invoice": { guides: [invoiceNumbers, net30, invoiceVsQuote, freelanceInvoice], tools: [invoiceTool, quoteTool], templates: [invoiceTemplates, requirements] },
   "/guides/invoice-vs-quote": { guides: [quoteBelongs, quoteCompare, writeInvoice], tools: [invoiceTool, quoteTool], templates: [invoiceTemplates, quoteTemplates] },
   "/guides/how-invoice-numbers-work": { guides: [writeInvoice, freelanceInvoice, creditGuide], tools: [invoiceTool, creditTool, quoteTool] },
   "/guides/how-to-invoice-as-a-freelancer": { guides: [writeInvoice, invoiceNumbers, rateGuide], tools: [invoiceTool, rateTool, timesheetTool] },
   "/receipt-template": { guides: [writeReceipt, partialPayment], tools: [receiptTool, rentTool, donationTool] },
   "/invoice-template": { guides: [writeInvoice, invoiceNumbers], tools: [invoiceTool, quoteTool, receiptTool] },
-  "/quote-template": { guides: [quoteBelongs, quoteCompare], tools: [quoteTool, invoiceTool, receiptTool] },
+  "/quote-template": { guides: [quoteBelongs, quoteCompare], tools: [quoteTool, invoiceTool, receiptTool], templates: [estimateTemplates] },
+  "/estimate-template": { guides: [quoteCompare, quoteBelongs], tools: [estimateTool, quoteTool, invoiceTool] },
   "/invoice-requirements": { guides: [writeInvoice, invoiceNumbers], tools: [invoiceTool, quoteTool, salesTaxTool] },
 };
 
 export const toolPaths = [
-  "/invoice-generator", "/quote-generator", "/receipt-generator", "/payment-reminder-generator",
+  "/invoice-generator", "/quote-generator", "/estimate-generator", "/receipt-generator", "/payment-reminder-generator",
   "/purchase-order", "/credit-note", "/delivery-note", "/timesheet-invoice", "/rent-receipt", "/donation-receipt",
   "/profit-margin-calculator", "/markup-calculator", "/sales-tax-calculator", "/freelance-rate-calculator",
   "/late-fee-calculator", "/break-even-calculator", "/discount-calculator", "/invoice-due-date-calculator",
@@ -244,7 +255,11 @@ export function linksFor(path: string): RelatedBlock | null {
     return {
       guides: [quoteBelongs, quoteCompare],
       tools: [quoteTool, invoiceTool],
-      templates: [link(`/invoice-template/${slug}`, "Matching invoice template"), quoteTemplates],
+      templates: [
+        link(`/invoice-template/${slug}`, "Matching invoice template"),
+        ...(ESTIMATE_TRADE_SLUGS.has(slug) ? [link(`/estimate-template/${slug}`, "Matching estimate template")] : []),
+        quoteTemplates,
+      ],
       moreCsv: [],
     };
   }
@@ -263,6 +278,16 @@ export function linksFor(path: string): RelatedBlock | null {
       guides: [writeReceipt, partialPayment],
       tools: [receiptTool, rentTool, donationTool],
       templates: [link("/receipt-template", "All receipt templates")],
+      moreCsv: [],
+    };
+  }
+  const estimateTemplate = path.match(/^\/estimate-template\/([^/]+)$/);
+  if (estimateTemplate) {
+    const slug = estimateTemplate[1] ?? "";
+    return {
+      guides: [quoteCompare, quoteBelongs],
+      tools: [estimateTool, quoteTool, invoiceTool],
+      templates: [link(`/quote-template/${slug}`, "Matching quote template"), estimateTemplates],
       moreCsv: [],
     };
   }

@@ -18,6 +18,7 @@ export default function SiteFooter() {
             <summary>Documents</summary>
             <Link href="/invoice-generator">Invoice generator</Link>
             <Link href="/quote-generator">Quote generator</Link>
+            <Link href="/estimate-generator">Estimate generator</Link>
             <Link href="/receipt-generator">Receipt generator</Link>
             <Link href="/payment-reminder-generator">Payment reminder</Link>
             <Link href="/purchase-order">Purchase order</Link>
@@ -57,6 +58,7 @@ export default function SiteFooter() {
           <strong>Templates</strong>
           <Link href="/invoice-template">Invoice templates</Link>
           <Link href="/quote-template">Quote templates</Link>
+          <Link href="/estimate-template">Estimate templates</Link>
           <Link href="/receipt-template">Receipt templates</Link>
           <Link href="/invoice-requirements">Invoice requirements</Link>
           <Link href="/guides">All guides</Link>

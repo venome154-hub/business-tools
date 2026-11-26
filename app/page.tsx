@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import {
   AlarmClock, BellRing, Braces, CalendarClock, Check, Clock, Columns, FileSignature, FileSpreadsheet,
-  FileText, HeartHandshake, Home as HomeIcon, Landmark, Link2, Merge, PackageCheck, Percent, Receipt, Replace,
+  ClipboardList, FileText, HeartHandshake, Home as HomeIcon, Landmark, Link2, Merge, PackageCheck, Percent, Receipt, Replace,
   RotateCcw, Scale, ScanSearch, Scissors, Sheet, ShoppingCart, Timer, Truck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 const documents: [LucideIcon, string, string, string][] = [
   [FileText, "Invoice", "Request payment for finished work.", "/invoice-generator"],
   [FileSignature, "Quote", "Send a project estimate for approval.", "/quote-generator"],
+  [ClipboardList, "Estimate", "Price a job as a low and high range.", "/estimate-generator"],
   [Receipt, "Receipt", "Record a payment you have received.", "/receipt-generator"],
   [BellRing, "Payment reminder", "Draft a reminder email for an unpaid invoice.", "/payment-reminder-generator"],
   [ShoppingCart, "Purchase order", "Tell a supplier what you want to buy.", "/purchase-order"],

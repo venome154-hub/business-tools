@@ -5,6 +5,7 @@ export type OfficeLine = {
   description: string;
   quantity: number;
   price: number;
+  priceHigh?: number;
   taxRate: number;
 };
 
@@ -39,12 +40,16 @@ export type OfficeDocument = {
 };
 
 export type OfficeTotals = {
-  lines: { description: string; quantity: number; price: number; taxRate: number; amount: number; tax: number }[];
+  lines: { description: string; quantity: number; price: number; priceHigh?: number; taxRate: number; amount: number; amountHigh: number; tax: number }[];
   subtotal: number;
+  subtotalHigh: number;
   discount: number;
+  discountHigh: number;
   tax: number;
+  taxHigh: number;
   shipping: number;
   total: number;
+  totalHigh: number;
 };
 
 function round2(value: number) {
@@ -55,17 +60,30 @@ function round2(value: number) {
 
 export function officeTotals(model: OfficeDocument): OfficeTotals {
   const lines = (model.lines.length ? model.lines : [{ description: "Item", quantity: 0, price: 0, taxRate: 0 }]).map((line) => {
+    const highPrice = line.priceHigh !== undefined && line.priceHigh > line.price ? line.priceHigh : line.price;
     const amount = round2(line.quantity * line.price);
+    const amountHigh = round2(line.quantity * highPrice);
     const tax = model.perLineTax ? round2(amount * (1 - model.discountRate / 100) * (line.taxRate / 100)) : 0;
-    return { ...line, description: line.description || "Item", amount, tax };
+    return { ...line, description: line.description || "Item", amount, amountHigh, tax };
   });
   const subtotal = round2(lines.reduce((sum, line) => sum + line.amount, 0));
+  const subtotalHigh = round2(lines.reduce((sum, line) => sum + line.amountHigh, 0));
   const discount = round2(subtotal * (model.discountRate / 100));
+  const discountHigh = round2(subtotalHigh * (model.discountRate / 100));
   const net = round2(Math.max(0, subtotal - discount));
+  const netHigh = round2(Math.max(0, subtotalHigh - discountHigh));
   const tax = model.perLineTax ? round2(lines.reduce((sum, line) => sum + line.tax, 0)) : round2(net * (model.taxRate / 100));
+  const taxHigh = model.perLineTax
+    ? round2(lines.reduce((sum, line) => sum + round2(line.amountHigh * (1 - model.discountRate / 100) * (line.taxRate / 100)), 0))
+    : round2(netHigh * (model.taxRate / 100));
   const shipping = model.shipping ?? 0;
   const total = round2(net + tax + shipping);
-  return { lines, subtotal, discount, tax, shipping, total };
+  const totalHigh = round2(netHigh + taxHigh + shipping);
+  return { lines, subtotal, subtotalHigh, discount, discountHigh, tax, taxHigh, shipping, total, totalHigh };
+}
+
+function moneySpan(low: number, high: number, model: OfficeDocument) {
+  return high > low ? `${money(low, model)} – ${money(high, model)}` : money(low, model);
 }
 
 function money(amount: number, model: OfficeDocument) {
@@ -147,17 +165,17 @@ export async function buildDocxBlob(model: OfficeDocument) {
     children: [
       cell(line.description),
       cell(String(line.quantity), { align: docx.AlignmentType.RIGHT }),
-      cell(money(line.price, model), { align: docx.AlignmentType.RIGHT }),
+      cell(moneySpan(line.price, line.priceHigh ?? line.price, model), { align: docx.AlignmentType.RIGHT }),
       ...(model.perLineTax ? [cell(String(line.taxRate), { align: docx.AlignmentType.RIGHT })] : []),
-      cell(money(line.amount, model), { align: docx.AlignmentType.RIGHT }),
+      cell(moneySpan(line.amount, line.amountHigh, model), { align: docx.AlignmentType.RIGHT }),
     ],
   }));
   const totalRows: [string, string][] = [
-    ["Subtotal", money(totals.subtotal, model)],
-    ...(model.discountRate > 0 ? [[`Discount (${model.discountRate}%)`, `-${money(totals.discount, model)}`] as [string, string]] : []),
-    ...(totals.tax > 0 ? [["Tax", money(totals.tax, model)] as [string, string]] : []),
+    ["Subtotal", moneySpan(totals.subtotal, totals.subtotalHigh, model)],
+    ...(model.discountRate > 0 ? [[`Discount (${model.discountRate}%)`, `-${moneySpan(totals.discount, totals.discountHigh, model)}`] as [string, string]] : []),
+    ...(totals.tax > 0 || totals.taxHigh > 0 ? [["Tax", moneySpan(totals.tax, totals.taxHigh, model)] as [string, string]] : []),
     ...(model.shipping !== null && totals.shipping > 0 ? [["Shipping", money(totals.shipping, model)] as [string, string]] : []),
-    [model.totalLabel, money(totals.total, model)],
+    [model.totalLabel, moneySpan(totals.total, totals.totalHigh, model)],
   ];
   if (model.previouslyPaid) totalRows.push(["Previously paid", money(model.previouslyPaid, model)]);
   if (model.amountPaid !== null) {
@@ -297,9 +315,12 @@ export async function buildXlsxBlob(model: OfficeDocument) {
     row += 1;
   }
   row += 1;
+  const ranged = !model.perLineTax && totals.lines.some((line) => line.amountHigh > line.amount);
   const headers = model.perLineTax
     ? ["Description", model.qtyHeader, model.priceHeader, "Tax %", "Amount", "Line tax"]
-    : ["Description", model.qtyHeader, model.priceHeader, "Amount"];
+    : ranged
+      ? ["Description", model.qtyHeader, "Low price", "High price", "Low amount", "High amount"]
+      : ["Description", model.qtyHeader, model.priceHeader, "Amount"];
   headers.forEach((header, index) => {
     const cell = sheet.getCell(row, index + 1);
     cell.value = header;
@@ -324,6 +345,16 @@ export async function buildXlsxBlob(model: OfficeDocument) {
       const lineTax = sheet.getCell(current, 6);
       lineTax.value = { formula: `ROUND(E${current}*(1-${discountCell}/100)*(D${current}/100),2)`, result: line.tax };
       lineTax.numFmt = format;
+    } else if (ranged) {
+      const high = sheet.getCell(current, 4);
+      high.value = line.priceHigh !== undefined && line.priceHigh > line.price ? line.priceHigh : line.price;
+      high.numFmt = format;
+      const lowAmount = sheet.getCell(current, 5);
+      lowAmount.value = { formula: `ROUND(B${current}*C${current},2)`, result: line.amount } satisfies FormulaCell;
+      lowAmount.numFmt = format;
+      const highAmount = sheet.getCell(current, 6);
+      highAmount.value = { formula: `ROUND(B${current}*D${current},2)`, result: line.amountHigh } satisfies FormulaCell;
+      highAmount.numFmt = format;
     } else {
       const amount = sheet.getCell(current, 4);
       amount.value = { formula: `ROUND(B${current}*C${current},2)`, result: line.amount } satisfies FormulaCell;
@@ -331,19 +362,29 @@ export async function buildXlsxBlob(model: OfficeDocument) {
     }
   });
   const lastItem = firstItem + totals.lines.length - 1;
-  const amountColumn = model.perLineTax ? "E" : "D";
+  const amountColumn = model.perLineTax ? "E" : ranged ? "E" : "D";
   row = lastItem + 2;
   const subtotalRow = row;
   sheet.getCell(row, 1).value = "Subtotal";
   const subtotal = sheet.getCell(row, 2);
   subtotal.value = { formula: `ROUND(SUM(${amountColumn}${firstItem}:${amountColumn}${lastItem}),2)`, result: totals.subtotal };
   subtotal.numFmt = format;
+  if (ranged) {
+    const highSubtotal = sheet.getCell(row, 3);
+    highSubtotal.value = { formula: `ROUND(SUM(F${firstItem}:F${lastItem}),2)`, result: totals.subtotalHigh };
+    highSubtotal.numFmt = format;
+  }
   row += 1;
   const discountRow = row;
   sheet.getCell(row, 1).value = "Discount";
   const discount = sheet.getCell(row, 2);
   discount.value = { formula: `ROUND(B${subtotalRow}*${discountCell}/100,2)`, result: totals.discount };
   discount.numFmt = format;
+  if (ranged) {
+    const highDiscount = sheet.getCell(row, 3);
+    highDiscount.value = { formula: `ROUND(C${subtotalRow}*${discountCell}/100,2)`, result: totals.discountHigh };
+    highDiscount.numFmt = format;
+  }
   row += 1;
   const taxRow = row;
   sheet.getCell(row, 1).value = "Tax";
@@ -352,6 +393,11 @@ export async function buildXlsxBlob(model: OfficeDocument) {
     ? { formula: `ROUND(SUM(F${firstItem}:F${lastItem}),2)`, result: totals.tax }
     : { formula: `ROUND((B${subtotalRow}-B${discountRow})*${taxCell}/100,2)`, result: totals.tax };
   tax.numFmt = format;
+  if (ranged) {
+    const highTax = sheet.getCell(row, 3);
+    highTax.value = { formula: `ROUND((C${subtotalRow}-C${discountRow})*${taxCell}/100,2)`, result: totals.taxHigh };
+    highTax.numFmt = format;
+  }
   row += 1;
   let shippingRow: number | null = null;
   if (shippingCell) {
@@ -372,6 +418,15 @@ export async function buildXlsxBlob(model: OfficeDocument) {
   total.value = { formula: totalFormula, result: totals.total };
   total.numFmt = format;
   total.font = { bold: true };
+  if (ranged) {
+    const highTotal = sheet.getCell(row, 3);
+    const highFormula = shippingRow
+      ? `ROUND(C${subtotalRow}-C${discountRow}+C${taxRow}+B${shippingRow},2)`
+      : `ROUND(C${subtotalRow}-C${discountRow}+C${taxRow},2)`;
+    highTotal.value = { formula: highFormula, result: totals.totalHigh };
+    highTotal.numFmt = format;
+    highTotal.font = { bold: true };
+  }
   row += 1;
   if (model.previouslyPaid !== null) {
     sheet.getCell(row, 1).value = "Previously paid";

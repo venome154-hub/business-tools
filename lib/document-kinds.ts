@@ -31,6 +31,9 @@ export type KindConfig = {
   price: string;
   lines: boolean;
   note: string;
+  range?: boolean;
+  termsLabel?: string;
+  detailsHeading?: string;
   chain: { to: string; label: string }[];
 };
 
@@ -64,6 +67,26 @@ export const KIND_CONFIG: Record<DocumentKind, KindConfig> = {
     perLine: false, termsBlock: true, property: false, qty: "Qty", price: "Price", lines: true,
     note: "A quote is an estimate for approval. It does not request payment.",
     chain: [{ to: "invoice", label: "Turn this quote into an invoice" }],
+  },
+  estimate: {
+    heading: "Estimate Generator",
+    lede: "Price a job as a low and high range, then download PDF, Word, or Excel. This is an estimate, not a fixed quote.",
+    pdfTitle: "ESTIMATE",
+    prefix: "EST",
+    party: "Prepared for",
+    numberLabel: "Estimate number",
+    prices: true, tax: true, discount: true, shipping: false, paid: false, paidLabel: "",
+    po: false, termsSelect: false, lateFee: false, paymentLink: false, paymentInfo: false,
+    signature: false, accepted: false, validity: true, due: false, method: false, related: false,
+    perLine: false, termsBlock: true, property: false, qty: "Qty", price: "Price", lines: true,
+    range: true,
+    termsLabel: "Assumptions and exclusions",
+    detailsHeading: "Assumptions",
+    note: "This is an estimate, not a fixed quote.",
+    chain: [
+      { to: "quote", label: "Convert to quote" },
+      { to: "invoice", label: "Convert to invoice" },
+    ],
   },
   receipt: {
     heading: "Receipt Generator",

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import DocumentStudio from "@/components/DocumentStudio";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbItems } from "@/lib/breadcrumbs";
+import { getEstimate } from "@/content/estimates";
 import { getIndustry, industries } from "@/content/industries";
 import { breadcrumbLd, faqLd } from "@/lib/schema";
 import { titled } from "@/lib/site";
@@ -32,6 +33,7 @@ export default async function Page({ params }: { params: Promise<{ industry: str
         <h1>{titled(item.name)} quote template</h1>
         <p>{item.quoteIntro}</p>
         <p>This estimate is not an invoice. It proposes the scope and the price before the work is billed. The sample lines are a draft you can edit.</p>
+        {getEstimate(item.slug) && <p>While the scope can still move, use the <Link href={`/estimate-template/${item.slug}`}>range page for this trade</Link>.</p>}
       </article>
       <DocumentStudio kind="quote" headingLevel={2} defaults={{ items: item.items, notes: "Price assumes the scope described in the lines. Work outside that scope needs a new quote." }} />
       <article className="seo-content">

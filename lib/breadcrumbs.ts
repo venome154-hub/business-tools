@@ -7,6 +7,7 @@ import { titled } from "@/lib/site";
 const labels: Record<string, string> = {
   "invoice-generator": "Invoice generator",
   "quote-generator": "Quote generator",
+  "estimate-generator": "Estimate generator",
   "receipt-generator": "Receipt generator",
   "payment-reminder-generator": "Payment reminder",
   "csv-cleaner": "CSV cleaner",
@@ -28,6 +29,7 @@ const labels: Record<string, string> = {
   "refund-policy": "Refund policy",
   "invoice-template": "Invoice templates",
   "quote-template": "Quote templates",
+  "estimate-template": "Estimate templates",
   "receipt-template": "Receipt templates",
   "invoice-requirements": "Invoice requirements",
   "profit-margin-calculator": "Profit margin",
@@ -59,7 +61,7 @@ const formatNames: Record<string, string> = {
 
 function titleFor(segment: string, previous: string) {
   if ((previous === "invoice-template" || previous === "quote-template" || previous === "receipt-template") && formatNames[segment]) return formatNames[segment];
-  if (previous === "invoice-template" || previous === "quote-template") return titled(industries.find((item) => item.slug === segment)?.name ?? segment);
+  if (previous === "invoice-template" || previous === "quote-template" || previous === "estimate-template") return titled(industries.find((item) => item.slug === segment)?.name ?? segment);
   if (previous === "receipt-template") return titled(receiptTypes.find((item) => item.slug === segment)?.name ?? segment);
   if (previous === "invoice-requirements") return invoiceCountries.find((item) => item.slug === segment)?.name ?? segment;
   if (previous === "guides") return articles.find((item) => item.slug === segment)?.title ?? labels[segment] ?? segment;

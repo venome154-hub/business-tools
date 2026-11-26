@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { articles } from "../content/articles.ts";
+import { estimateMetaTitle, getEstimate } from "../content/estimates.ts";
 import { formatPages } from "../content/format-pages.ts";
 import { countryDescription, invoiceCountries } from "../content/countries.ts";
 import { industries } from "../content/industries.ts";
@@ -27,6 +28,13 @@ function metaFor(path: string) {
   if (format) return { title: format.title, description: format.description };
   const article = articles.find((item) => path === `/guides/${item.slug}`);
   if (article) return { title: article.title, description: article.description };
+  const estimate = path.match(/^\/estimate-template\/([^/]+)$/);
+  if (estimate && estimate[1]) {
+    const item = getEstimate(estimate[1]);
+    const industryName = industries.find((entry) => entry.slug === estimate[1])?.name ?? "";
+    if (!item || !industryName) return { title: "", description: "" };
+    return { title: estimateMetaTitle(industryName), description: item.description };
+  }
   const industry = path.match(/^\/(invoice|quote)-template\/([^/]+)$/);
   if (industry) {
     const item = industries.find((entry) => entry.slug === industry[2]);
@@ -56,6 +64,7 @@ for (const path of Object.keys(updatedAt)) {
   const meta = metaFor(path);
   const length = meta.description.length;
   if (length < 120 || length > 160) problems.push(`${path} description is ${length} characters`);
+  if (path.startsWith("/estimate-") && (length < 140 || length > 160)) problems.push(`${path} description is outside 140–160 (${length})`);
   if (!meta.title) problems.push(`${path} has no title`);
   const previous = titles.get(meta.title);
   if (previous) problems.push(`title "${meta.title}" is used by ${previous} and ${path}`);
@@ -125,6 +134,7 @@ if (htmlFor.size === routes.length) {
     "/invoice-template/word", "/invoice-template/excel", "/quote-template/pdf",
     "/invoice-template/freelance-designer", "/invoice-template/photographer", "/invoice-template/plumber",
     "/quote-template/consulting", "/quote-template/baker", "/quote-template/architect",
+    "/estimate-template/plumber",
     "/receipt-template/rent-payment", "/receipt-template/freelance-payment", "/receipt-template/security-deposit",
     "/invoice-requirements/united-states", "/invoice-requirements/germany", "/invoice-requirements/india",
     "/guides/what-net-30-means", "/guides/how-to-write-an-invoice", "/guides/invoice-vs-quote",
@@ -167,6 +177,54 @@ if (htmlFor.size === routes.length) {
     });
     const hub = json[1];
     if (!hub || hub.path === route || visible[1]?.path !== hub?.path) problems.push(`${route} hub crumb is not a link`);
+  }
+}
+
+const baseline = fs.readFileSync("scripts/baseline-urls.txt", "utf8").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+for (const route of baseline) {
+  if (!Object.hasOwn(updatedAt, route)) problems.push(`baseline URL missing from sitemap: ${route}`);
+  const html = htmlFor.get(route);
+  if (!html) continue;
+  const tag = html.match(/<link[^>]*rel="canonical"[^>]*>/i)?.[0] ?? "";
+  const href = tag.match(/href="([^"]+)"/)?.[1] ?? "";
+  let pathname = "";
+  try {
+    pathname = new URL(href).pathname.replace(/\/$/, "") || "/";
+  } catch {
+    pathname = "";
+  }
+  if (pathname !== route) problems.push(`${route} canonical is ${href || "missing"}`);
+}
+
+function jsonLdTypes(html: string) {
+  const types: string[] = [];
+  for (const script of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    let data: unknown;
+    try {
+      data = JSON.parse(script[1] ?? "");
+    } catch {
+      problems.push("invalid JSON-LD");
+      continue;
+    }
+    const nodes = Array.isArray(data) ? data : [data];
+    for (const node of nodes) {
+      if (node && typeof node === "object" && "@type" in node) types.push(String((node as { "@type": unknown })["@type"]));
+    }
+  }
+  return types;
+}
+
+for (const route of routes.filter((item) => item.startsWith("/estimate"))) {
+  const html = htmlFor.get(route);
+  if (!html) continue;
+  const types = jsonLdTypes(html);
+  const required = route === "/estimate-generator"
+    ? ["WebApplication", "FAQPage", "BreadcrumbList"]
+    : route === "/estimate-template"
+      ? ["BreadcrumbList"]
+      : ["FAQPage", "BreadcrumbList"];
+  for (const type of required) {
+    if (!types.includes(type)) problems.push(`${route} JSON-LD missing ${type}`);
   }
 }
 

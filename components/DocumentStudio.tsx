@@ -8,7 +8,7 @@ import AdSlot from "@/components/AdSlot";
 import CurrencyField from "@/components/CurrencyField";
 import MobileToolBar from "@/components/MobileToolBar";
 import { KIND_CONFIG } from "@/lib/document-kinds";
-import { blankDocument, blankLine, DOC_PATHS, takeHandoff, writeHandoff, type DocumentKind, type DocumentState, type LineItem } from "@/lib/document-model";
+import { blankDocument, blankLine, DOC_PATHS, handoffDocument, takeHandoff, writeHandoff, type DocumentKind, type DocumentState, type LineItem } from "@/lib/document-model";
 import { saveDocument } from "@/lib/drafts";
 import { acceptDecimal, decimalLabel, displayDate, formatMoney, localDate, parseDecimal, roundMoney } from "@/lib/format";
 import { addDays, isCurrencyCode, LOCALES } from "@/lib/locales";
@@ -31,20 +31,30 @@ function moneyOf(state: DocumentState) {
   const lines = state.items.map((item) => {
     const quantity = parseDecimal(item.quantity);
     const price = parseDecimal(item.price);
+    const highRaw = (item.priceHigh ?? "").trim() ? parseDecimal(item.priceHigh ?? "") : price;
+    const priceHigh = highRaw > price ? highRaw : price;
     const amount = roundMoney(quantity * price);
+    const amountHigh = roundMoney(quantity * priceHigh);
     const taxRate = state.perLineTax ? Math.min(100, parseDecimal(item.tax)) : 0;
-    return { description: item.description, quantityLabel: decimalLabel(item.quantity), quantity, price, amount, taxRate };
+    return { description: item.description, quantityLabel: decimalLabel(item.quantity), quantity, price, priceHigh, amount, amountHigh, taxRate };
   });
   const subtotal = roundMoney(lines.reduce((sum, line) => sum + line.amount, 0));
+  const subtotalHigh = roundMoney(lines.reduce((sum, line) => sum + line.amountHigh, 0));
   const discountRate = Math.min(100, parseDecimal(state.discount));
   const discountAmount = roundMoney(subtotal * (discountRate / 100));
+  const discountHigh = roundMoney(subtotalHigh * (discountRate / 100));
   const net = roundMoney(Math.max(0, subtotal - discountAmount));
+  const netHigh = roundMoney(Math.max(0, subtotalHigh - discountHigh));
   const taxAmount = state.perLineTax
     ? roundMoney(lines.reduce((sum, line) => sum + roundMoney(line.amount * (1 - discountRate / 100) * (line.taxRate / 100)), 0))
     : roundMoney(net * (Math.min(100, parseDecimal(state.tax)) / 100));
+  const taxHigh = state.perLineTax
+    ? roundMoney(lines.reduce((sum, line) => sum + roundMoney(line.amountHigh * (1 - discountRate / 100) * (line.taxRate / 100)), 0))
+    : roundMoney(netHigh * (Math.min(100, parseDecimal(state.tax)) / 100));
   const shipping = roundMoney(parseDecimal(state.shipping));
   const total = roundMoney(net + taxAmount + shipping);
-  return { lines, subtotal, discountRate, discountAmount, taxAmount, shipping, total };
+  const totalHigh = roundMoney(netHigh + taxHigh + shipping);
+  return { lines, subtotal, subtotalHigh, discountRate, discountAmount, discountHigh, taxAmount, taxHigh, shipping, total, totalHigh };
 }
 
 export default function DocumentStudio({
@@ -54,7 +64,7 @@ export default function DocumentStudio({
   preferredFormat,
 }: {
   kind: DocumentKind;
-  defaults?: { currency?: string; locale?: string; notes?: string; items?: { description: string; quantity: string; price: string }[] };
+  defaults?: { currency?: string; locale?: string; notes?: string; terms?: string; items?: { description: string; quantity: string; price: string; priceHigh?: string }[] };
   headingLevel?: 1 | 2;
   preferredFormat?: "pdf" | "docx" | "xlsx";
 }) {
@@ -94,7 +104,8 @@ export default function DocumentStudio({
     if (preset?.currency) next.currency = preset.currency;
     if (preset?.locale) next.locale = preset.locale;
     if (preset?.notes) next.notes = preset.notes;
-    if (preset?.items?.length) next.items = preset.items.map((item) => ({ ...item, tax: "" }));
+    if (preset?.terms) next.terms = preset.terms;
+    if (preset?.items?.length) next.items = preset.items.map((item) => ({ ...item, tax: "", priceHigh: item.priceHigh ?? "" }));
     const handoff = takeHandoff(kind);
     if (handoff?.payload) {
       Object.assign(next, handoff.payload);
@@ -194,13 +205,13 @@ export default function DocumentStudio({
     return id;
   }
 
-  const office = kind === "invoice" || kind === "quote" || kind === "receipt";
+  const office = kind === "invoice" || kind === "quote" || kind === "receipt" || kind === "estimate";
 
   function noteList() {
     return [
       ...(config.paymentInfo && state.paymentInfo ? [{ title: "Payment instructions", text: state.paymentInfo }] : []),
       ...(config.lateFee && state.lateFee ? [{ title: "Late fee", text: state.lateFee }] : []),
-      ...(config.termsBlock && state.terms ? [{ title: "Terms and conditions", text: state.terms }] : []),
+      ...(config.termsBlock && state.terms ? [{ title: config.termsLabel || "Terms and conditions", text: state.terms }] : []),
       ...(state.notes ? [{ title: "Notes", text: state.notes }] : []),
       ...(config.note ? [{ title: "Note", text: config.note }] : []),
       ...(config.method && state.paymentMethod ? [{ title: "Payment method", text: [state.paymentMethod, state.paymentReference].filter(Boolean).join(" · ") }] : []),
@@ -233,6 +244,7 @@ export default function DocumentStudio({
         description: line.description,
         quantity: line.quantity,
         price: line.price,
+        priceHigh: line.priceHigh,
         taxRate: line.taxRate,
       })),
       perLineTax: state.perLineTax,
@@ -257,6 +269,7 @@ export default function DocumentStudio({
     setError("");
     try {
       const money = (amount: number) => formatMoney(amount, state.currency, state.locale);
+      const span = (low: number, high: number) => high > low ? `${money(low)} – ${money(high)}` : money(low);
       const columns = config.prices
         ? [
             { header: "Description", width: state.perLineTax ? 0.4 : 0.52, align: "left" as const },
@@ -293,14 +306,14 @@ export default function DocumentStudio({
         ],
         columns,
         rows: figures.lines.map((line, index) => config.prices
-          ? [line.description, line.quantityLabel, money(line.price), ...(state.perLineTax ? [decimalLabel(state.items[index]?.tax || "0")] : []), money(line.amount)]
+          ? [line.description, line.quantityLabel, span(line.price, line.priceHigh), ...(state.perLineTax ? [decimalLabel(state.items[index]?.tax || "0")] : []), span(line.amount, line.amountHigh)]
           : [line.description, line.quantityLabel]),
         totals: config.prices ? [
-          { label: "Subtotal", value: money(figures.subtotal) },
-          ...(figures.discountRate > 0 ? [{ label: `Discount (${decimalLabel(state.discount)}%)`, value: `-${money(figures.discountAmount)}` }] : []),
-          ...(figures.taxAmount > 0 ? [{ label: "Tax", value: money(figures.taxAmount) }] : []),
+          { label: "Subtotal", value: span(figures.subtotal, figures.subtotalHigh) },
+          ...(figures.discountRate > 0 ? [{ label: `Discount (${decimalLabel(state.discount)}%)`, value: `-${span(figures.discountAmount, figures.discountHigh)}` }] : []),
+          ...(figures.taxAmount > 0 || figures.taxHigh > 0 ? [{ label: "Tax", value: span(figures.taxAmount, figures.taxHigh) }] : []),
           ...(figures.shipping > 0 ? [{ label: "Shipping", value: money(figures.shipping) }] : []),
-          { label: kind === "credit-note" ? "Amount credited" : "Total", value: money(figures.total), emphasize: true },
+          { label: kind === "credit-note" ? "Amount credited" : "Total", value: span(figures.total, figures.totalHigh), emphasize: true },
           ...(prior > 0 ? [{ label: "Previously paid", value: money(prior) }] : []),
           ...(paidSpecified ? [{ label: config.paidLabel, value: money(paid) }, { label: "Balance", value: money(balance), emphasize: true }] : []),
         ] : [],
@@ -354,7 +367,7 @@ export default function DocumentStudio({
         },
       });
     } else {
-      const payload: Partial<DocumentState> = { ...state, number: "", date: "" };
+      const payload: DocumentState = handoffDocument(state, target);
       if (target === "receipt") {
         const priorText = state.amountPaid.trim();
         const priorAmount = priorText ? roundMoney(parseDecimal(priorText)) : 0;
@@ -365,10 +378,6 @@ export default function DocumentStudio({
         payload.dueDate = "";
         payload.validUntil = "";
         payload.paymentTerms = "";
-      }
-      if (target === "invoice") {
-        payload.validUntil = "";
-        payload.acceptedBy = "";
       }
       writeHandoff({ to: target, payload });
     }
@@ -496,14 +505,15 @@ export default function DocumentStudio({
         {config.lines ? (
           <>
             <div className="items">
-              <div className={`line-head${state.perLineTax ? " with-tax" : ""}`} aria-hidden="true"><span>Description</span><span>Qty</span>{config.prices && <span>Price</span>}{state.perLineTax && <span>Tax</span>}{config.prices && <span>Amount</span>}<span /></div>
+              <div className={`line-head${state.perLineTax ? " with-tax" : ""}${config.range ? " with-range" : ""}`} aria-hidden="true"><span>Description</span><span>Qty</span>{config.prices && <span>{config.range ? "Low" : "Price"}</span>}{config.range && <span>High</span>}{state.perLineTax && <span>Tax</span>}{config.prices && <span>Amount</span>}<span /></div>
               {state.items.map((item, index) => (
-                <div className={`item${state.perLineTax ? " with-tax" : ""}`} key={index}>
+                <div className={`item${state.perLineTax ? " with-tax" : ""}${config.range ? " with-range" : ""}`} key={index}>
                   <input aria-label={`Description for item ${index + 1}`} value={item.description} onChange={(event) => updateLine(index, "description", event.target.value)} />
                   <input aria-label={`${config.qty} for item ${index + 1}`} inputMode="decimal" value={item.quantity} onChange={(event) => updateLine(index, "quantity", event.target.value)} />
-                  {config.prices && <input aria-label={`${config.price} for item ${index + 1}`} inputMode="decimal" value={item.price} onChange={(event) => updateLine(index, "price", event.target.value)} />}
+                  {config.prices && <input aria-label={`${config.range ? "Low price" : config.price} for item ${index + 1}`} inputMode="decimal" value={item.price} onChange={(event) => updateLine(index, "price", event.target.value)} />}
+                  {config.range && <input aria-label={`High price for item ${index + 1}`} inputMode="decimal" value={item.priceHigh || ""} onChange={(event) => updateLine(index, "priceHigh", event.target.value)} />}
                   {state.perLineTax && <input aria-label={`Tax percent for item ${index + 1}`} inputMode="decimal" value={item.tax} placeholder="Tax %" onChange={(event) => updateLine(index, "tax", event.target.value)} />}
-                  {config.prices && <span className="line-amount">{formatMoney(figures.lines[index]?.amount || 0, state.currency, state.locale)}</span>}
+                  {config.prices && <span className="line-amount">{(figures.lines[index]?.amountHigh || 0) > (figures.lines[index]?.amount || 0) ? `${formatMoney(figures.lines[index]?.amount || 0, state.currency, state.locale)} – ${formatMoney(figures.lines[index]?.amountHigh || 0, state.currency, state.locale)}` : formatMoney(figures.lines[index]?.amount || 0, state.currency, state.locale)}</span>}
                   <button className="icon" type="button" onClick={() => patch({ items: state.items.filter((_, itemIndex) => itemIndex !== index) })} aria-label="Remove item"><Trash2 size={16} /></button>
                 </div>
               ))}
@@ -535,18 +545,18 @@ export default function DocumentStudio({
             <div>Discount <span>{formatMoney(figures.discountAmount, state.currency, state.locale)}</span></div>
             <div>Tax <span>{formatMoney(figures.taxAmount, state.currency, state.locale)}</span></div>
             <div>Shipping <span>{formatMoney(figures.shipping, state.currency, state.locale)}</span></div>
-            <div className="grand">Total <span>{formatMoney(figures.total, state.currency, state.locale)}</span></div>
+            <div className="grand">Total <span>{figures.totalHigh > figures.total ? `${formatMoney(figures.total, state.currency, state.locale)} – ${formatMoney(figures.totalHigh, state.currency, state.locale)}` : formatMoney(figures.total, state.currency, state.locale)}</span></div>
             <div className="balance-due">Balance due <span>{formatMoney(Math.max(0, balance), state.currency, state.locale)}</span></div>
           </div>
         )}
         </details>
         <details className="field-card" open>
-        <summary><span className="tool-icon"><Receipt size={20} /></span><h2>Payment</h2></summary>
+        <summary><span className="tool-icon"><Receipt size={20} /></span><h2>{config.detailsHeading || "Payment"}</h2></summary>
         <div className="grid two">
           {config.paymentInfo && <label className="full-field">Payment instructions<textarea rows={3} value={state.paymentInfo} onChange={(event) => patch({ paymentInfo: event.target.value })} /></label>}
           {config.paymentLink && <label className="full-field">Payment link<textarea rows={2} value={state.paymentLink} onChange={(event) => patch({ paymentLink: event.target.value })} placeholder="https://" /></label>}
           {config.lateFee && <label className="full-field">Late-fee note<textarea rows={2} value={state.lateFee} onChange={(event) => patch({ lateFee: event.target.value })} /></label>}
-          {config.termsBlock && <label className="full-field">Terms and conditions<textarea rows={3} value={state.terms} onChange={(event) => patch({ terms: event.target.value })} /></label>}
+          {config.termsBlock && <label className="full-field">{config.termsLabel || "Terms and conditions"}<textarea rows={3} value={state.terms} onChange={(event) => patch({ terms: event.target.value })} /></label>}
           <label className="full-field">Notes<textarea rows={3} value={state.notes} onChange={(event) => patch({ notes: event.target.value })} /></label>
           {config.signature && <label>Signature name<input value={state.signature} onChange={(event) => patch({ signature: event.target.value })} /></label>}
           {config.accepted && <label>Accepted by<input value={state.acceptedBy} onChange={(event) => patch({ acceptedBy: event.target.value })} /></label>}
@@ -577,7 +587,7 @@ export default function DocumentStudio({
           {figures.lines.map((line, index) => (
             <div className="paper-row" key={index}>
               <span>{line.description || "Item"}{config.prices ? ` × ${line.quantityLabel}` : ` · ${line.quantityLabel}`}</span>
-              {config.prices && <b>{formatMoney(line.amount, state.currency, state.locale)}</b>}
+              {config.prices && <b>{line.amountHigh > line.amount ? `${formatMoney(line.amount, state.currency, state.locale)} – ${formatMoney(line.amountHigh, state.currency, state.locale)}` : formatMoney(line.amount, state.currency, state.locale)}</b>}
             </div>
           ))}
           {config.prices && (
@@ -586,7 +596,7 @@ export default function DocumentStudio({
               {figures.discountRate > 0 && <div>Discount <span>-{formatMoney(figures.discountAmount, state.currency, state.locale)}</span></div>}
               {figures.taxAmount > 0 && <div>Tax <span>{formatMoney(figures.taxAmount, state.currency, state.locale)}</span></div>}
               {figures.shipping > 0 && <div>Shipping <span>{formatMoney(figures.shipping, state.currency, state.locale)}</span></div>}
-              <div className="grand">{kind === "credit-note" ? "Amount credited" : "Total"} <span>{formatMoney(figures.total, state.currency, state.locale)}</span></div>
+              <div className="grand">{kind === "credit-note" ? "Amount credited" : "Total"} <span>{figures.totalHigh > figures.total ? `${formatMoney(figures.total, state.currency, state.locale)} – ${formatMoney(figures.totalHigh, state.currency, state.locale)}` : formatMoney(figures.total, state.currency, state.locale)}</span></div>
               {prior > 0 && <div>Previously paid <span>{formatMoney(prior, state.currency, state.locale)}</span></div>}
               {paidSpecified && <div>{config.paidLabel} <span>{formatMoney(paid, state.currency, state.locale)}</span></div>}
               {paidSpecified && <div>Balance <span>{formatMoney(balance, state.currency, state.locale)}</span></div>}

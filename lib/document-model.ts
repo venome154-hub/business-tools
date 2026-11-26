@@ -1,10 +1,11 @@
 import type { PageSize, PdfTemplate } from "@/lib/profile";
 
-export type LineItem = { description: string; quantity: string; price: string; tax: string };
+export type LineItem = { description: string; quantity: string; price: string; tax: string; priceHigh?: string };
 
 export type DocumentKind =
   | "invoice"
   | "quote"
+  | "estimate"
   | "receipt"
   | "purchase-order"
   | "credit-note"
@@ -74,6 +75,7 @@ const HANDOFF_KEY = "biztoolsbox-handoff";
 export const DOC_PATHS: Record<string, string> = {
   invoice: "/invoice-generator",
   quote: "/quote-generator",
+  estimate: "/estimate-generator",
   receipt: "/receipt-generator",
   reminder: "/payment-reminder-generator",
   "purchase-order": "/purchase-order",
@@ -85,7 +87,29 @@ export const DOC_PATHS: Record<string, string> = {
 };
 
 export function blankLine(description = "Service"): LineItem {
-  return { description, quantity: "1", price: "100", tax: "" };
+  return { description, quantity: "1", price: "100", tax: "", priceHigh: "" };
+}
+
+export function handoffDocument(state: DocumentState, target: string): DocumentState {
+  const items = state.items.map((item) => ({
+    description: item.description,
+    quantity: item.quantity,
+    price: item.price,
+    tax: item.tax,
+    priceHigh: "",
+  }));
+  const ranges = state.items
+    .filter((item) => (item.priceHigh ?? "").trim() && (item.priceHigh ?? "").trim() !== item.price.trim())
+    .map((item) => `${item.description}: ${item.price}–${item.priceHigh}`);
+  const notes = ranges.length
+    ? [state.notes.trim(), "Ranges from the estimate:", ...ranges].filter(Boolean).join("\n")
+    : state.notes;
+  const payload: DocumentState = { ...state, items, notes, number: "", date: "" };
+  if (target === "invoice") {
+    payload.validUntil = "";
+    payload.acceptedBy = "";
+  }
+  return payload;
 }
 
 export function blankDocument(kind: DocumentKind): DocumentState {
