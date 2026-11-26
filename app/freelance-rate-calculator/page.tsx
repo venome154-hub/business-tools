@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Freelance Hourly Rate Calculator" path="/freelance-rate-calculator" description="Estimate an hourly rate from an income goal, expenses, weeks, and hours." intro="Add the yearly income you want to the yearly business expenses, then divide by billable hours. Billable hours are working weeks times hours per week." faqs={faqs}>
+    <ToolArticle name="Freelance Hourly Rate Calculator" path="/freelance-rate-calculator" description="Estimate an hourly rate from an income goal, expenses, weeks, and hours." intro="Add the yearly income you want to the yearly business expenses, then divide by billable hours. Billable hours are working weeks times hours per week." faqs={faqs} headingAbove>
       <CalculatorTool slug="freelance-rate" />
     </ToolArticle>
   );

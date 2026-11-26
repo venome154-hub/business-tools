@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   description: "BizToolsBox does not sell a paid plan, so there is nothing to refund.",
   alternates: { canonical: "/refund-policy" },
   openGraph: { title: "Refund policy", description: "Nothing is sold, so nothing can be refunded.", type: "website", url: "/refund-policy" },
+  robots: { index: false, follow: false },
 };
 
 export default function Page() {

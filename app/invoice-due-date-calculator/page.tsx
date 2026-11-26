@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Invoice Due Date Calculator" path="/invoice-due-date-calculator" description="Add net days to an invoice issue date." intro="Choose the issue date and the number of days, such as 7, 15, or 30. The due date is that many days later on the calendar." faqs={faqs}>
+    <ToolArticle name="Invoice Due Date Calculator" path="/invoice-due-date-calculator" description="Add net days to an invoice issue date." intro="Choose the issue date and the number of days, such as 7, 15, or 30. The due date is that many days later on the calendar." faqs={faqs} headingAbove>
       <CalculatorTool slug="due-date" />
     </ToolArticle>
   );

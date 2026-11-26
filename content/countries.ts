@@ -2,6 +2,7 @@ export type InvoiceCountry = {
   slug: string;
   name: string;
   currency: string;
+  locale: string;
   sourceName: string;
   sourceUrl: string;
   intro: string;
@@ -13,6 +14,7 @@ export const invoiceCountries: InvoiceCountry[] = [
     slug: "united-states",
     name: "the United States",
     currency: "USD",
+    locale: "en-US",
     sourceName: "IRS recordkeeping guidance",
     sourceUrl: "https://www.irs.gov/businesses/small-businesses-self-employed/recordkeeping",
     intro: "The United States does not have one national VAT invoice. Sales tax is set by states and sometimes by cities, and a seller may also need to keep ordinary business records. The list below is a common commercial set, not a ruling for your state.",
@@ -22,6 +24,7 @@ export const invoiceCountries: InvoiceCountry[] = [
     slug: "united-kingdom",
     name: "the United Kingdom",
     currency: "GBP",
+    locale: "en-GB",
     sourceName: "GOV.UK VAT invoice guidance",
     sourceUrl: "https://www.gov.uk/vat-record-keeping/vat-invoices",
     intro: "UK invoices used by VAT-registered businesses usually need a unique number, the supplier VAT number, the tax point, and a breakdown of VAT. A business that is not VAT-registered does not invent a VAT number. Check whether your supply needs a full VAT invoice.",
@@ -31,6 +34,7 @@ export const invoiceCountries: InvoiceCountry[] = [
     slug: "canada",
     name: "Canada",
     currency: "CAD",
+    locale: "en-CA",
     sourceName: "CRA guidance on GST/HST receipts and invoices",
     sourceUrl: "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate.html",
     intro: "Canadian invoices for GST/HST registrants generally identify the supplier and the registration number, and show the tax charged. Provinces can add their own sales-tax rules. This checklist is the common federal starting point.",
@@ -40,6 +44,7 @@ export const invoiceCountries: InvoiceCountry[] = [
     slug: "australia",
     name: "Australia",
     currency: "AUD",
+    locale: "en-AU",
     sourceName: "Australian Taxation Office tax invoice guidance",
     sourceUrl: "https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/tax-invoices/",
     intro: "A tax invoice in Australia is a specific document for GST-registered sales, and it usually includes an ABN. Not every sale needs the words tax invoice. The ATO page explains when a tax invoice is required.",
@@ -49,6 +54,7 @@ export const invoiceCountries: InvoiceCountry[] = [
     slug: "ireland",
     name: "Ireland",
     currency: "EUR",
+    locale: "en-IE",
     sourceName: "Revenue guidance on invoice information",
     sourceUrl: "https://www.revenue.ie/en/vat/vat-records-invoices-and-credit-notes/invoices/what-information-do-i-need-to-include-on-an-invoice.aspx",
     intro: "Irish VAT invoices have a set of particulars published by Revenue, including the supplier VAT number and the VAT breakdown. A business that is not registered for VAT should not copy those VAT fields for show.",
@@ -58,6 +64,7 @@ export const invoiceCountries: InvoiceCountry[] = [
     slug: "new-zealand",
     name: "New Zealand",
     currency: "NZD",
+    locale: "en-NZ",
     sourceName: "Inland Revenue taxable supply information",
     sourceUrl: "https://www.ird.govt.nz/gst/taxable-supply-information-for-gst",
     intro: "Since 1 April 2023, Inland Revenue asks GST-registered businesses to keep taxable supply information. A document can still be marked tax invoice. The details depend on the value of the supply, so use the IRD page rather than this summary alone.",
@@ -67,6 +74,7 @@ export const invoiceCountries: InvoiceCountry[] = [
     slug: "south-africa",
     name: "South Africa",
     currency: "ZAR",
+    locale: "en-ZA",
     sourceName: "SARS VAT guidance",
     sourceUrl: "https://www.sars.gov.za/types-of-tax/value-added-tax/",
     intro: "A South African VAT vendor has to issue a tax invoice that meets SARS requirements before the recipient relies on it for input tax. The SARS VAT pages describe the particulars. A non-vendor should not label a document as a VAT tax invoice.",
@@ -76,6 +84,7 @@ export const invoiceCountries: InvoiceCountry[] = [
     slug: "india",
     name: "India",
     currency: "INR",
+    locale: "en-IN",
     sourceName: "GST portal",
     sourceUrl: "https://www.gst.gov.in/",
     intro: "India's GST tax invoice has particulars set under GST law, including the GSTIN and the place of supply for many invoices. E-invoicing applies only to taxpayers who meet the notified turnover. This page is a checklist, not a filing tool.",
@@ -85,6 +94,7 @@ export const invoiceCountries: InvoiceCountry[] = [
     slug: "germany",
     name: "Germany",
     currency: "EUR",
+    locale: "de-DE",
     sourceName: "UStG §14 on invoices",
     sourceUrl: "https://www.gesetze-im-internet.de/ustg_1980/__14.html",
     intro: "German invoices for VAT purposes follow section 14 of the Umsatzsteuergesetz. Small invoices have a shorter list than full invoices. The statute is the source; this checklist only names the fields people most often miss.",
@@ -94,6 +104,7 @@ export const invoiceCountries: InvoiceCountry[] = [
     slug: "united-arab-emirates",
     name: "the United Arab Emirates",
     currency: "AED",
+    locale: "en-AE",
     sourceName: "UAE Federal Tax Authority",
     sourceUrl: "https://tax.gov.ae/",
     intro: "UAE VAT tax invoices must meet Federal Tax Authority requirements, including the supplier tax registration number when the supplier is registered. E-invoicing rules are being phased in for some businesses. Confirm the current FTA notice before you rely on a template.",

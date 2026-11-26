@@ -31,7 +31,7 @@ export default async function Page({ params }: { params: Promise<{ type: string 
         <h1>{titled(item.name)} receipt template</h1>
         <p>{item.intro}</p>
       </article>
-      <DocumentStudio kind="receipt" defaults={{ items: item.items }} />
+      <DocumentStudio kind="receipt" headingLevel={2} defaults={{ items: item.items }} />
       <article className="seo-content">
         <div className="faq-list">
           {item.faqs.map((faq) => <details key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}

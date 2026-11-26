@@ -26,7 +26,7 @@ export default async function Page({ params }: { params: Promise<{ country: stri
   const faqs = [
     { question: "Does this page know where I am?", answer: "No. Opening it does not detect your location. It only shows a checklist for this jurisdiction because you chose the page." },
     { question: "Is this a complete legal invoice?", answer: "No. It is a short list of commonly required fields plus the official source. Your supply, registration, and thresholds can change what you must show." },
-    { question: "Which currency is the generator using?", answer: `The embedded invoice starts in ${item.currency}. You can change it.` },
+    { question: "Which currency is the generator using?", answer: `The embedded invoice starts in ${item.currency}, with the matching number and date format. You can change both. This page does not detect where you are.` },
   ];
   return (
     <main className="page">
@@ -39,7 +39,7 @@ export default async function Page({ params }: { params: Promise<{ country: stri
         <h2>Checklist</h2>
         <ul>{item.fields.map((field) => <li key={field}>{field}</li>)}</ul>
       </article>
-      <DocumentStudio kind="invoice" defaults={{ currency: item.currency, notes: "Check the official source linked on this page before treating this invoice as complete." }} />
+      <DocumentStudio kind="invoice" headingLevel={2} defaults={{ currency: item.currency, locale: item.locale, notes: "Check the official source linked on this page before treating this invoice as complete." }} />
       <article className="seo-content">
         <div className="faq-list">
           {faqs.map((faq) => <details key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}

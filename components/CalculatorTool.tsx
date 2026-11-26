@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { breakEven, discountPrice, dueDate, freelanceRate, lateFee, markup, profitMargin, salesTax, type CalcSlug } from "@/lib/calculators";
 import { acceptDecimal, displayDate, formatMoney } from "@/lib/format";
+import { getSiteUrl } from "@/lib/site";
+import CopyEmbed from "@/components/CopyEmbed";
 
 function NumberField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
@@ -16,9 +18,29 @@ function NumberField({ label, value, onChange }: { label: string; value: string;
   );
 }
 
+const embedTitle: Record<CalcSlug, string> = {
+  "profit-margin": "Profit margin calculator",
+  markup: "Markup calculator",
+  "sales-tax": "Sales tax calculator",
+  "freelance-rate": "Freelance rate calculator",
+  "late-fee": "Late fee calculator",
+  "break-even": "Break-even calculator",
+  discount: "Discount calculator",
+  "due-date": "Invoice due date calculator",
+};
+
+function amountLabel(slug: CalcSlug) {
+  if (slug === "freelance-rate") return "Yearly income goal";
+  if (slug === "break-even") return "Fixed costs";
+  if (slug === "sales-tax") return "Amount";
+  if (slug === "late-fee") return "Invoice amount";
+  if (slug === "discount") return "Original price";
+  return "Cost";
+}
+
 export default function CalculatorTool({ slug, embedded = false }: { slug: CalcSlug; embedded?: boolean }) {
-  const [a, setA] = useState(slug === "due-date" ? "" : "100");
-  const [b, setB] = useState(slug === "sales-tax" || slug === "discount" || slug === "late-fee" ? "20" : "150");
+  const [a, setA] = useState(slug === "due-date" ? "" : slug === "freelance-rate" ? "60000" : "100");
+  const [b, setB] = useState(slug === "freelance-rate" ? "12000" : slug === "sales-tax" || slug === "discount" || slug === "late-fee" ? "20" : "150");
   const [c, setC] = useState("48");
   const [d, setD] = useState("30");
   const [mode, setMode] = useState<"add" | "remove">("add");
@@ -61,7 +83,7 @@ export default function CalculatorTool({ slug, embedded = false }: { slug: CalcS
           </>
         ) : (
           <>
-            <NumberField label={slug === "freelance-rate" ? "Yearly income goal" : slug === "break-even" ? "Fixed costs" : slug === "sales-tax" ? "Amount" : "Cost or original price"} value={a} onChange={setA} />
+            <NumberField label={amountLabel(slug)} value={a} onChange={setA} />
             <NumberField label={slug === "freelance-rate" ? "Yearly expenses" : slug === "break-even" ? "Price per unit" : slug === "late-fee" ? "Annual rate %" : slug === "discount" || slug === "sales-tax" ? "Rate %" : "Selling price"} value={b} onChange={setB} />
           </>
         )}
@@ -78,7 +100,12 @@ export default function CalculatorTool({ slug, embedded = false }: { slug: CalcS
       </div>
       <p className="calc-result" role="status">{result}</p>
       <p className="quote-note">The numbers stay in this browser. This is arithmetic, not tax or legal advice.</p>
-      {embedded ? null : <p><Link href={`/embed/${slug}`}>Embed this calculator</Link></p>}
+      {embedded ? null : (
+        <>
+          <p><Link href={`/embed/${slug}`}>Open the embeddable calculator</Link></p>
+          <CopyEmbed code={`<iframe src="${getSiteUrl()}/embed/${slug}" title="${embedTitle[slug]}" style="width:100%;max-width:480px;height:460px;border:0"></iframe>`} />
+        </>
+      )}
     </section>
   );
 }

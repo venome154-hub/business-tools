@@ -7,6 +7,7 @@ export default function ToolArticle({
   description,
   intro,
   faqs,
+  headingAbove = false,
   children,
 }: {
   name: string;
@@ -14,6 +15,7 @@ export default function ToolArticle({
   description: string;
   intro: string;
   faqs: FaqItem[];
+  headingAbove?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -23,10 +25,15 @@ export default function ToolArticle({
         faqLd(faqs),
         breadcrumbLd([{ name: "Home", path: "/" }, { name, path }]),
       ]} />
+      {headingAbove && (
+        <section className="seo-content">
+          <h1>{name}</h1>
+          <p>{intro}</p>
+        </section>
+      )}
       {children}
       <section className="seo-content">
-        <h2>{name}</h2>
-        <p>{intro}</p>
+        {!headingAbove && <><h2>{name}</h2><p>{intro}</p></>}
         <h2>Frequently asked questions</h2>
         <div className="faq-list">
           {faqs.map((item) => <details key={item.question}><summary>{item.question}</summary><p>{item.answer}</p></details>)}

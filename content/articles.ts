@@ -69,7 +69,7 @@ export const articles: GuideArticle[] = [
     paragraphs: [
       "A Shopify product CSV uses a handle to group rows that belong to one product, and variant rows for each option. Before you import, look for an empty Variant SKU, an empty Variant Price, and a handle that appears on two different products by mistake.",
       "Do not delete the header row. Importers match columns by those names. Blank data under a real header is still an empty value; the CSV cleaner can drop columns that have a header but no values in the data rows.",
-      "Duplicate handles are not always wrong: extra rows can be variants or images. The checker flags repeated handles so you can decide. A second product that reused a handle will collide on import.",
+      "Duplicate handles are not always wrong: extra rows can be variants or images, and those variant rows usually leave Title empty. The checker calls a handle a possible duplicate product only when more than one of its rows has a title, or when the option values are the same. A second product that reused a handle will collide on import.",
       "Open the file in the product CSV checker or the CSV cleaner in your browser. The file is not uploaded. Export a fresh copy from Shopify if you are unsure which version is current.",
     ],
   },

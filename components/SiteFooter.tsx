@@ -8,35 +8,44 @@ export default function SiteFooter() {
       <div className="site-footer-inner">
         <div>
           <strong>Tools</strong>
-          <Link href="/invoice-generator">Invoice generator</Link>
-          <Link href="/quote-generator">Quote generator</Link>
-          <Link href="/receipt-generator">Receipt generator</Link>
-          <Link href="/payment-reminder-generator">Payment reminder</Link>
-          <Link href="/csv-cleaner">CSV cleaner</Link>
-          <Link href="/csv-merger">CSV merger</Link>
-          <Link href="/duplicate-sku-finder">Duplicate SKU finder</Link>
-          <Link href="/purchase-order">Purchase order</Link>
-          <Link href="/credit-note">Credit note</Link>
-          <Link href="/delivery-note">Delivery note</Link>
-          <Link href="/timesheet-invoice">Timesheet invoice</Link>
-          <Link href="/rent-receipt">Rent receipt</Link>
-          <Link href="/donation-receipt">Donation receipt</Link>
-          <Link href="/my-documents">My documents</Link>
-          <Link href="/csv-excel">CSV and Excel</Link>
-          <Link href="/csv-to-json">CSV to JSON</Link>
-          <Link href="/split-csv">Split CSV</Link>
-          <Link href="/csv-columns">CSV columns</Link>
-          <Link href="/csv-find-replace">Find and replace</Link>
-          <Link href="/csv-join">Join CSVs</Link>
-          <Link href="/product-csv-checker">Product CSV checker</Link>
-          <Link href="/profit-margin-calculator">Profit margin</Link>
-          <Link href="/markup-calculator">Markup</Link>
-          <Link href="/sales-tax-calculator">Sales tax</Link>
-          <Link href="/freelance-rate-calculator">Freelance rate</Link>
-          <Link href="/late-fee-calculator">Late fee</Link>
-          <Link href="/break-even-calculator">Break-even</Link>
-          <Link href="/discount-calculator">Discount</Link>
-          <Link href="/invoice-due-date-calculator">Due date</Link>
+          <details className="footer-group">
+            <summary>Documents</summary>
+            <Link href="/invoice-generator">Invoice generator</Link>
+            <Link href="/quote-generator">Quote generator</Link>
+            <Link href="/receipt-generator">Receipt generator</Link>
+            <Link href="/payment-reminder-generator">Payment reminder</Link>
+            <Link href="/purchase-order">Purchase order</Link>
+            <Link href="/credit-note">Credit note</Link>
+            <Link href="/delivery-note">Delivery note</Link>
+            <Link href="/timesheet-invoice">Timesheet invoice</Link>
+            <Link href="/rent-receipt">Rent receipt</Link>
+            <Link href="/donation-receipt">Donation receipt</Link>
+            <Link href="/my-documents">My documents</Link>
+          </details>
+          <details className="footer-group">
+            <summary>CSV tools</summary>
+            <Link href="/csv-cleaner">CSV cleaner</Link>
+            <Link href="/csv-merger">CSV merger</Link>
+            <Link href="/duplicate-sku-finder">Duplicate SKU finder</Link>
+            <Link href="/csv-excel">CSV and Excel</Link>
+            <Link href="/csv-to-json">CSV to JSON</Link>
+            <Link href="/split-csv">Split CSV</Link>
+            <Link href="/csv-columns">CSV columns</Link>
+            <Link href="/csv-find-replace">Find and replace</Link>
+            <Link href="/csv-join">Join CSVs</Link>
+            <Link href="/product-csv-checker">Product CSV checker</Link>
+          </details>
+          <details className="footer-group">
+            <summary>Calculators</summary>
+            <Link href="/profit-margin-calculator">Profit margin</Link>
+            <Link href="/markup-calculator">Markup</Link>
+            <Link href="/sales-tax-calculator">Sales tax</Link>
+            <Link href="/freelance-rate-calculator">Freelance rate</Link>
+            <Link href="/late-fee-calculator">Late fee</Link>
+            <Link href="/break-even-calculator">Break-even</Link>
+            <Link href="/discount-calculator">Discount</Link>
+            <Link href="/invoice-due-date-calculator">Due date</Link>
+          </details>
         </div>
         <div>
           <strong>Templates</strong>

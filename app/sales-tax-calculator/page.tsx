@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Sales Tax Calculator" path="/sales-tax-calculator" description="Add or remove VAT, GST, or sales tax from an amount." intro="Enter an amount and a rate to add tax on top, or to pull tax back out of a tax-inclusive price. The rate is capped at 100%." faqs={faqs}>
+    <ToolArticle name="Sales Tax Calculator" path="/sales-tax-calculator" description="Add or remove VAT, GST, or sales tax from an amount." intro="Enter an amount and a rate to add tax on top, or to pull tax back out of a tax-inclusive price. The rate is capped at 100%." faqs={faqs} headingAbove>
       <CalculatorTool slug="sales-tax" />
     </ToolArticle>
   );

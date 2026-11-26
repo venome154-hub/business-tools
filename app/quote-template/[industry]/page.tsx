@@ -32,7 +32,7 @@ export default async function Page({ params }: { params: Promise<{ industry: str
         <p>{item.quoteIntro}</p>
         <p>This estimate is not an invoice. It proposes the scope and the price before the work is billed. The sample lines are a draft you can edit.</p>
       </article>
-      <DocumentStudio kind="quote" defaults={{ items: item.items, notes: "Price assumes the scope described in the lines. Work outside that scope needs a new quote." }} />
+      <DocumentStudio kind="quote" headingLevel={2} defaults={{ items: item.items, notes: "Price assumes the scope described in the lines. Work outside that scope needs a new quote." }} />
       <article className="seo-content">
         <h2>Questions about {item.name} quotes</h2>
         <div className="faq-list">

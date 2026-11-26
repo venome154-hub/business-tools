@@ -50,10 +50,12 @@ export function sanitizePercent(value: string, max = 100) {
 
 export function formatMoney(amount: number, currency: string, locale = "en-US") {
   const value = roundMoney(amount);
+  const code = currency.trim().toUpperCase();
+  if (!/^[A-Z]{3}$/.test(code)) return value.toFixed(2);
   try {
-    return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
+    return new Intl.NumberFormat(locale, { style: "currency", currency: code }).format(value);
   } catch {
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+    return value.toFixed(2);
   }
 }
 

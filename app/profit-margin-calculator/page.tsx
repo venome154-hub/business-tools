@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Profit Margin Calculator" path="/profit-margin-calculator" description="Calculate profit margin from cost and selling price in your browser." intro="Margin is the share of the selling price that is left after cost. Enter cost and selling price. The percentage is (price − cost) ÷ price." faqs={faqs}>
+    <ToolArticle name="Profit Margin Calculator" path="/profit-margin-calculator" description="Calculate profit margin from cost and selling price in your browser." intro="Margin is the share of the selling price that is left after cost. Enter cost and selling price. The percentage is (price − cost) ÷ price." faqs={faqs} headingAbove>
       <CalculatorTool slug="profit-margin" />
     </ToolArticle>
   );

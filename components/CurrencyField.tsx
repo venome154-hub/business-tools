@@ -1,35 +1,62 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { currencyCodes } from "@/lib/locales";
 
 export default function CurrencyField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  const [query, setQuery] = useState("");
   const codes = useMemo(() => currencyCodes(), []);
-  const matches = codes.filter((code) => code.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 8);
+  const [text, setText] = useState(value);
+  const [open, setOpen] = useState(false);
+  const picked = useRef(false);
+  useEffect(() => { setText(value); }, [value]);
 
-  function commit(next: string) {
-    const code = next.trim().toUpperCase();
-    if (codes.includes(code)) onChange(code);
-    setQuery("");
+  const query = text.trim().toUpperCase();
+  const known = codes.includes(query);
+  const matches = codes.filter((code) => code.includes(query)).slice(0, 12);
+
+  function choose(code: string) {
+    picked.current = true;
+    setText(code);
+    onChange(code);
+    setOpen(false);
   }
 
   return (
     <label className="currency-field">Currency
       <input
-        value={query || value}
-        onChange={(event) => setQuery(event.target.value.toUpperCase())}
-        onBlur={() => commit(query || value)}
+        role="combobox"
+        aria-expanded={open}
+        aria-controls="currency-options"
+        aria-autocomplete="list"
         aria-label="Currency"
+        value={text}
         autoComplete="off"
+        onFocus={() => setOpen(true)}
+        onBlur={() => {
+          setOpen(false);
+          if (picked.current) {
+            picked.current = false;
+            return;
+          }
+          const code = text.trim().toUpperCase();
+          setText(code);
+          onChange(code);
+        }}
+        onChange={(event) => {
+          const next = event.target.value.toUpperCase();
+          setText(next);
+          setOpen(true);
+          if (codes.includes(next.trim())) onChange(next.trim());
+        }}
       />
-      {query && matches.length > 0 && (
-        <div className="currency-list" role="listbox">
+      {open && matches.length > 0 && (
+        <div className="currency-list" id="currency-options" role="listbox">
           {matches.map((code) => (
-            <button key={code} type="button" onMouseDown={(event) => { event.preventDefault(); commit(code); }}>{code}</button>
+            <button key={code} type="button" role="option" aria-selected={code === query} onMouseDown={(event) => { event.preventDefault(); choose(code); }}>{code}</button>
           ))}
         </div>
       )}
+      {query && !known && <span className="field-error">Unknown currency code</span>}
     </label>
   );
 }

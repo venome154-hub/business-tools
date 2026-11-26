@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   description: "BizToolsBox does not sell a paid plan. The document, calculator, and CSV tools are free.",
   alternates: { canonical: "/pricing" },
   openGraph: { title: "Pricing", description: "No paid plan is for sale. The tools are free.", type: "website", url: "/pricing" },
+  robots: { index: false, follow: false },
 };
 
 export default function Page() {

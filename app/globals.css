@@ -201,6 +201,11 @@ button:disabled { opacity:.65; cursor:progress; }
   .menu-button { display:inline-flex; margin-left:auto; }
 }
 .site-footer a { overflow-wrap:anywhere; }
+.footer-group { margin:0 0 8px; }
+.footer-group summary { cursor:pointer; font-weight:700; padding:4px 0; }
+.issue-list { display:grid; gap:8px; margin:12px 0; padding:0; list-style:none; }
+.issue-list li { display:grid; gap:2px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; }
+.issue-list span { color:var(--muted); font-size:13px; }
 .mobile-doc-bar { display:none; }
 @media (max-width: 767px) {
   .site-nav { display:none; }

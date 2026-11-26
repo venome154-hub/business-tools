@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Discount Calculator" path="/discount-calculator" description="Take a percentage off a price." intro="Enter the original price and a discount percent from 0 to 100. The result is the amount off and the price after the discount." faqs={faqs}>
+    <ToolArticle name="Discount Calculator" path="/discount-calculator" description="Take a percentage off a price." intro="Enter the original price and a discount percent from 0 to 100. The result is the amount off and the price after the discount." faqs={faqs} headingAbove>
       <CalculatorTool slug="discount" />
     </ToolArticle>
   );

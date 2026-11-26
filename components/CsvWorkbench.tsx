@@ -15,7 +15,7 @@ const COPY: Record<CsvExtraMode, { title: string; description: string }> = {
   columns: { title: "Remove or reorder columns", description: "Choose which columns to keep and move them up or down before downloading." },
   replace: { title: "Find and replace in a CSV", description: "Replace text in one column or across the whole sheet, then download the result." },
   join: { title: "Join two CSVs by a key", description: "Match rows the way a spreadsheet VLOOKUP does. The first file keeps every row." },
-  products: { title: "Product CSV checker", description: "Look for a missing SKU, a missing price, or a repeated Shopify handle in a product export." },
+  products: { title: "Product CSV checker", description: "Look for a missing SKU, a missing or non-numeric price, a repeated SKU, or a handle that looks like two products." },
 };
 
 export default function CsvWorkbench({ mode }: { mode: CsvExtraMode }) {
@@ -90,6 +90,17 @@ export default function CsvWorkbench({ mode }: { mode: CsvExtraMode }) {
         </label>
         {error && <p className="csv-error" role="alert">{error}</p>}
         {first && <p className="csv-privacy-note">{first.name}: {Math.max(first.rows.length - 1, 0)} data rows</p>}
+        {mode === "products" && output.length > 1 && (
+          <ul className="issue-list">
+            {output.slice(1).map((issue) => (
+              <li key={`${issue[0]}-${issue[1]}-${issue[2]}`}>
+                <span>Row {issue[0]}</span>
+                <strong>{issue[1]}</strong>
+                {issue[2] ? <span>{issue[2]}</span> : null}
+              </li>
+            ))}
+          </ul>
+        )}
         {mode === "split" && <label>Rows per file<input inputMode="numeric" value={chunkSize} onChange={(event) => setChunkSize(event.target.value.replace(/[^\d]/g, ""))} /></label>}
         {mode === "columns" && (
           <div className="column-list">

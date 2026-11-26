@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Markup Calculator" path="/markup-calculator" description="Calculate markup from cost and selling price." intro="Markup is the amount added to cost, divided by that cost. A 50% markup on a 100 cost is a 150 selling price." faqs={faqs}>
+    <ToolArticle name="Markup Calculator" path="/markup-calculator" description="Calculate markup from cost and selling price." intro="Markup is the amount added to cost, divided by that cost. A 50% markup on a 100 cost is a 150 selling price." faqs={faqs} headingAbove>
       <CalculatorTool slug="markup" />
     </ToolArticle>
   );

@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Break-even Calculator" path="/break-even-calculator" description="Estimate how many units cover fixed costs." intro="Break-even units equal fixed costs divided by the amount left from the price after variable cost. If the price is not higher than the variable cost, there is no break-even point." faqs={faqs}>
+    <ToolArticle name="Break-even Calculator" path="/break-even-calculator" description="Estimate how many units cover fixed costs." intro="Break-even units equal fixed costs divided by the amount left from the price after variable cost. If the price is not higher than the variable cost, there is no break-even point." faqs={faqs} headingAbove>
       <CalculatorTool slug="break-even" />
     </ToolArticle>
   );

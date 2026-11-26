@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Late Payment Fee Calculator" path="/late-fee-calculator" description="Estimate a simple annual late fee for an unpaid invoice." intro="The fee is the unpaid amount times the annual rate times days late, divided by 365. It is a simple estimate, not a statutory interest calculation." faqs={faqs}>
+    <ToolArticle name="Late Payment Fee Calculator" path="/late-fee-calculator" description="Estimate a simple annual late fee for an unpaid invoice." intro="The fee is the unpaid amount times the annual rate times days late, divided by 365. It is a simple estimate, not a statutory interest calculation." faqs={faqs} headingAbove>
       <CalculatorTool slug="late-fee" />
     </ToolArticle>
   );

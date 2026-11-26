@@ -41,7 +41,7 @@ export default async function Page({ params }: { params: Promise<{ industry: str
         <p>{item.invoiceIntro}</p>
         <p>The example lines below are a starting point for this kind of work. Change the quantities and prices. The PDF is created in your browser.</p>
       </article>
-      <DocumentStudio kind="invoice" defaults={{ items: item.items }} />
+      <DocumentStudio kind="invoice" headingLevel={2} defaults={{ items: item.items }} />
       <article className="seo-content">
         <h2>Questions about {item.name} invoices</h2>
         <div className="faq-list">

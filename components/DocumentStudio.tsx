@@ -46,9 +46,11 @@ function moneyOf(state: DocumentState) {
 export default function DocumentStudio({
   kind,
   defaults,
+  headingLevel = 1,
 }: {
   kind: DocumentKind;
-  defaults?: { currency?: string; notes?: string; items?: { description: string; quantity: string; price: string }[] };
+  defaults?: { currency?: string; locale?: string; notes?: string; items?: { description: string; quantity: string; price: string }[] };
+  headingLevel?: 1 | 2;
 }) {
   const config = KIND_CONFIG[kind];
   const router = useRouter();
@@ -83,10 +85,14 @@ export default function DocumentStudio({
     }
     const preset = defaultsKey ? JSON.parse(defaultsKey) as NonNullable<typeof defaults> : null;
     if (preset?.currency) next.currency = preset.currency;
+    if (preset?.locale) next.locale = preset.locale;
     if (preset?.notes) next.notes = preset.notes;
     if (preset?.items?.length) next.items = preset.items.map((item) => ({ ...item, tax: "" }));
     const handoff = takeHandoff(kind);
-    if (handoff?.payload) Object.assign(next, handoff.payload);
+    if (handoff?.payload) {
+      Object.assign(next, handoff.payload);
+      next.previouslyPaid = handoff.payload.previouslyPaid ?? "";
+    }
     if (!next.date) next.date = localDate();
     if (!next.number) next.number = peekNumber(config.prefix);
     if (handoff?.draftId) setDraftId(handoff.draftId);
@@ -107,10 +113,11 @@ export default function DocumentStudio({
   }, [config.paymentLink, state.paymentLink]);
 
   const figures = useMemo(() => moneyOf(state), [state]);
-  const paid = config.paid
-    ? (kind === "receipt" && state.amountPaid.trim() === "" ? figures.total : roundMoney(parseDecimal(state.amountPaid)))
-    : 0;
-  const balance = roundMoney(figures.total - paid);
+  const paidSpecified = config.paid && state.amountPaid.trim() !== "";
+  const paid = paidSpecified ? roundMoney(parseDecimal(state.amountPaid)) : 0;
+  const prior = roundMoney(parseDecimal(state.previouslyPaid || ""));
+  const balance = roundMoney(figures.total - prior - paid);
+  const HeadingTag = headingLevel === 2 ? "h2" : "h1";
 
   function patch(partial: Partial<DocumentState>) {
     setState((current) => ({ ...current, ...partial }));
@@ -209,10 +216,10 @@ export default function DocumentStudio({
         meta: [
           `${config.numberLabel}: ${state.number || "—"}`,
           `Date: ${displayDate(state.date, state.locale) || "—"}`,
-          ...(state.dueDate ? [`Due: ${displayDate(state.dueDate, state.locale)}`] : []),
-          ...(state.validUntil ? [`Valid until: ${displayDate(state.validUntil, state.locale)}`] : []),
-          ...(state.poNumber ? [`PO: ${state.poNumber}`] : []),
-          ...(state.relatedNumber ? [`Related: ${state.relatedNumber}`] : []),
+          ...(config.due && state.dueDate ? [`Due: ${displayDate(state.dueDate, state.locale)}`] : []),
+          ...(config.validity && state.validUntil ? [`Valid until: ${displayDate(state.validUntil, state.locale)}`] : []),
+          ...(config.po && state.poNumber ? [`PO: ${state.poNumber}`] : []),
+          ...(config.related && state.relatedNumber ? [`Related: ${state.relatedNumber}`] : []),
         ],
         blocks: [
           { title: "FROM", lines: [state.company, state.companyAddress, state.companyEmail] },
@@ -228,12 +235,13 @@ export default function DocumentStudio({
           ...(figures.taxAmount > 0 ? [{ label: "Tax", value: money(figures.taxAmount) }] : []),
           ...(figures.shipping > 0 ? [{ label: "Shipping", value: money(figures.shipping) }] : []),
           { label: kind === "credit-note" ? "Amount credited" : "Total", value: money(figures.total), emphasize: true },
-          ...(config.paid ? [{ label: config.paidLabel, value: money(paid) }, { label: "Balance", value: money(balance), emphasize: true }] : []),
+          ...(prior > 0 ? [{ label: "Previously paid", value: money(prior) }] : []),
+          ...(paidSpecified ? [{ label: config.paidLabel, value: money(paid) }, { label: "Balance", value: money(balance), emphasize: true }] : []),
         ] : [],
         notes: [
-          ...(state.paymentInfo ? [{ title: "Payment instructions", text: state.paymentInfo }] : []),
-          ...(state.lateFee ? [{ title: "Late fee", text: state.lateFee }] : []),
-          ...(state.terms ? [{ title: "Terms and conditions", text: state.terms }] : []),
+          ...(config.paymentInfo && state.paymentInfo ? [{ title: "Payment instructions", text: state.paymentInfo }] : []),
+          ...(config.lateFee && state.lateFee ? [{ title: "Late fee", text: state.lateFee }] : []),
+          ...(config.termsBlock && state.terms ? [{ title: "Terms and conditions", text: state.terms }] : []),
           ...(state.notes ? [{ title: "Notes", text: state.notes }] : []),
           ...(config.note ? [{ title: "Note", text: config.note }] : []),
           ...(config.method && state.paymentMethod ? [{ title: "Payment method", text: [state.paymentMethod, state.paymentReference].filter(Boolean).join(" · ") }] : []),
@@ -267,8 +275,19 @@ export default function DocumentStudio({
     } else {
       const payload: Partial<DocumentState> = { ...state, number: "", date: "" };
       if (target === "receipt") {
+        const priorText = state.amountPaid.trim();
+        const priorAmount = priorText ? roundMoney(parseDecimal(priorText)) : 0;
+        const stillDue = roundMoney(Math.max(0, figures.total - priorAmount));
         payload.relatedNumber = state.number;
-        payload.amountPaid = "";
+        payload.previouslyPaid = priorText ? String(priorAmount) : "";
+        payload.amountPaid = String(stillDue);
+        payload.dueDate = "";
+        payload.validUntil = "";
+        payload.paymentTerms = "";
+      }
+      if (target === "invoice") {
+        payload.validUntil = "";
+        payload.acceptedBy = "";
       }
       writeHandoff({ to: target, payload });
     }
@@ -283,7 +302,7 @@ export default function DocumentStudio({
         <div className="heading">
           <div>
             <span className="badge">100% FREE</span>
-            <h1>{config.heading}</h1>
+            <HeadingTag>{config.heading}</HeadingTag>
             <p>{config.lede}</p>
           </div>
           <button className="download" type="button" onClick={downloadPDF} disabled={pdfBusy}>{pdfBusy ? "Preparing PDF…" : "Download PDF"}</button>
@@ -394,7 +413,13 @@ export default function DocumentStudio({
           {config.tax && !state.perLineTax && <label>Tax %<input inputMode="decimal" value={state.tax} onChange={(event) => updateAmount("tax", event.target.value)} /></label>}
           {config.discount && <label>Discount %<input inputMode="decimal" value={state.discount} onChange={(event) => updateAmount("discount", event.target.value)} /></label>}
           {config.shipping && <label>Shipping<input inputMode="decimal" value={state.shipping} onChange={(event) => updateAmount("shipping", event.target.value)} /></label>}
-          {config.paid && <label>{config.paidLabel}<input inputMode="decimal" value={state.amountPaid} onChange={(event) => updateAmount("amountPaid", event.target.value)} placeholder={kind === "receipt" ? "Blank means paid in full" : ""} /></label>}
+          {kind === "receipt" && <label>Previously paid<input inputMode="decimal" value={state.previouslyPaid || ""} onChange={(event) => {
+            const next = acceptDecimal(event.target.value);
+            if (next.value === undefined) { setError(next.error); return; }
+            setError(next.error);
+            patch({ previouslyPaid: next.value });
+          }} /></label>}
+          {config.paid && <label>{config.paidLabel}<input inputMode="decimal" value={state.amountPaid} onChange={(event) => updateAmount("amountPaid", event.target.value)} /></label>}
         </div>
         <div className="grid two">
           {config.paymentInfo && <label className="full-field">Payment instructions<textarea rows={3} value={state.paymentInfo} onChange={(event) => patch({ paymentInfo: event.target.value })} /></label>}
@@ -423,8 +448,8 @@ export default function DocumentStudio({
             <div className="invoice-preview-client"><b>{config.party}</b><br />{state.client || "Name"}</div>
             {state.clientAddress && <div className="pre-line">{state.clientAddress}</div>}
             <div>Date: {dateLabel || "—"}</div>
-            {state.dueDate && <div>Due: {displayDate(state.dueDate, state.locale)}</div>}
-            {state.validUntil && <div>Valid until: {displayDate(state.validUntil, state.locale)}</div>}
+            {config.due && state.dueDate && <div>Due: {displayDate(state.dueDate, state.locale)}</div>}
+            {config.validity && state.validUntil && <div>Valid until: {displayDate(state.validUntil, state.locale)}</div>}
           </div>
           <hr />
           {figures.lines.map((line, index) => (
@@ -440,7 +465,9 @@ export default function DocumentStudio({
               {figures.taxAmount > 0 && <div>Tax <span>{formatMoney(figures.taxAmount, state.currency, state.locale)}</span></div>}
               {figures.shipping > 0 && <div>Shipping <span>{formatMoney(figures.shipping, state.currency, state.locale)}</span></div>}
               <div className="grand">{kind === "credit-note" ? "Amount credited" : "Total"} <span>{formatMoney(figures.total, state.currency, state.locale)}</span></div>
-              {config.paid && <div>Balance <span>{formatMoney(balance, state.currency, state.locale)}</span></div>}
+              {prior > 0 && <div>Previously paid <span>{formatMoney(prior, state.currency, state.locale)}</span></div>}
+              {paidSpecified && <div>{config.paidLabel} <span>{formatMoney(paid, state.currency, state.locale)}</span></div>}
+              {paidSpecified && <div>Balance <span>{formatMoney(balance, state.currency, state.locale)}</span></div>}
             </div>
           )}
           {qr && <LocalImage className="paper-qr" src={qr} alt="Payment link QR code" />}

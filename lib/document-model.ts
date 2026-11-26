@@ -34,6 +34,7 @@ export type DocumentState = {
   discount: string;
   shipping: string;
   amountPaid: string;
+  previouslyPaid: string;
   poNumber: string;
   paymentTerms: "" | "due" | "7" | "15" | "30";
   lateFee: string;
@@ -111,6 +112,7 @@ export function blankDocument(kind: DocumentKind): DocumentState {
     discount: "0",
     shipping: "",
     amountPaid: "",
+    previouslyPaid: "",
     poNumber: "",
     paymentTerms: "",
     lateFee: "",

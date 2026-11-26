@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CalculatorTool from "@/components/CalculatorTool";
-import CopyEmbed from "@/components/CopyEmbed";
+import EmbedCode from "@/components/EmbedCode";
 import type { CalcSlug } from "@/lib/calculators";
 import { getSiteUrl } from "@/lib/site";
 
@@ -38,7 +38,7 @@ export default async function Page({ params }: { params: Promise<{ tool: string 
       <h1>{item.title}</h1>
       <CalculatorTool slug={item.slug} embedded />
       <p className="embed-credit"><a href={`${getSiteUrl()}${item.path}`}>Powered by BizToolsBox</a></p>
-      <CopyEmbed code={code} />
+      <EmbedCode code={code} />
     </main>
   );
 }
