@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContextualLinks from "@/components/ContextualLinks";
 import JsonLd from "@/components/JsonLd";
 import { invoiceCountries } from "@/content/countries";
+import { breadcrumbItems } from "@/lib/breadcrumbs";
 import { breadcrumbLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
@@ -14,7 +16,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <main className="page">
-      <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Invoice requirements", path: "/invoice-requirements" }])} />
+      <JsonLd data={breadcrumbLd(breadcrumbItems("/invoice-requirements") ?? [])} />
       <article className="seo-content">
         <h1>Invoice requirements, jurisdiction by jurisdiction</h1>
         <p>These pages list fields that are commonly expected and link to an official source. They do not detect where you are, and they are not a substitute for the tax authority’s own instructions.</p>
@@ -22,6 +24,7 @@ export default function Page() {
           {invoiceCountries.map((item) => <Link key={item.slug} href={`/invoice-requirements/${item.slug}`}>{item.name} →</Link>)}
         </div>
       </article>
+      <ContextualLinks path="/invoice-requirements" />
     </main>
   );
 }

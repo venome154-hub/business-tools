@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContextualLinks from "@/components/ContextualLinks";
 import CsvUtility, { CsvOutputNote } from "@/components/CsvUtility";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbLd, faqLd, webApplicationLd } from "@/lib/schema";
@@ -37,5 +38,6 @@ export default function CsvCleanerPage() {
       </div>
       <p>Need to combine exports? Try the <Link href="/csv-merger">free CSV merger</Link>. To check product identifiers, use the <Link href="/duplicate-sku-finder">duplicate SKU finder</Link>.</p>
     </section>
+    <ContextualLinks path="/csv-cleaner" />
   </main>;
 }

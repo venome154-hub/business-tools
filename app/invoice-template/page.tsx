@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContextualLinks from "@/components/ContextualLinks";
 import JsonLd from "@/components/JsonLd";
 import { industries } from "@/content/industries";
+import { breadcrumbItems } from "@/lib/breadcrumbs";
 import { breadcrumbLd } from "@/lib/schema";
 import { titled } from "@/lib/site";
 
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <main className="page">
-      <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Invoice templates", path: "/invoice-template" }])} />
+      <JsonLd data={breadcrumbLd(breadcrumbItems("/invoice-template") ?? [])} />
       <article className="seo-content">
         <h1>Invoice templates for specific work</h1>
         <p>Each template opens the invoice generator with example lines for that trade. The descriptions are different because the work is different: a plumber’s call-out is not a tutor’s lesson block. Replace the sample prices with yours.</p>
@@ -23,6 +25,7 @@ export default function Page() {
           {industries.map((item) => <Link key={item.slug} href={`/invoice-template/${item.slug}`}>{titled(item.name)} →</Link>)}
         </div>
       </article>
+      <ContextualLinks path="/invoice-template" />
     </main>
   );
 }

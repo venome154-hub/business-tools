@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ContextualLinks from "@/components/ContextualLinks";
 import DocumentStudio from "@/components/DocumentStudio";
 import JsonLd from "@/components/JsonLd";
 import { countryDescription, getInvoiceCountry, invoiceCountries } from "@/content/countries";
+import { breadcrumbItems } from "@/lib/breadcrumbs";
 import { breadcrumbLd, faqLd } from "@/lib/schema";
 
 export function generateStaticParams() {
@@ -30,7 +32,7 @@ export default async function Page({ params }: { params: Promise<{ country: stri
   ];
   return (
     <main className="page">
-      <JsonLd data={[faqLd(faqs), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Invoice requirements", path: "/invoice-requirements" }, { name: item.name, path: `/invoice-requirements/${item.slug}` }])]} />
+      <JsonLd data={[faqLd(faqs), breadcrumbLd(breadcrumbItems(`/invoice-requirements/${item.slug}`) ?? [])]} />
       <article className="seo-content">
         <h1>Common invoice fields for {item.name}</h1>
         <p>{item.intro}</p>
@@ -48,6 +50,7 @@ export default async function Page({ params }: { params: Promise<{ country: stri
           {invoiceCountries.filter((other) => other.slug !== item.slug).slice(0, 4).map((other) => <Link key={other.slug} href={`/invoice-requirements/${other.slug}`}>{other.name} →</Link>)}
         </div>
       </article>
+      <ContextualLinks path={`/invoice-requirements/${item.slug}`} />
     </main>
   );
 }

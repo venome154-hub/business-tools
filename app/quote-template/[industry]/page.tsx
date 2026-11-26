@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import DocumentStudio from "@/components/DocumentStudio";
 import JsonLd from "@/components/JsonLd";
+import { breadcrumbItems } from "@/lib/breadcrumbs";
 import { getIndustry, industries } from "@/content/industries";
 import { breadcrumbLd, faqLd } from "@/lib/schema";
 import { titled } from "@/lib/site";
@@ -26,7 +27,7 @@ export default async function Page({ params }: { params: Promise<{ industry: str
   if (!item) notFound();
   return (
     <main className="page">
-      <JsonLd data={[faqLd(item.quoteFaqs), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Quote templates", path: "/quote-template" }, { name: item.name, path: `/quote-template/${item.slug}` }])]} />
+      <JsonLd data={[faqLd(item.quoteFaqs), breadcrumbLd(breadcrumbItems(`/quote-template/${item.slug}`) ?? [])]} />
       <article className="seo-content">
         <h1>{titled(item.name)} quote template</h1>
         <p>{item.quoteIntro}</p>
@@ -41,6 +42,8 @@ export default async function Page({ params }: { params: Promise<{ industry: str
         <div className="guide-links">
           {item.related.map((slug) => <Link key={slug} href={`/quote-template/${slug}`}>{titled(getIndustry(slug)?.name ?? slug)} quote template →</Link>)}
           <Link href={`/invoice-template/${item.slug}`}>Invoice template for a {item.name} →</Link>
+          <Link href="/quote-generator">Quote generator →</Link>
+          <Link href="/invoice-generator">Invoice generator →</Link>
         </div>
       </article>
     </main>

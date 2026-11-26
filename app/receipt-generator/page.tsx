@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContextualLinks from "@/components/ContextualLinks";
 import ReceiptGenerator from "@/components/ReceiptGenerator";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbLd, faqLd, webApplicationLd, type FaqItem } from "@/lib/schema";
@@ -47,6 +48,7 @@ export default function ReceiptPage() {
           <details><summary>Can I link the receipt to an invoice?</summary><p>Yes. Enter the related invoice number so it appears on the receipt.</p></details>
         </div>
       </section>
+      <ContextualLinks path="/receipt-generator" />
     </main>
   );
 }

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContextualLinks from "@/components/ContextualLinks";
 import JsonLd from "@/components/JsonLd";
+import { breadcrumbItems } from "@/lib/breadcrumbs";
 import { articleLd, breadcrumbLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
@@ -12,10 +14,11 @@ export const metadata: Metadata = {
 export default function InvoiceVsQuotePage() {
   return (
     <main className="page">
-      <JsonLd data={[articleLd("Invoice vs. quote: what is the difference?", "Learn when to send a quote and when to issue an invoice.", "/guides/invoice-vs-quote"), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Guides", path: "/guides" }, { name: "Invoice vs. quote", path: "/guides/invoice-vs-quote" }])]} />
+      <JsonLd data={[articleLd("Invoice vs. quote: what is the difference?", "Learn when to send a quote and when to issue an invoice.", "/guides/invoice-vs-quote"), breadcrumbLd(breadcrumbItems("/guides/invoice-vs-quote") ?? [])]} />
       <article className="seo-content">
         <span className="badge">CLIENT PAPERWORK</span>
         <h1>Invoice vs. quote: what is the difference?</h1>
+        <p className="guide-cta"><Link className="btn-primary" href="/invoice-generator">Try the Invoice generator</Link></p>
         <p>A quote and an invoice can show similar details, such as services, quantities, and prices, but they serve different purposes. A quote proposes work and an estimated price before a client agrees. An invoice requests payment for work or products that have been agreed or supplied.</p>
 
         <h2>When to send a quote</h2>
@@ -38,6 +41,7 @@ export default function InvoiceVsQuotePage() {
         <h2>Create either document</h2>
         <p>Use the <Link href="/quote-generator">free quote generator</Link> to prepare a project estimate, or create a payment request with the <Link href="/invoice-generator">free invoice generator</Link>. Both tools let you review the document and download a PDF.</p>
       </article>
+      <ContextualLinks path="/guides/invoice-vs-quote" />
     </main>
   );
 }

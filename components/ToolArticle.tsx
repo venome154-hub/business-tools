@@ -1,4 +1,5 @@
 import AdSlot from "@/components/AdSlot";
+import ContextualLinks from "@/components/ContextualLinks";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbLd, faqLd, webApplicationLd, type FaqItem } from "@/lib/schema";
 
@@ -41,6 +42,7 @@ export default function ToolArticle({
           {faqs.map((item) => <details key={item.question}><summary>{item.question}</summary><p>{item.answer}</p></details>)}
         </div>
       </section>
+      <ContextualLinks path={path} />
     </main>
   );
 }

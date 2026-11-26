@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContextualLinks from "@/components/ContextualLinks";
 import CsvUtility, { CsvOutputNote } from "@/components/CsvUtility";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbLd, faqLd, webApplicationLd } from "@/lib/schema";
@@ -37,5 +38,6 @@ export default function DuplicateSkuFinderPage() {
       </div>
       <p>Need to prepare or combine spreadsheet exports? Use the <Link href="/csv-cleaner">CSV cleaner</Link> or the <Link href="/csv-merger">CSV merger</Link>.</p>
     </section>
+    <ContextualLinks path="/duplicate-sku-finder" />
   </main>;
 }

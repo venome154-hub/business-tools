@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ContextualLinks from "@/components/ContextualLinks";
 import DocumentStudio from "@/components/DocumentStudio";
 import JsonLd from "@/components/JsonLd";
 import { getReceiptType, receiptTypes } from "@/content/receipt-types";
+import { breadcrumbItems } from "@/lib/breadcrumbs";
 import { breadcrumbLd, faqLd } from "@/lib/schema";
 import { titled } from "@/lib/site";
 
@@ -26,7 +28,7 @@ export default async function Page({ params }: { params: Promise<{ type: string 
   if (!item) notFound();
   return (
     <main className="page">
-      <JsonLd data={[faqLd(item.faqs), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Receipt templates", path: "/receipt-template" }, { name: item.name, path: `/receipt-template/${item.slug}` }])]} />
+      <JsonLd data={[faqLd(item.faqs), breadcrumbLd(breadcrumbItems(`/receipt-template/${item.slug}`) ?? [])]} />
       <article className="seo-content">
         <h1>{titled(item.name)} receipt template</h1>
         <p>{item.intro}</p>
@@ -40,6 +42,7 @@ export default async function Page({ params }: { params: Promise<{ type: string 
           {item.related.map((slug) => <Link key={slug} href={`/receipt-template/${slug}`}>{titled(getReceiptType(slug)?.name ?? slug)} receipt →</Link>)}
         </div>
       </article>
+      <ContextualLinks path={`/receipt-template/${item.slug}`} />
     </main>
   );
 }

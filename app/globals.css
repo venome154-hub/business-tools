@@ -45,6 +45,7 @@ button:disabled { opacity:.5; cursor:not-allowed; }
 .home-columns article { padding:22px; border:1px solid var(--line); border-radius:14px; background:#fff; }
 .home-columns article p { margin:0 0 14px; font-size:15px; }
 .home-columns article a,.guide-links a,.seo-content a { color:#1d4ed8; text-decoration:underline; text-underline-offset:3px; }
+.seo-content a.btn-primary { color:#fff; text-decoration:none; }
 .guide-links { display:grid; gap:12px; margin-top:18px; }
 .csv-tools-section { margin-top:-34px; }
 .csv-home-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:22px; text-align:left; }
@@ -102,7 +103,8 @@ textarea { resize:vertical; line-height:1.45; }
 .reading { max-width:var(--reading); }
 .guide-index { max-width:850px; margin:48px auto; }
 .guide-card { display:block; padding:22px; margin:14px 0; background:#fff; border:1px solid var(--line); border-radius:14px; }
-.guide-card h2 { margin:0 0 8px; }
+.guide-index > section > h2 { margin-top:32px; }
+.guide-card h2,.guide-card h3 { margin:0 0 8px; font-size:var(--fs-h3); }
 .guide-card p { margin:0; }
 .seo-content h2 { margin:24px 0 10px; font-size:24px; }
 .seo-content h2:first-child { margin-top:0; }
@@ -259,8 +261,10 @@ textarea { resize:vertical; line-height:1.45; }
 html,body { max-width:100%; overflow-x:clip; }
 .crumbs { max-width:var(--container); margin:12px auto 0; padding:0 24px; color:var(--ink-500); font-size:14px; }
 .crumbs a,.related-links a,.embed-credit a { color:#1d4ed8; text-decoration:underline; text-underline-offset:3px; }
-.related-links { max-width:var(--container); margin:0 auto 28px; padding:8px 24px 20px; display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.related-links { max-width:var(--container); margin:0 auto 28px; padding:8px 24px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:18px; }
+.page > .related-links { max-width:none; margin:32px 0 0; padding:0; }
 .related-links div { display:grid; gap:8px; align-content:start; }
+.guide-cta { margin:16px 0 20px; }
 .embed-app { max-width:480px; margin:0 auto; padding:16px; }
 .embed-code { width:100%; margin-top:6px; }
 .embed-copy { display:grid; gap:8px; margin-top:16px; }

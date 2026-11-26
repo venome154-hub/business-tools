@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import { getSiteUrl } from "@/lib/site";
 import AnalyticsConsent from "@/components/AnalyticsConsent";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import RelatedLinks from "@/components/RelatedLinks";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import "./globals.css";
@@ -34,7 +33,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SiteHeader />
         <Breadcrumbs />
         {children}
-        <RelatedLinks />
         <SiteFooter />
         <AnalyticsConsent />
       </body>

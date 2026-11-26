@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AnalyticsSettingsButton } from "@/components/AnalyticsConsent";
 import LogoMark from "@/components/LogoMark";
+import { footerGuides } from "@/lib/related";
 import { SUPPORT_EMAIL } from "@/lib/site";
 
 export default function SiteFooter() {
@@ -59,8 +60,7 @@ export default function SiteFooter() {
           <Link href="/receipt-template">Receipt templates</Link>
           <Link href="/invoice-requirements">Invoice requirements</Link>
           <Link href="/guides">All guides</Link>
-          <Link href="/guides/invoice-vs-quote">Invoice vs. quote</Link>
-          <Link href="/guides/how-to-write-an-invoice">How to write an invoice</Link>
+          {footerGuides.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </div>
         <div>
           <strong>Company</strong>

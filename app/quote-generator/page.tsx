@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContextualLinks from "@/components/ContextualLinks";
 import QuoteGenerator from "@/components/QuoteGenerator";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbLd, faqLd, webApplicationLd, type FaqItem } from "@/lib/schema";
@@ -49,6 +50,7 @@ export default function QuotePage() {
           <details><summary>Is a quote the same as an invoice?</summary><p>No. A quote is a proposed price for approval. An invoice requests payment. You can create one after the client approves the quote.</p></details>
         </div>
       </section>
+      <ContextualLinks path="/quote-generator" />
     </main>
   );
 }

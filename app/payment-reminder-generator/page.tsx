@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContextualLinks from "@/components/ContextualLinks";
 import PaymentReminderGenerator from "@/components/PaymentReminderGenerator";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbLd, faqLd, webApplicationLd, type FaqItem } from "@/lib/schema";
@@ -49,6 +50,7 @@ export default function PaymentReminderPage() {
           <details><summary>Are the details I enter saved?</summary><p>No. The draft is generated in your browser and is not saved to a BizToolsBox account.</p></details>
         </div>
       </section>
+      <ContextualLinks path="/payment-reminder-generator" />
     </main>
   );
 }

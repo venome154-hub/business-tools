@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContextualLinks from "@/components/ContextualLinks";
 import JsonLd from "@/components/JsonLd";
+import { breadcrumbItems } from "@/lib/breadcrumbs";
 import { articleLd, breadcrumbLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
@@ -12,10 +14,11 @@ export const metadata: Metadata = {
 export default function HowToWriteInvoicePage() {
   return (
     <main className="page">
-      <JsonLd data={[articleLd("How to write an invoice: a simple checklist", "A practical invoice checklist for freelancers and small businesses.", "/guides/how-to-write-an-invoice"), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Guides", path: "/guides" }, { name: "How to write an invoice", path: "/guides/how-to-write-an-invoice" }])]} />
+      <JsonLd data={[articleLd("How to write an invoice: a simple checklist", "A practical invoice checklist for freelancers and small businesses.", "/guides/how-to-write-an-invoice"), breadcrumbLd(breadcrumbItems("/guides/how-to-write-an-invoice") ?? [])]} />
       <article className="seo-content">
         <span className="badge">INVOICING BASICS</span>
         <h1>How to write an invoice: a simple checklist</h1>
+        <p className="guide-cta"><Link className="btn-primary" href="/invoice-generator">Try the Invoice generator</Link></p>
         <p>A good invoice makes it easy for a client to understand the charge and what to do next. Before you send one, check that the document clearly identifies both parties, describes the work, shows the amount due, and includes payment instructions that match your agreement.</p>
 
         <h2>1. Identify the invoice and its dates</h2>
@@ -43,6 +46,7 @@ export default function HowToWriteInvoicePage() {
         </ul>
         <p>Use the <Link href="/invoice-generator">free invoice generator</Link> to add items, calculate the total, review the preview, and download a PDF. If the client has not approved the work or its price yet, prepare a <Link href="/quote-generator">quote first</Link>.</p>
       </article>
+      <ContextualLinks path="/guides/how-to-write-an-invoice" />
     </main>
   );
 }
