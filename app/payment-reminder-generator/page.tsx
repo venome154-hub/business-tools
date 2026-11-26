@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PaymentReminderGenerator from "@/components/PaymentReminderGenerator";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbLd, faqLd, webApplicationLd, type FaqItem } from "@/lib/schema";
+
+const reminderFaqs: FaqItem[] = [
+  { question: "Is the payment reminder generator free?", answer: "Yes. You can draft and copy reminder emails for free without creating an account." },
+  { question: "Does it send an email to my client?", answer: "No. It prepares text in your browser for you to review and send from your own email app." },
+  { question: "Can I change the tone of the reminder?", answer: "Yes. Choose a friendly, professional, or firm version, then edit the copied draft as needed." },
+  { question: "Are the details I enter saved?", answer: "No. The draft is generated in your browser and is not saved to a BizToolsBox account." },
+];
 
 export const metadata: Metadata = {
   title: "Free Payment Reminder Email Generator",
@@ -17,10 +26,7 @@ export const metadata: Metadata = {
 export default function PaymentReminderPage() {
   return (
     <main className="page">
-      <nav className="topbar" aria-label="Main navigation">
-        <Link href="/" className="brand">BizToolsBox</Link>
-        <Link href="/invoice-generator">Need an invoice first? Create one →</Link>
-      </nav>
+      <JsonLd data={[webApplicationLd("Free Payment Reminder Generator", "/payment-reminder-generator", "Draft a payment reminder email in your browser."), faqLd(reminderFaqs), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Payment reminder", path: "/payment-reminder-generator" }])]} />
       <PaymentReminderGenerator />
       <section className="seo-content" aria-labelledby="reminder-guide-title">
         <h2 id="reminder-guide-title">Write a clear payment reminder email</h2>

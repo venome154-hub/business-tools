@@ -1,6 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import InvoiceGenerator from "@/components/InvoiceGenerator";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbLd, faqLd, webApplicationLd, type FaqItem } from "@/lib/schema";
+
+const invoiceFaqs: FaqItem[] = [
+  { question: "Is this invoice generator free?", answer: "Yes. You can create and download an invoice PDF for free, without creating an account." },
+  { question: "How do I save my invoice as a PDF?", answer: "Fill in the invoice details, review the preview, and select the Download PDF button. The PDF will be saved through your browser." },
+  { question: "Can I add tax and discounts?", answer: "Yes. Enter tax and discount percentages and the invoice preview will update the subtotal and total." },
+  { question: "Can I add a due date and payment instructions?", answer: "Yes. Set an optional due date and include payment instructions in the invoice and PDF." },
+  { question: "Are my invoice details uploaded?", answer: "The generator uses your entries in this browser to update the preview and create your PDF. See the privacy and data page for details." },
+  { question: "Do I need to sign up?", answer: "No account or signup is required to use the generator." },
+];
 
 export const metadata: Metadata = {
   title: "Free Invoice Generator — Create & Download PDF Invoices",
@@ -17,10 +28,7 @@ export const metadata: Metadata = {
 export default function InvoicePage() {
   return (
     <main className="page">
-      <div className="topbar">
-        <Link href="/" className="brand">BizToolsBox</Link>
-        <Link href="/quote-generator">Preparing a quote first? Create an estimate →</Link>
-      </div>
+      <JsonLd data={[webApplicationLd("Free Invoice Generator", "/invoice-generator", "Create a detailed PDF invoice in your browser."), faqLd(invoiceFaqs), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Invoice generator", path: "/invoice-generator" }])]} />
       <InvoiceGenerator />
       <section className="seo-content" aria-labelledby="invoice-guide-title">
         <h2 id="invoice-guide-title">Create a free invoice online</h2>
@@ -64,7 +72,6 @@ export default function InvoicePage() {
           </details>
         </div>
       </section>
-      <footer className="home-footer"><Link href="/guides">Guides</Link><Link href="/privacy">Privacy & data</Link></footer>
     </main>
   );
 }

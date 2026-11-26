@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { getSiteUrl } from "@/lib/site";
 
 const FONT = "Roboto";
 const MARGIN = 18;
@@ -18,6 +19,14 @@ export type PdfModel = {
   totals: PdfTotal[];
   notes?: PdfNote[];
   footer: string;
+  template?: "classic" | "modern" | "minimal";
+  pageSize?: "a4" | "letter";
+  accent?: string;
+  logoDataUrl?: string;
+  qrDataUrl?: string;
+  signature?: string;
+  signatureLabel?: string;
+  madeWith?: boolean;
 };
 
 let regularFont: string | null = null;
@@ -39,10 +48,16 @@ async function fontBase64(path: string) {
   return arrayBufferToBase64(await response.arrayBuffer());
 }
 
-async function createDocument() {
+function accentRgb(value: string): [number, number, number] {
+  const hex = value.trim().replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(hex)) return [17, 24, 39];
+  return [Number.parseInt(hex.slice(0, 2), 16), Number.parseInt(hex.slice(2, 4), 16), Number.parseInt(hex.slice(4, 6), 16)];
+}
+
+async function createDocument(pageSize: "a4" | "letter") {
   if (!regularFont) regularFont = await fontBase64("/fonts/Roboto-Regular.ttf");
   if (!boldFont) boldFont = await fontBase64("/fonts/Roboto-Bold.ttf");
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const doc = new jsPDF({ unit: "mm", format: pageSize });
   doc.addFileToVFS("Roboto-Regular.ttf", regularFont);
   doc.addFont("Roboto-Regular.ttf", FONT, "normal");
   doc.addFileToVFS("Roboto-Bold.ttf", boldFont);
@@ -66,13 +81,19 @@ export function safePdfFilename(name: string) {
 }
 
 export async function downloadBusinessPdf(model: PdfModel) {
-  const doc = await createDocument();
+  const template = model.template ?? "classic";
+  const accent = accentRgb(model.accent || "#111827");
+  const doc = await createDocument(model.pageSize ?? "a4");
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const left = MARGIN;
   const right = pageWidth - MARGIN;
   const contentWidth = right - left;
-  let y = 20;
+  let y = template === "modern" ? 24 : 20;
+  if (template === "modern") {
+    doc.setFillColor(accent[0], accent[1], accent[2]);
+    doc.rect(0, 0, pageWidth, 8, "F");
+  }
 
   const preparePage = () => {
     doc.setFont(FONT, "normal");
@@ -89,18 +110,32 @@ export async function downloadBusinessPdf(model: PdfModel) {
   const wrap = (text: string, width: number) => asLines(doc.splitTextToSize(text || " ", Math.max(width, 8)));
 
   preparePage();
+  let titleX = left;
+  if (model.logoDataUrl?.startsWith("data:image/")) {
+    try {
+      const format = model.logoDataUrl.includes("image/png") ? "PNG" : "JPEG";
+      doc.addImage(model.logoDataUrl, format, left, y - 6, 16, 16);
+      titleX = left + 20;
+    } catch {
+      titleX = left;
+    }
+  }
   doc.setFont(FONT, "bold");
-  doc.setFontSize(22);
+  doc.setFontSize(template === "minimal" ? 16 : 22);
+  doc.setTextColor(accent[0], accent[1], accent[2]);
   const titleWidth = doc.getTextWidth(model.title);
+  doc.setTextColor(17, 24, 39);
   doc.setFont(FONT, "normal");
   doc.setFontSize(10);
   const metaWidth = 78;
-  const sideBySide = left + titleWidth + 8 <= right - metaWidth;
+  const sideBySide = titleX + titleWidth + 8 <= right - metaWidth;
 
   if (sideBySide) {
     doc.setFont(FONT, "bold");
-    doc.setFontSize(22);
-    doc.text(model.title, left, y);
+    doc.setFontSize(template === "minimal" ? 16 : 22);
+    doc.setTextColor(accent[0], accent[1], accent[2]);
+    doc.text(model.title, titleX, y);
+    doc.setTextColor(17, 24, 39);
     doc.setFont(FONT, "normal");
     doc.setFontSize(10);
     let metaY = y - 1;
@@ -113,8 +148,10 @@ export async function downloadBusinessPdf(model: PdfModel) {
     y = Math.max(y + 12, metaY + 6);
   } else {
     doc.setFont(FONT, "bold");
-    doc.setFontSize(22);
-    doc.text(model.title, left, y);
+    doc.setFontSize(template === "minimal" ? 16 : 22);
+    doc.setTextColor(accent[0], accent[1], accent[2]);
+    doc.text(model.title, titleX, y);
+    doc.setTextColor(17, 24, 39);
     y += 10;
     doc.setFont(FONT, "normal");
     doc.setFontSize(10);
@@ -163,11 +200,19 @@ export async function downloadBusinessPdf(model: PdfModel) {
 
   const drawTableHeader = () => {
     if (y + 16 > pageHeight - MARGIN) nextPage();
-    doc.setFillColor(241, 245, 249);
-    doc.rect(left, y - 5, contentWidth, 10, "F");
+    if (template === "modern") {
+      doc.setFillColor(accent[0], accent[1], accent[2]);
+      doc.rect(left, y - 5, contentWidth, 10, "F");
+      doc.setTextColor(255, 255, 255);
+    } else if (template === "classic") {
+      doc.setFillColor(241, 245, 249);
+      doc.rect(left, y - 5, contentWidth, 10, "F");
+      doc.setTextColor(17, 24, 39);
+    } else {
+      doc.setTextColor(accent[0], accent[1], accent[2]);
+    }
     doc.setFont(FONT, "bold");
     doc.setFontSize(10);
-    doc.setTextColor(17, 24, 39);
     let x = left;
     model.columns.forEach((column, index) => {
       const textX = column.align === "right" ? x + widths[index] - 2 : x + 2;
@@ -175,6 +220,7 @@ export async function downloadBusinessPdf(model: PdfModel) {
       x += widths[index];
     });
     doc.setFont(FONT, "normal");
+    doc.setTextColor(17, 24, 39);
     y += 12;
   };
 
@@ -237,6 +283,32 @@ export async function downloadBusinessPdf(model: PdfModel) {
     y += lines.length * 5;
   }
 
+  if (model.qrDataUrl) {
+    if (y + 36 > pageHeight - MARGIN) nextPage();
+    y += 4;
+    try {
+      doc.addImage(model.qrDataUrl, "PNG", right - 28, y, 28, 28);
+      doc.setFont(FONT, "normal");
+      doc.text("Payment link", left, y + 6);
+    } catch {
+      // A broken QR image should not block the PDF.
+    }
+    y += 32;
+  }
+
+  if (model.signature) {
+    if (y + 24 > pageHeight - MARGIN) nextPage();
+    y += 10;
+    doc.setFont(FONT, "normal");
+    doc.setTextColor(17, 24, 39);
+    doc.text(model.signature, left, y);
+    doc.setDrawColor(148, 163, 184);
+    doc.line(left, y + 2, left + 60, y + 2);
+    doc.setFontSize(8);
+    doc.text(model.signatureLabel || "Signature", left, y + 7);
+    y += 12;
+  }
+
   const footerLines = wrap(model.footer, contentWidth);
   if (y + 8 + footerLines.length * 4 > pageHeight - 10) nextPage();
   y += 8;
@@ -244,5 +316,10 @@ export async function downloadBusinessPdf(model: PdfModel) {
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
   footerLines.forEach((line, index) => doc.text(line, left, y + index * 4));
+  if (model.madeWith) {
+    y += footerLines.length * 4 + 4;
+    doc.setTextColor(71, 85, 105);
+    doc.textWithLink("Made with BizToolsBox", left, y, { url: getSiteUrl() });
+  }
   doc.save(safePdfFilename(model.filename));
 }

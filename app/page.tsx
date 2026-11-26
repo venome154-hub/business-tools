@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { AnalyticsSettingsButton } from "@/components/AnalyticsConsent";
+import JsonLd from "@/components/JsonLd";
+import { organizationLd, websiteLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: { absolute: "Free Business Tools: Invoices, Quotes & CSV Utilities | BizToolsBox" },
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main className="landing">
+      <JsonLd data={[organizationLd(), websiteLd()]} />
       <div className="hero">
         <span className="badge">FREE BUSINESS TOOLS</span>
         <h1>Simple tools for documents and spreadsheets.</h1>
@@ -33,12 +35,27 @@ export default function Home() {
       </section>
       <section className="home-section">
         <h2>Business documents, made simple</h2>
-        <p>BizToolsBox helps freelancers and small businesses prepare everyday client documents. Create a project quote before work begins, make an invoice when it is time to request payment, send a reminder if payment is late, then issue a receipt after payment. Details entered into the tools are processed in your browser and are not saved to an account on this site.</p>
+        <p>BizToolsBox helps freelancers and small businesses prepare everyday client documents. Create a project quote before work begins, make an invoice when it is time to request payment, send a reminder if payment is late, then issue a receipt after payment. The tools run in your browser. A business profile and recent documents can be saved on this device, and they are not stored in a BizToolsBox account.</p>
         <div className="home-columns">
           <article><h3>1. Prepare a quote</h3><p>Describe the work, quantities, prices, optional tax, and how long your estimate is valid. Share the PDF with your client for review.</p><Link href="/quote-generator">Make a free quote →</Link></article>
           <article><h3>2. Send an invoice</h3><p>After the client approves the work, list the completed products or services, set the invoice date, and download a payment request.</p><Link href="/invoice-generator">Make a free invoice →</Link></article>
           <article><h3>3. Follow up if needed</h3><p>If an invoice is still unpaid, prepare a clear reminder that matches the situation and copy it into your email app.</p><Link href="/payment-reminder-generator">Write a free reminder →</Link></article>
           <article><h3>4. Record a payment</h3><p>After payment arrives, create a receipt showing the amount received, payment method, and any remaining balance.</p><Link href="/receipt-generator">Make a free receipt →</Link></article>
+        </div>
+      </section>
+      <section className="home-section">
+        <h2>More documents and calculators</h2>
+        <p>Purchase orders, credit notes, delivery notes, timesheet invoices, rent receipts, and donation receipts use the same browser PDF tools. The calculators only do the arithmetic you see on the page.</p>
+        <div className="guide-links">
+          <Link href="/purchase-order">Purchase order →</Link>
+          <Link href="/credit-note">Credit note →</Link>
+          <Link href="/delivery-note">Delivery note →</Link>
+          <Link href="/timesheet-invoice">Timesheet invoice →</Link>
+          <Link href="/invoice-template">Invoice templates →</Link>
+          <Link href="/quote-template">Quote templates →</Link>
+          <Link href="/sales-tax-calculator">Sales tax calculator →</Link>
+          <Link href="/profit-margin-calculator">Profit margin calculator →</Link>
+          <Link href="/my-documents">My documents →</Link>
         </div>
       </section>
       <section className="home-section">
@@ -50,7 +67,6 @@ export default function Home() {
           <Link href="/guides">Browse all business guides →</Link>
         </div>
       </section>
-      <footer className="home-footer"><div><Link href="/guides">Guides</Link><Link href="/privacy">Privacy & data</Link><AnalyticsSettingsButton /></div><span>Free tools and straightforward guidance for small businesses.</span></footer>
     </main>
   );
 }

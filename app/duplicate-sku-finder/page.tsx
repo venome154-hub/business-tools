@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CsvUtility, { CsvOutputNote } from "@/components/CsvUtility";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbLd, faqLd, webApplicationLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Free Duplicate SKU Finder — Check Product Codes in CSV",
@@ -11,6 +13,11 @@ export const metadata: Metadata = {
 
 export default function DuplicateSkuFinderPage() {
   return <main className="page csv-page">
+    <JsonLd data={[webApplicationLd("Free Duplicate SKU Finder", "/duplicate-sku-finder", "Find repeated SKUs in a CSV in your browser."), faqLd([
+      { question: "Does the finder change my original file?", answer: "No. It reads the file in your browser and offers a separate download with matching rows or a summary." },
+      { question: "Are blank SKU cells reported as duplicates?", answer: "No. Blank values are skipped so empty cells do not appear as repeated product codes." },
+      { question: "Can I choose a column with a different name?", answer: "Yes. Select any column from the CSV header row, even if it is not labeled SKU." },
+    ]), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Duplicate SKU finder", path: "/duplicate-sku-finder" }])]} />
     <CsvUtility mode="sku-finder" />
     <CsvOutputNote />
     <section className="seo-content" aria-labelledby="duplicate-sku-guide">

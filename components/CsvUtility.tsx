@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
-import Link from "next/link";
-import { cleanCsvRows, downloadCsv, findDuplicateSkus, mergeCsvFiles, parseCsv, preferredDelimiter, type CsvRow } from "@/lib/csv";
+import { cleanCsvRows, downloadCsv, findDuplicateSkus, mergeCsvFiles, preferredDelimiter, type CsvRow } from "@/lib/csv";
+import { readTableFile } from "@/lib/table-file";
 import { trackEvent } from "@/lib/analytics";
 
 type ToolMode = "cleaner" | "merger" | "sku-finder";
@@ -73,11 +73,11 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
     setError("");
     try {
       const parsed = await Promise.all(files.map(async (file) => {
-        const result = parseCsv(await file.text());
+        const result = await readTableFile(file);
         return { name: file.name, rows: result.rows, delimiter: result.delimiter };
       }));
       if (parsed.some((document) => document.rows.length === 0)) {
-        setError("At least one selected file is empty or could not be read as CSV. Please choose valid CSV files.");
+        setError("At least one selected file is empty or could not be read. Choose a CSV or Excel file.");
         return;
       }
       const nextDocuments = mode === "merger" ? [...documents, ...parsed] : parsed.slice(0, 1);
@@ -88,7 +88,7 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
         setSkuColumn(String(Math.max(0, detected)));
       }
     } catch {
-      setError("The file could not be read. Try saving it as a UTF-8 CSV and upload it again.");
+      setError("The file could not be read. Use a CSV or Excel file from your device.");
     } finally {
       setBusy(false);
     }
@@ -116,10 +116,6 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
 
   return (
     <>
-      <nav className="topbar" aria-label="Main navigation">
-        <Link href="/" className="brand">BizToolsBox</Link>
-        <Link href="/">All free tools →</Link>
-      </nav>
       <div className="csv-tool-layout">
         <section className="csv-tool-panel" aria-labelledby="csv-tool-title">
           <span className="badge">FREE CSV TOOL · FILES STAY ON YOUR DEVICE</span>
@@ -128,8 +124,8 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
 
           <label className="csv-upload">
             <span>{busy ? "Reading your file…" : mode === "merger" ? "Choose CSV files" : "Choose a CSV file"}</span>
-            <small>{mode === "merger" ? "Select two or more .csv files" : "UTF-8 .csv file · processed in this browser"}</small>
-            <input type="file" accept=".csv,text/csv" multiple={mode === "merger"} onChange={handleFiles} disabled={busy} />
+            <small>{mode === "merger" ? "Select two or more CSV or Excel files" : "CSV or Excel · processed in this browser"}</small>
+            <input type="file" accept=".csv,text/csv,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple={mode === "merger"} onChange={handleFiles} disabled={busy} />
           </label>
           {error && <p className="csv-error" role="alert">{error}</p>}
 
@@ -144,7 +140,7 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
             <strong>Cleaning options</strong>
             <label><input type="checkbox" checked={trimSpaces} onChange={(event) => setTrimSpaces(event.target.checked)} /> Trim spaces around cell values</label>
             <label><input type="checkbox" checked={removeBlankRows} onChange={(event) => setRemoveBlankRows(event.target.checked)} /> Remove blank rows</label>
-            <label><input type="checkbox" checked={removeEmptyColumns} onChange={(event) => setRemoveEmptyColumns(event.target.checked)} /> Remove columns that are empty in every row</label>
+            <label><input type="checkbox" checked={removeEmptyColumns} onChange={(event) => setRemoveEmptyColumns(event.target.checked)} /> Remove columns with no values in the data rows</label>
             <label><input type="checkbox" checked={removeDuplicateRows} onChange={(event) => setRemoveDuplicateRows(event.target.checked)} /> Remove exact duplicate data rows</label>
           </div>}
 

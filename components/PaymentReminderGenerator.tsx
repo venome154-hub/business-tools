@@ -1,8 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
-import { sanitizeDecimal } from "@/lib/format";
+import CurrencyField from "@/components/CurrencyField";
+import MobileToolBar from "@/components/MobileToolBar";
+import { takeHandoff } from "@/lib/document-model";
+import { acceptDecimal } from "@/lib/format";
+import { readProfile } from "@/lib/profile";
 
 type Tone = "friendly" | "professional" | "firm";
 
@@ -26,15 +30,34 @@ export default function PaymentReminderGenerator() {
   const [invoiceNo, setInvoiceNo] = useState("INV-001");
   const [amount, setAmount] = useState("250.00");
   const [currency, setCurrency] = useState("USD");
-  const [dueDate, setDueDate] = useState(() => localDate(-7));
+  const [dueDate, setDueDate] = useState("");
+  const [today, setToday] = useState("");
+  const [amountError, setAmountError] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [tone, setTone] = useState<Tone>("friendly");
   const [paymentLink, setPaymentLink] = useState("");
   const [note, setNote] = useState("");
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
 
+  useEffect(() => {
+    setToday(localDate(0));
+    const handoff = takeHandoff("reminder");
+    const profile = readProfile();
+    if (profile?.name) setBusiness(profile.name);
+    if (handoff?.reminder) {
+      setBusiness(handoff.reminder.business || profile?.name || "");
+      setClient(handoff.reminder.client);
+      setInvoiceNo(handoff.reminder.invoiceNo);
+      setAmount(handoff.reminder.amount);
+      setCurrency(handoff.reminder.currency || "USD");
+      setDueDate(handoff.reminder.dueDate || localDate(-7));
+    } else {
+      setDueDate(localDate(-7));
+    }
+  }, []);
+
   const email = useMemo(() => {
     const due = displayDate(dueDate);
-    const today = localDate(0);
     const timing = !dueDate ? "has the due date shown on the invoice" : dueDate === today ? "is due today" : dueDate > today ? `will be due on ${due}` : `was due on ${due}`;
     const overdue = Boolean(dueDate && dueDate < today);
     const balance = Number(amount);
@@ -63,7 +86,7 @@ export default function PaymentReminderGenerator() {
       subject: `Friendly reminder about invoice ${invoice}`,
       body: `Hi ${recipient},\n\nI hope you're doing well. Just a friendly reminder that invoice ${invoice} for ${formattedAmount} ${timing}.${linkLine}${noteLine}\n\nIf you've already sent payment, please ignore this message. Let me know if you have any questions or need me to resend the invoice.\n\nThanks,\n${sender}`,
     };
-  }, [amount, business, client, currency, dueDate, invoiceNo, note, paymentLink, tone]);
+  }, [amount, business, client, currency, dueDate, invoiceNo, note, paymentLink, today, tone]);
 
   function copyWithTextarea(text: string) {
     const area = document.createElement("textarea");
@@ -119,8 +142,9 @@ export default function PaymentReminderGenerator() {
           <label>Your business name<input value={business} onChange={e => setBusiness(e.target.value)} /></label>
           <label>Client name<input value={client} onChange={e => setClient(e.target.value)} /></label>
           <label>Invoice number<input value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} /></label>
-          <label>Outstanding amount<input inputMode="decimal" value={amount} onChange={e => setAmount(sanitizeDecimal(e.target.value))} /></label>
-          <label>Currency<select value={currency} onChange={e => setCurrency(e.target.value)}><option>USD</option><option>EUR</option><option>GBP</option><option>CAD</option><option>AUD</option></select></label>
+          <label>Outstanding amount<input inputMode="decimal" value={amount} onChange={e => { const next = acceptDecimal(e.target.value); if (next.value === undefined) { setAmountError(next.error); return; } setAmountError(next.error); setAmount(next.value); }} /></label>
+          {amountError && <p className="field-error" role="alert">{amountError}</p>}
+          <CurrencyField value={currency} onChange={setCurrency} />
           <label>Due date<input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} /></label>
           <label>Email tone<select value={tone} onChange={e => setTone(e.target.value as Tone)}><option value="friendly">Friendly</option><option value="professional">Professional</option><option value="firm">Firm</option></select></label>
           <label>Payment link (optional)<input type="url" value={paymentLink} onChange={e => setPaymentLink(e.target.value)} placeholder="https://..." /></label>
@@ -129,7 +153,7 @@ export default function PaymentReminderGenerator() {
         <p className="quote-note">This tool drafts text only. It does not send email or contact your client. Details stay in your browser until you copy the message.</p>
       </div>
 
-      <aside className="preview">
+      <aside className={`preview${previewOpen ? " is-open" : ""}`}>
         <div className="paper reminder-paper">
           <span className="badge">EMAIL PREVIEW</span>
           <div className="reminder-subject"><strong>Subject</strong><div>{email.subject}</div></div>
@@ -137,6 +161,7 @@ export default function PaymentReminderGenerator() {
           <pre className="reminder-body">{email.body}</pre>
         </div>
       </aside>
+      <MobileToolBar primaryLabel={copyState === "copied" ? "Copied!" : "Copy email"} onPrimary={copyEmail} previewOpen={previewOpen} onPreview={() => setPreviewOpen((open) => !open)} />
     </section>
   );
 }

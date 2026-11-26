@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { getSiteUrl } from "@/lib/site";
 import AnalyticsConsent from "@/components/AnalyticsConsent";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import RelatedLinks from "@/components/RelatedLinks";
+import SiteFooter from "@/components/SiteFooter";
+import SiteHeader from "@/components/SiteHeader";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,13 +14,19 @@ export const metadata: Metadata = {
     template: "%s | BizToolsBox",
   },
   description: "Free online tools for business documents and spreadsheets. No account required.",
+  openGraph: { siteName: "BizToolsBox", type: "website" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body>
+        <SiteHeader />
+        <Breadcrumbs />
         {children}
+        <RelatedLinks />
+        <SiteFooter />
         <AnalyticsConsent />
       </body>
     </html>

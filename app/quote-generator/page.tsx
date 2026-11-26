@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import QuoteGenerator from "@/components/QuoteGenerator";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbLd, faqLd, webApplicationLd, type FaqItem } from "@/lib/schema";
+
+const quoteFaqs: FaqItem[] = [
+  { question: "Is this quote generator free?", answer: "Yes. Create and download a quote PDF for free without an account." },
+  { question: "Can I include tax or a discount?", answer: "Yes. Add optional tax and discount percentages; the preview and estimate total update automatically." },
+  { question: "Can I set an expiry date?", answer: "Yes. Add an optional valid-until date to show when the estimate expires." },
+  { question: "Is a quote the same as an invoice?", answer: "No. A quote is a proposed price for approval. An invoice requests payment. You can create one after the client approves the quote." },
+];
 
 export const metadata: Metadata = {
   title: "Free Quote Generator — Create Project Estimates",
@@ -17,10 +26,7 @@ export const metadata: Metadata = {
 export default function QuotePage() {
   return (
     <main className="page">
-      <nav className="topbar" aria-label="Main navigation">
-        <Link href="/" className="brand">BizToolsBox</Link>
-        <Link href="/invoice-generator">Need to bill a client? Create an invoice →</Link>
-      </nav>
+      <JsonLd data={[webApplicationLd("Free Quote Generator", "/quote-generator", "Create a project quote PDF in your browser."), faqLd(quoteFaqs), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Quote generator", path: "/quote-generator" }])]} />
       <QuoteGenerator />
       <section className="seo-content" aria-labelledby="quote-guide-title">
         <h2 id="quote-guide-title">Create a free project quote online</h2>
@@ -43,7 +49,6 @@ export default function QuotePage() {
           <details><summary>Is a quote the same as an invoice?</summary><p>No. A quote is a proposed price for approval. An invoice requests payment. You can create one after the client approves the quote.</p></details>
         </div>
       </section>
-      <footer className="home-footer"><Link href="/guides">Guides</Link><Link href="/privacy">Privacy & data</Link></footer>
     </main>
   );
 }

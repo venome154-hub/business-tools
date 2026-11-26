@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import JsonLd from "@/components/JsonLd";
+import { articleLd, breadcrumbLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Invoice vs. Quote: What's the Difference?",
@@ -10,7 +12,7 @@ export const metadata: Metadata = {
 export default function InvoiceVsQuotePage() {
   return (
     <main className="page">
-      <nav className="topbar" aria-label="Main navigation"><Link href="/" className="brand">BizToolsBox</Link><Link href="/guides">All guides</Link></nav>
+      <JsonLd data={[articleLd("Invoice vs. quote: what is the difference?", "Learn when to send a quote and when to issue an invoice.", "/guides/invoice-vs-quote"), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Guides", path: "/guides" }, { name: "Invoice vs. quote", path: "/guides/invoice-vs-quote" }])]} />
       <article className="seo-content">
         <span className="badge">CLIENT PAPERWORK</span>
         <h1>Invoice vs. quote: what is the difference?</h1>
@@ -36,7 +38,6 @@ export default function InvoiceVsQuotePage() {
         <h2>Create either document</h2>
         <p>Use the <Link href="/quote-generator">free quote generator</Link> to prepare a project estimate, or create a payment request with the <Link href="/invoice-generator">free invoice generator</Link>. Both tools let you review the document and download a PDF.</p>
       </article>
-      <footer className="home-footer"><Link href="/guides">All guides</Link><Link href="/privacy">Privacy & data</Link></footer>
     </main>
   );
 }

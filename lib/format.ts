@@ -28,6 +28,17 @@ export function sanitizeDecimal(value: string) {
   return `${cleaned.slice(0, dot + 1)}${cleaned.slice(dot + 1).replace(/\./g, "")}`;
 }
 
+export function acceptDecimal(raw: string, max?: number): { value?: string; error: string } {
+  if (raw.trim() === "") return { value: "", error: "" };
+  if (raw.includes("-")) return { error: "Enter a number that is 0 or greater." };
+  if (!/^\d*\.?\d*$/.test(raw)) return { error: "Use digits and one decimal point." };
+  if (raw === "." || raw.endsWith(".")) return { value: raw, error: "" };
+  const amount = Number(raw);
+  if (!Number.isFinite(amount)) return { error: "Enter a valid number." };
+  if (max !== undefined && amount > max) return { value: String(max), error: "Enter a percentage from 0 to 100." };
+  return { value: raw, error: "" };
+}
+
 export function sanitizePercent(value: string, max = 100) {
   const sanitized = sanitizeDecimal(value);
   if (sanitized === "" || sanitized.endsWith(".")) return sanitized;
@@ -37,8 +48,13 @@ export function sanitizePercent(value: string, max = 100) {
   return sanitized;
 }
 
-export function formatMoney(amount: number, currency: string) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(roundMoney(amount));
+export function formatMoney(amount: number, currency: string, locale = "en-US") {
+  const value = roundMoney(amount);
+  try {
+    return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
+  } catch {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+  }
 }
 
 export function decimalLabel(value: string) {
@@ -52,11 +68,11 @@ export function localDate() {
   return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
 }
 
-export function displayDate(value: string) {
+export function displayDate(value: string, locale = "en-US") {
   if (!value) return "";
   const [year, month, day] = value.split("-").map(Number);
   if (!year || !month || !day) return "";
-  return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+  return new Date(year, month - 1, day).toLocaleDateString(locale, {
     month: "short", day: "numeric", year: "numeric",
   });
 }
@@ -81,7 +97,7 @@ export function applyTaxAndDiscount(subtotal: number, taxInput: string, discount
   const discountRate = Math.min(100, parseDecimal(discountInput));
   const discountAmount = roundMoney(subtotal * (discountRate / 100));
   const taxable = roundMoney(Math.max(0, subtotal - discountAmount));
-  const taxRate = parseDecimal(taxInput);
+  const taxRate = Math.min(100, parseDecimal(taxInput));
   const taxAmount = roundMoney(taxable * (taxRate / 100));
   const total = roundMoney(taxable + taxAmount);
   return { discountRate, discountAmount, taxable, taxRate, taxAmount, total };

@@ -133,7 +133,10 @@ export function cleanCsvRows(
   if (options.removeBlankRows) rows = rows.filter((row) => !isBlankRow(row));
   if (options.removeEmptyColumns && rows.length > 0) {
     const width = rows.reduce((max, row) => Math.max(max, row.length), 0);
-    const keep = Array.from({ length: width }, (_, column) => rows.some((row) => Boolean(row[column]?.trim())));
+    const dataRows = rows.slice(1);
+    const keep = Array.from({ length: width }, (_, column) =>
+      dataRows.length === 0 || dataRows.some((row) => Boolean(row[column]?.trim())),
+    );
     rows = rows.map((row) => keep.flatMap((shouldKeep, column) => shouldKeep ? [row[column] ?? ""] : []));
   }
   if (options.removeDuplicateRows && rows.length > 1) {

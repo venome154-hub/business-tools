@@ -1,3 +1,9 @@
+export const SUPPORT_EMAIL = "support@biztoolsbox.online";
+
+export function titled(name: string) {
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
 export function getSiteUrl() {
   const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL;
   const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;

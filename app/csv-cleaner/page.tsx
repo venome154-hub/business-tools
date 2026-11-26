@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CsvUtility, { CsvOutputNote } from "@/components/CsvUtility";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbLd, faqLd, webApplicationLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Free CSV Cleaner — Remove Blank Rows and Duplicates",
@@ -11,6 +13,11 @@ export const metadata: Metadata = {
 
 export default function CsvCleanerPage() {
   return <main className="page csv-page">
+    <JsonLd data={[webApplicationLd("Free CSV Cleaner", "/csv-cleaner", "Clean a CSV file in your browser."), faqLd([
+      { question: "Is my CSV uploaded to a server?", answer: "No. The file is processed in your browser and is not uploaded to or saved by BizToolsBox." },
+      { question: "Does the cleaner keep the header row?", answer: "Yes. The first row is treated as the column header. Duplicate removal applies to data rows below it." },
+      { question: "Can I undo cleanup after downloading?", answer: "The original file on your device is unchanged. You can adjust the options and create another copy at any time." },
+    ]), breadcrumbLd([{ name: "Home", path: "/" }, { name: "CSV cleaner", path: "/csv-cleaner" }])]} />
     <CsvUtility mode="cleaner" />
     <CsvOutputNote />
     <section className="seo-content" aria-labelledby="csv-cleaner-guide">

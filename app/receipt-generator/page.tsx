@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ReceiptGenerator from "@/components/ReceiptGenerator";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbLd, faqLd, webApplicationLd, type FaqItem } from "@/lib/schema";
+
+const receiptFaqs: FaqItem[] = [
+  { question: "Is this receipt generator free?", answer: "Yes. Create and download a receipt PDF for free without creating an account." },
+  { question: "Can I record a partial payment?", answer: "Yes. Enter the amount received; the receipt shows any remaining balance against the listed total." },
+  { question: "Does the tool process or verify payments?", answer: "No. It creates a receipt document for a payment you report as received. It does not collect or verify payment." },
+  { question: "Can I link the receipt to an invoice?", answer: "Yes. Enter the related invoice number so it appears on the receipt." },
+];
 
 export const metadata: Metadata = {
   title: "Free Receipt Generator — Create Payment Receipt PDFs",
@@ -17,10 +26,7 @@ export const metadata: Metadata = {
 export default function ReceiptPage() {
   return (
     <main className="page">
-      <nav className="topbar" aria-label="Main navigation">
-        <Link href="/" className="brand">BizToolsBox</Link>
-        <Link href="/invoice-generator">Need to request payment? Create an invoice →</Link>
-      </nav>
+      <JsonLd data={[webApplicationLd("Free Receipt Generator", "/receipt-generator", "Create a payment receipt PDF in your browser."), faqLd(receiptFaqs), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Receipt generator", path: "/receipt-generator" }])]} />
       <ReceiptGenerator />
       <section className="seo-content" aria-labelledby="receipt-guide-title">
         <h2 id="receipt-guide-title">Create a free payment receipt online</h2>

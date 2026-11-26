@@ -1,0 +1,24 @@
+import type { Metadata } from "next";
+import ToolArticle from "@/components/ToolArticle";
+import DocumentStudio from "@/components/DocumentStudio";
+
+export const metadata: Metadata = {
+  title: "Free Donation Receipt Generator",
+  description: "Create a generic donation receipt PDF. Tax rules vary.",
+  alternates: { canonical: "/donation-receipt" },
+  openGraph: { title: "Free Donation Receipt Generator", description: "Create a generic donation receipt PDF. Tax rules vary.", type: "website", url: "/donation-receipt" },
+};
+
+const faqs = [
+    { question: "Does this prove a donation is tax-deductible?", answer: "No. Deductibility depends on local rules and on the organization. Check the authority that applies to you." },
+    { question: "Who is the receipt for?", answer: "It is a record of a donation you report as received." },
+    { question: "Is donor information uploaded?", answer: "No. The receipt is created in your browser." },
+];
+
+export default function Page() {
+  return (
+    <ToolArticle name="Free Donation Receipt Generator" path="/donation-receipt" description="Create a generic donation receipt PDF. Tax rules vary." intro="Record the donor, the amount, and the date. The PDF includes a note that tax rules vary and that this document does not decide whether a gift is deductible." faqs={faqs}>
+      <DocumentStudio kind="donation-receipt" />
+    </ToolArticle>
+  );
+}

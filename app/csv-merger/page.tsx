@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CsvUtility, { CsvOutputNote } from "@/components/CsvUtility";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbLd, faqLd, webApplicationLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Free CSV Merger — Combine CSV Files Online",
@@ -11,6 +13,11 @@ export const metadata: Metadata = {
 
 export default function CsvMergerPage() {
   return <main className="page csv-page">
+    <JsonLd data={[webApplicationLd("Free CSV Merger", "/csv-merger", "Combine CSV files in your browser."), faqLd([
+      { question: "Do the columns need to be in the same order?", answer: "No. The merger matches columns by their names in the header row and arranges them into one shared set of columns." },
+      { question: "What if a file is missing a column?", answer: "Rows from that file receive an empty value in the missing column." },
+      { question: "Are my files sent to BizToolsBox?", answer: "No. Files are read and combined in your browser. They are not uploaded or saved to an account." },
+    ]), breadcrumbLd([{ name: "Home", path: "/" }, { name: "CSV merger", path: "/csv-merger" }])]} />
     <CsvUtility mode="merger" />
     <CsvOutputNote />
     <section className="seo-content" aria-labelledby="csv-merger-guide">
