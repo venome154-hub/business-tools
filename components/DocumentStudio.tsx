@@ -173,6 +173,7 @@ export default function DocumentStudio({
   }
 
   async function persistDraft() {
+    if (!currencyValid) return "";
     const id = draftId || crypto.randomUUID();
     await saveDocument({
       id,
@@ -262,6 +263,7 @@ export default function DocumentStudio({
   }
 
   function sendTo(target: string) {
+    if (!currencyValid) return;
     if (target === "reminder") {
       writeHandoff({
         to: "reminder",
@@ -434,8 +436,8 @@ export default function DocumentStudio({
         </div>
         {config.note && <p className="quote-note">{config.note}</p>}
         <div className="profile-actions">
-          <button type="button" className="secondary" onClick={async () => { await persistDraft(); setNotice("Saved in My documents on this device."); }}>Save on this device</button>
-          {config.chain.map((link) => <button key={link.to} type="button" className="secondary" onClick={() => sendTo(link.to)}>{link.label}</button>)}
+          <button type="button" className="secondary" onClick={async () => { if (!currencyValid) return; await persistDraft(); setNotice("Saved in My documents on this device."); }} disabled={!currencyValid}>Save on this device</button>
+          {config.chain.map((link) => <button key={link.to} type="button" className="secondary" onClick={() => sendTo(link.to)} disabled={!currencyValid}>{link.label}</button>)}
         </div>
       </div>
 

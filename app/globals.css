@@ -184,6 +184,7 @@ button:disabled { opacity:.65; cursor:progress; }
 .currency-field { position:relative; }
 .currency-list { position:absolute; z-index:5; left:0; right:0; display:grid; background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
 .currency-list button { border:0; border-bottom:1px solid var(--line); background:#fff; text-align:left; padding:8px 10px; cursor:pointer; }
+.currency-list button[aria-selected="true"] { background:#e8edf5; }
 .paper-logo { display:block; max-width:72px; max-height:72px; margin-bottom:8px; }
 .paper-qr { width:96px; height:96px; margin-top:12px; }
 .sign-line { margin-top:16px; border-top:1px solid var(--line); padding-top:8px; }
