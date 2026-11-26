@@ -77,6 +77,11 @@ const estimateTemplates = link("/estimate-template", "Estimate templates");
 export const ESTIMATE_TRADE_SLUGS_FOR_TEST = [
   "contractor", "plumber", "electrician", "hvac", "painter",
   "landscaping", "cleaning", "handyman", "carpenter", "web-developer",
+  "freelance-designer", "photographer", "consulting", "tutoring", "catering",
+  "bookkeeper", "personal-trainer", "interior-designer", "copywriter", "videographer",
+  "dog-walker", "translator", "music-teacher", "event-planner", "virtual-assistant",
+  "mechanic", "florist", "baker", "massage-therapist", "it-support",
+  "architect", "social-media-manager",
 ];
 
 const ESTIMATE_TRADE_SLUGS = new Set(ESTIMATE_TRADE_SLUGS_FOR_TEST);
