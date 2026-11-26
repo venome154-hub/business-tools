@@ -4,9 +4,9 @@ import CsvWorkbench from "@/components/CsvWorkbench";
 
 export const metadata: Metadata = {
   title: "Remove and Reorder CSV Columns",
-  description: "Drop columns and change their order, then download the CSV.",
+  description: "Remove, keep or reorder CSV columns online, then download the cleaned file. Free and private: your CSV is processed in your browser, never uploaded.",
   alternates: { canonical: "/csv-columns" },
-  openGraph: { title: "Remove and Reorder CSV Columns", description: "Drop columns and change their order, then download the CSV.", type: "website", url: "/csv-columns" },
+  openGraph: { title: "Remove and Reorder CSV Columns", description: "Remove, keep or reorder CSV columns online, then download the cleaned file. Free and private: your CSV is processed in your browser, never uploaded.", type: "website", url: "/csv-columns" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Remove and Reorder CSV Columns" path="/csv-columns" description="Drop columns and change their order, then download the CSV." intro="Uncheck a column to remove it. Use Up and Down to change the order, then download the sheet." faqs={faqs}>
+    <ToolArticle name="Remove and Reorder CSV Columns" path="/csv-columns" description="Remove, keep or reorder CSV columns online, then download the cleaned file. Free and private: your CSV is processed in your browser, never uploaded." intro="Uncheck a column to remove it. Use Up and Down to change the order, then download the sheet." faqs={faqs}>
       <CsvWorkbench mode="columns" />
     </ToolArticle>
   );

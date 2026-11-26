@@ -7,9 +7,9 @@ import { titled } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Quote templates by trade",
-  description: "Free quote templates with example lines for estimates before the work starts.",
+  description: "Free quote templates with example lines for estimates before the work starts. Adjust the quantities and prices, then download a PDF. No sign-up needed.",
   alternates: { canonical: "/quote-template" },
-  openGraph: { title: "Quote templates by trade", description: "Example estimate lines for specific kinds of work.", type: "website", url: "/quote-template" },
+  openGraph: { title: "Quote templates by trade", description: "Free quote templates with example lines for estimates before the work starts. Adjust the quantities and prices, then download a PDF. No sign-up needed.", type: "website", url: "/quote-template" },
 };
 
 export default function Page() {

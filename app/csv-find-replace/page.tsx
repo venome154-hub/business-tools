@@ -4,9 +4,9 @@ import CsvWorkbench from "@/components/CsvWorkbench";
 
 export const metadata: Metadata = {
   title: "Find and Replace in a CSV",
-  description: "Replace text in one CSV column or in every column.",
+  description: "Find and replace text in a CSV file, in one column or in every column, then download the result. Free, private, runs in your browser. No sign-up.",
   alternates: { canonical: "/csv-find-replace" },
-  openGraph: { title: "Find and Replace in a CSV", description: "Replace text in one CSV column or in every column.", type: "website", url: "/csv-find-replace" },
+  openGraph: { title: "Find and Replace in a CSV", description: "Find and replace text in a CSV file, in one column or in every column, then download the result. Free, private, runs in your browser. No sign-up.", type: "website", url: "/csv-find-replace" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Find and Replace in a CSV" path="/csv-find-replace" description="Replace text in one CSV column or in every column." intro="Search the data rows, optionally in a single column, and write the replacement into a new CSV. The header row is left as it is." faqs={faqs}>
+    <ToolArticle name="Find and Replace in a CSV" path="/csv-find-replace" description="Find and replace text in a CSV file, in one column or in every column, then download the result. Free, private, runs in your browser. No sign-up." intro="Search the data rows, optionally in a single column, and write the replacement into a new CSV. The header row is left as it is." faqs={faqs}>
       <CsvWorkbench mode="replace" />
     </ToolArticle>
   );

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import DocumentStudio from "@/components/DocumentStudio";
 import JsonLd from "@/components/JsonLd";
-import { getInvoiceCountry, invoiceCountries } from "@/content/countries";
+import { countryDescription, getInvoiceCountry, invoiceCountries } from "@/content/countries";
 import { breadcrumbLd, faqLd } from "@/lib/schema";
 
 export function generateStaticParams() {
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ country: 
   const item = getInvoiceCountry(country);
   if (!item) return {};
   const title = `Common invoice fields for ${item.name}`;
-  const description = `A checklist of invoice fields often used in ${item.name}, with a link to the official source. Requirements vary.`;
+  const description = countryDescription(item.name);
   return { title, description, alternates: { canonical: `/invoice-requirements/${item.slug}` }, openGraph: { title, description, type: "website", url: `/invoice-requirements/${item.slug}` } };
 }
 

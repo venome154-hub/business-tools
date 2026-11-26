@@ -4,9 +4,9 @@ import DocumentStudio from "@/components/DocumentStudio";
 
 export const metadata: Metadata = {
   title: "Free Rent Receipt Generator",
-  description: "Write a rent receipt PDF for a payment you received.",
+  description: "Create a free rent receipt PDF for a tenant payment: dates, amount, property and payment method. Your details stay in your browser. No sign-up needed.",
   alternates: { canonical: "/rent-receipt" },
-  openGraph: { title: "Free Rent Receipt Generator", description: "Write a rent receipt PDF for a payment you received.", type: "website", url: "/rent-receipt" },
+  openGraph: { title: "Free Rent Receipt Generator", description: "Create a free rent receipt PDF for a tenant payment: dates, amount, property and payment method. Your details stay in your browser. No sign-up needed.", type: "website", url: "/rent-receipt" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Free Rent Receipt Generator" path="/rent-receipt" description="Write a rent receipt PDF for a payment you received." intro="Record the tenant, the property, the rent period, and the amount you received. Download a PDF for your records." faqs={faqs}>
+    <ToolArticle name="Free Rent Receipt Generator" path="/rent-receipt" description="Create a free rent receipt PDF for a tenant payment: dates, amount, property and payment method. Your details stay in your browser. No sign-up needed." intro="Record the tenant, the property, the rent period, and the amount you received. Download a PDF for your records." faqs={faqs}>
       <DocumentStudio kind="rent-receipt" />
     </ToolArticle>
   );

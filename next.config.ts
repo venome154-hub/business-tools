@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true
+  reactStrictMode: true,
+  async headers() {
+    return [{ source: "/embed/:tool", headers: [{ key: "X-Robots-Tag", value: "noindex" }] }];
+  },
 };
 
 export default nextConfig;

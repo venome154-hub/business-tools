@@ -4,9 +4,9 @@ import { breadcrumbLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Terms of Use",
-  description: "Terms for using the free BizToolsBox document and CSV tools.",
+  description: "Terms of use for BizToolsBox, a set of free online tools for invoices, quotes, receipts and CSV files. Read what you can expect when using the tools.",
   alternates: { canonical: "/terms" },
-  openGraph: { title: "Terms of Use", description: "Free use, your responsibility for document content, and limits on liability.", type: "website", url: "/terms" },
+  openGraph: { title: "Terms of Use", description: "Terms of use for BizToolsBox, a set of free online tools for invoices, quotes, receipts and CSV files. Read what you can expect when using the tools.", type: "website", url: "/terms" },
 };
 
 export default function TermsPage() {

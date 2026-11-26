@@ -7,9 +7,9 @@ import { titled } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Receipt templates by payment type",
-  description: "Receipt templates for rent, deposits, repairs, lessons, and other payments you have already received.",
+  description: "Free receipt templates for rent, deposits, repairs, lessons, and other payments already received. Download a PDF in your browser. No sign-up needed.",
   alternates: { canonical: "/receipt-template" },
-  openGraph: { title: "Receipt templates by payment type", description: "Record a specific kind of payment you have received.", type: "website", url: "/receipt-template" },
+  openGraph: { title: "Receipt templates by payment type", description: "Free receipt templates for rent, deposits, repairs, lessons, and other payments already received. Download a PDF in your browser. No sign-up needed.", type: "website", url: "/receipt-template" },
 };
 
 export default function Page() {

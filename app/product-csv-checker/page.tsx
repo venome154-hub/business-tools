@@ -4,9 +4,9 @@ import CsvWorkbench from "@/components/CsvWorkbench";
 
 export const metadata: Metadata = {
   title: "Shopify and WooCommerce Product CSV Checker",
-  description: "Find a missing SKU, a missing price, or a duplicate product handle.",
+  description: "Check a Shopify or WooCommerce product CSV before import: find missing SKUs, missing prices and duplicate handles. Free, runs in your browser.",
   alternates: { canonical: "/product-csv-checker" },
-  openGraph: { title: "Shopify and WooCommerce Product CSV Checker", description: "Find a missing SKU, a missing price, or a duplicate product handle.", type: "website", url: "/product-csv-checker" },
+  openGraph: { title: "Shopify and WooCommerce Product CSV Checker", description: "Check a Shopify or WooCommerce product CSV before import: find missing SKUs, missing prices and duplicate handles. Free, runs in your browser.", type: "website", url: "/product-csv-checker" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Shopify and WooCommerce Product CSV Checker" path="/product-csv-checker" description="Find a missing SKU, a missing or invalid price, a repeated SKU, or a possible duplicate product." intro="Open a product export. The checker lists a missing SKU, a missing or non-numeric price, a SKU used on more than one row, and a handle that looks like two products. Variant rows that share a handle and leave Title empty are not treated as a second product." faqs={faqs}>
+    <ToolArticle name="Shopify and WooCommerce Product CSV Checker" path="/product-csv-checker" description="Check a Shopify or WooCommerce product CSV before import: find missing SKUs, missing prices and duplicate handles. Free, runs in your browser." intro="Open a product export. The checker lists a missing SKU, a missing or non-numeric price, a SKU used on more than one row, and a handle that looks like two products. Variant rows that share a handle and leave Title empty are not treated as a second product." faqs={faqs}>
       <CsvWorkbench mode="products" />
     </ToolArticle>
   );

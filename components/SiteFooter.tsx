@@ -25,7 +25,7 @@ export default function SiteFooter() {
             <Link href="/timesheet-invoice">Timesheet invoice</Link>
             <Link href="/rent-receipt">Rent receipt</Link>
             <Link href="/donation-receipt">Donation receipt</Link>
-            <Link href="/my-documents">My documents</Link>
+            <Link href="/my-documents" rel="nofollow">My documents</Link>
           </details>
           <details className="footer-group">
             <summary>CSV tools</summary>

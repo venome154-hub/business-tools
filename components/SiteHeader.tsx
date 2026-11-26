@@ -58,7 +58,7 @@ export default function SiteHeader() {
             <button type="button" aria-expanded={open === "documents"} onClick={() => toggle("documents")}>Documents</button>
             {open === "documents" && (
               <div className="nav-menu" role="menu">
-                {documents.map((item) => <Link key={item.href} href={item.href} onClick={() => setOpen(null)}>{item.label}</Link>)}
+                {documents.map((item) => <Link key={item.href} href={item.href} rel={item.href === "/my-documents" ? "nofollow" : undefined} onClick={() => setOpen(null)}>{item.label}</Link>)}
               </div>
             )}
           </div>
@@ -85,7 +85,7 @@ export default function SiteHeader() {
       {open === "mobile" && (
         <nav className="mobile-sheet" aria-label="Mobile navigation">
           <strong>Documents</strong>
-          {documents.map((item) => <Link key={item.href} href={item.href} onClick={() => setOpen(null)}>{item.label}</Link>)}
+          {documents.map((item) => <Link key={item.href} href={item.href} rel={item.href === "/my-documents" ? "nofollow" : undefined} onClick={() => setOpen(null)}>{item.label}</Link>)}
           <strong>CSV tools</strong>
           {csvTools.map((item) => <Link key={item.href} href={item.href} onClick={() => setOpen(null)}>{item.label}</Link>)}
           <strong>Calculators</strong>

@@ -115,3 +115,7 @@ export const invoiceCountries: InvoiceCountry[] = [
 export function getInvoiceCountry(slug: string) {
   return invoiceCountries.find((item) => item.slug === slug);
 }
+
+export function countryDescription(name: string) {
+  return `Common invoice fields for ${name}, with a link to the official source. The sample invoice uses that jurisdiction's currency. Rules vary.`;
+}

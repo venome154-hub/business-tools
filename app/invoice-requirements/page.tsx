@@ -6,9 +6,9 @@ import { breadcrumbLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Invoice requirements by jurisdiction",
-  description: "Checklists of commonly required invoice fields, each with a link to an official source.",
+  description: "Checklists of commonly required invoice fields for several jurisdictions, each with a link to an official source. These pages do not detect where you are.",
   alternates: { canonical: "/invoice-requirements" },
-  openGraph: { title: "Invoice requirements by jurisdiction", description: "Common invoice fields and official sources.", type: "website", url: "/invoice-requirements" },
+  openGraph: { title: "Invoice requirements by jurisdiction", description: "Checklists of commonly required invoice fields for several jurisdictions, each with a link to an official source. These pages do not detect where you are.", type: "website", url: "/invoice-requirements" },
 };
 
 export default function Page() {

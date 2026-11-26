@@ -7,9 +7,9 @@ import { titled } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Invoice templates by trade",
-  description: "Free invoice templates with example lines for designers, trades, tutors, and other small businesses.",
+  description: "Free invoice templates with example line items for designers, trades, tutors, and other small businesses. Edit the lines and download a PDF in your browser.",
   alternates: { canonical: "/invoice-template" },
-  openGraph: { title: "Invoice templates by trade", description: "Example invoice lines for specific kinds of work.", type: "website", url: "/invoice-template" },
+  openGraph: { title: "Invoice templates by trade", description: "Free invoice templates with example line items for designers, trades, tutors, and other small businesses. Edit the lines and download a PDF in your browser.", type: "website", url: "/invoice-template" },
 };
 
 export default function Page() {

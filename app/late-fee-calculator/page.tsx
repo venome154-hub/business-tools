@@ -4,9 +4,9 @@ import CalculatorTool from "@/components/CalculatorTool";
 
 export const metadata: Metadata = {
   title: "Late Payment Fee Calculator",
-  description: "Estimate a simple annual late fee for an unpaid invoice.",
+  description: "Free late fee calculator for unpaid invoices: enter amount, annual rate and days overdue to estimate a simple late payment fee. No sign-up needed.",
   alternates: { canonical: "/late-fee-calculator" },
-  openGraph: { title: "Late Payment Fee Calculator", description: "Estimate a simple annual late fee for an unpaid invoice.", type: "website", url: "/late-fee-calculator" },
+  openGraph: { title: "Late Payment Fee Calculator", description: "Free late fee calculator for unpaid invoices: enter amount, annual rate and days overdue to estimate a simple late payment fee. No sign-up needed.", type: "website", url: "/late-fee-calculator" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Late Payment Fee Calculator" path="/late-fee-calculator" description="Estimate a simple annual late fee for an unpaid invoice." intro="The fee is the unpaid amount times the annual rate times days late, divided by 365. It is a simple estimate, not a statutory interest calculation." faqs={faqs} headingAbove>
+    <ToolArticle name="Late Payment Fee Calculator" path="/late-fee-calculator" description="Free late fee calculator for unpaid invoices: enter amount, annual rate and days overdue to estimate a simple late payment fee. No sign-up needed." intro="The fee is the unpaid amount times the annual rate times days late, divided by 365. It is a simple estimate, not a statutory interest calculation." faqs={faqs} headingAbove>
       <CalculatorTool slug="late-fee" />
     </ToolArticle>
   );

@@ -5,9 +5,9 @@ import { SUPPORT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Contact Georgiy T. about BizToolsBox, including bugs, privacy questions, and corrections.",
+  description: "Email Georgiy T. about BizToolsBox: broken tools, privacy questions, and corrections to the guides. Do not send invoices or customer spreadsheets.",
   alternates: { canonical: "/contact" },
-  openGraph: { title: "Contact BizToolsBox", description: "Email Georgiy T. about the free business tools.", type: "website", url: "/contact" },
+  openGraph: { title: "Contact BizToolsBox", description: "Email Georgiy T. about BizToolsBox: broken tools, privacy questions, and corrections to the guides. Do not send invoices or customer spreadsheets.", type: "website", url: "/contact" },
 };
 
 export default function ContactPage() {

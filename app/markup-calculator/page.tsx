@@ -4,9 +4,9 @@ import CalculatorTool from "@/components/CalculatorTool";
 
 export const metadata: Metadata = {
   title: "Markup Calculator",
-  description: "Calculate markup from cost and selling price.",
+  description: "Free markup calculator: enter cost and selling price to see the markup percentage. Markup divides profit by cost, which is not the same as margin. No sign-up.",
   alternates: { canonical: "/markup-calculator" },
-  openGraph: { title: "Markup Calculator", description: "Calculate markup from cost and selling price.", type: "website", url: "/markup-calculator" },
+  openGraph: { title: "Markup Calculator", description: "Free markup calculator: enter cost and selling price to see the markup percentage. Markup divides profit by cost, which is not the same as margin. No sign-up.", type: "website", url: "/markup-calculator" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Markup Calculator" path="/markup-calculator" description="Calculate markup from cost and selling price." intro="Markup is the amount added to cost, divided by that cost. A 50% markup on a 100 cost is a 150 selling price." faqs={faqs} headingAbove>
+    <ToolArticle name="Markup Calculator" path="/markup-calculator" description="Free markup calculator: enter cost and selling price to see the markup percentage. Markup divides profit by cost, which is not the same as margin. No sign-up." intro="Markup is the amount added to cost, divided by that cost. A 50% markup on a 100 cost is a 150 selling price." faqs={faqs} headingAbove>
       <CalculatorTool slug="markup" />
     </ToolArticle>
   );

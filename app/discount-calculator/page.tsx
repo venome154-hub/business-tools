@@ -4,9 +4,9 @@ import CalculatorTool from "@/components/CalculatorTool";
 
 export const metadata: Metadata = {
   title: "Discount Calculator",
-  description: "Take a percentage off a price.",
+  description: "Free discount calculator: take a percentage off a price and see the sale price and the amount saved. Fast, works in your browser, no sign-up needed.",
   alternates: { canonical: "/discount-calculator" },
-  openGraph: { title: "Discount Calculator", description: "Take a percentage off a price.", type: "website", url: "/discount-calculator" },
+  openGraph: { title: "Discount Calculator", description: "Free discount calculator: take a percentage off a price and see the sale price and the amount saved. Fast, works in your browser, no sign-up needed.", type: "website", url: "/discount-calculator" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Discount Calculator" path="/discount-calculator" description="Take a percentage off a price." intro="Enter the original price and a discount percent from 0 to 100. The result is the amount off and the price after the discount." faqs={faqs} headingAbove>
+    <ToolArticle name="Discount Calculator" path="/discount-calculator" description="Free discount calculator: take a percentage off a price and see the sale price and the amount saved. Fast, works in your browser, no sign-up needed." intro="Enter the original price and a discount percent from 0 to 100. The result is the amount off and the price after the discount." faqs={faqs} headingAbove>
       <CalculatorTool slug="discount" />
     </ToolArticle>
   );

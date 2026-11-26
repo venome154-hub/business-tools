@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   description: "Open, duplicate, or delete the latest documents saved in this browser.",
   alternates: { canonical: "/my-documents" },
   openGraph: { title: "My Documents", description: "Documents saved on this device.", type: "website", url: "/my-documents" },
+  robots: { index: false, follow: true },
 };
 
 export default function Page() {

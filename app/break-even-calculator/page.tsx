@@ -4,9 +4,9 @@ import CalculatorTool from "@/components/CalculatorTool";
 
 export const metadata: Metadata = {
   title: "Break-even Calculator",
-  description: "Estimate how many units cover fixed costs.",
+  description: "Free break-even calculator: enter fixed costs, price and variable cost per unit to find how many units you must sell to break even. With examples.",
   alternates: { canonical: "/break-even-calculator" },
-  openGraph: { title: "Break-even Calculator", description: "Estimate how many units cover fixed costs.", type: "website", url: "/break-even-calculator" },
+  openGraph: { title: "Break-even Calculator", description: "Free break-even calculator: enter fixed costs, price and variable cost per unit to find how many units you must sell to break even. With examples.", type: "website", url: "/break-even-calculator" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Break-even Calculator" path="/break-even-calculator" description="Estimate how many units cover fixed costs." intro="Break-even units equal fixed costs divided by the amount left from the price after variable cost. If the price is not higher than the variable cost, there is no break-even point." faqs={faqs} headingAbove>
+    <ToolArticle name="Break-even Calculator" path="/break-even-calculator" description="Free break-even calculator: enter fixed costs, price and variable cost per unit to find how many units you must sell to break even. With examples." intro="Break-even units equal fixed costs divided by the amount left from the price after variable cost. Example: fixed costs of 1,000, a price of 50, and a variable cost of 30 break even at 50 units. If the price is not higher than the variable cost, there is no break-even point." faqs={faqs} headingAbove>
       <CalculatorTool slug="break-even" />
     </ToolArticle>
   );

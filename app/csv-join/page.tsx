@@ -4,9 +4,9 @@ import CsvWorkbench from "@/components/CsvWorkbench";
 
 export const metadata: Metadata = {
   title: "Join Two CSVs by Key",
-  description: "Combine two CSV files by a shared key, like VLOOKUP.",
+  description: "Join two CSV files by a shared key column, like VLOOKUP, and download the combined file. Free, private, runs in your browser, nothing is uploaded.",
   alternates: { canonical: "/csv-join" },
-  openGraph: { title: "Join Two CSVs by Key", description: "Combine two CSV files by a shared key, like VLOOKUP.", type: "website", url: "/csv-join" },
+  openGraph: { title: "Join Two CSVs by Key", description: "Join two CSV files by a shared key column, like VLOOKUP, and download the combined file. Free, private, runs in your browser, nothing is uploaded.", type: "website", url: "/csv-join" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Join Two CSVs by Key" path="/csv-join" description="Combine two CSV files by a shared key, like VLOOKUP." intro="Every row from the first file is kept. Matching rows from the second file add their other columns. A missing key leaves those cells blank." faqs={faqs}>
+    <ToolArticle name="Join Two CSVs by Key" path="/csv-join" description="Join two CSV files by a shared key column, like VLOOKUP, and download the combined file. Free, private, runs in your browser, nothing is uploaded." intro="Every row from the first file is kept. Matching rows from the second file add their other columns. A missing key leaves those cells blank." faqs={faqs}>
       <CsvWorkbench mode="join" />
     </ToolArticle>
   );

@@ -5,9 +5,9 @@ import { breadcrumbLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Refund policy",
-  description: "BizToolsBox does not sell a paid plan, so there is nothing to refund.",
+  description: "Refund policy for BizToolsBox. The invoice, receipt, quote and CSV tools are free to use, so there is no paid plan and nothing to refund at this time.",
   alternates: { canonical: "/refund-policy" },
-  openGraph: { title: "Refund policy", description: "Nothing is sold, so nothing can be refunded.", type: "website", url: "/refund-policy" },
+  openGraph: { title: "Refund policy", description: "Refund policy for BizToolsBox. The invoice, receipt, quote and CSV tools are free to use, so there is no paid plan and nothing to refund at this time.", type: "website", url: "/refund-policy" },
   robots: { index: false, follow: false },
 };
 

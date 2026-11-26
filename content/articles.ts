@@ -11,7 +11,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "how-to-invoice-as-a-freelancer",
     title: "How to invoice as a freelancer",
-    description: "What a freelancer should put on an invoice before sending it to a client.",
+    description: "What a freelancer should put on an invoice before sending it: names, a unique number, the agreed work, tax only if you charge it, and any deposit already paid.",
     toolHref: "/invoice-generator",
     toolLabel: "invoice generator",
     paragraphs: [
@@ -24,7 +24,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "what-net-30-means",
     title: "What net 30 means",
-    description: "How to read net 7, net 15, and net 30 on an invoice.",
+    description: "What net 30 means on an invoice, how to count the days, and how net 7, net 15 and net 30 payment terms compare. With examples and a due date calculator.",
     toolHref: "/invoice-due-date-calculator",
     toolLabel: "due date calculator",
     paragraphs: [
@@ -37,7 +37,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "how-to-write-a-late-payment-email",
     title: "How to write a late payment email",
-    description: "A plain structure for chasing an unpaid invoice without hiding the amount or the date.",
+    description: "How to write a late payment email that names the invoice number, the amount still due, and the due date. Match the tone to how late it is, then copy it.",
     toolHref: "/payment-reminder-generator",
     toolLabel: "payment reminder generator",
     paragraphs: [
@@ -50,7 +50,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "quote-vs-estimate-vs-proposal",
     title: "Quote vs estimate vs proposal",
-    description: "How a quote, an estimate, and a proposal differ before any invoice exists.",
+    description: "How a quote, an estimate, and a proposal differ before an invoice exists, and why the document should say which one it is. With a free quote generator.",
     toolHref: "/quote-generator",
     toolLabel: "quote generator",
     paragraphs: [
@@ -63,7 +63,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "how-to-clean-a-shopify-product-csv",
     title: "How to clean a Shopify product CSV",
-    description: "What to check in a Shopify product export before you import it again.",
+    description: "How to clean a Shopify product CSV before re-importing: check handles, SKUs, prices and variants, fix duplicates and empty rows. Step-by-step guide.",
     toolHref: "/product-csv-checker",
     toolLabel: "product CSV checker",
     paragraphs: [
@@ -76,7 +76,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "how-to-write-a-receipt",
     title: "How to write a receipt",
-    description: "What to record after a customer pays.",
+    description: "How to write a receipt after a customer pays: what to include, from date and amount to payment method and receipt number, with a free receipt generator.",
     toolHref: "/receipt-generator",
     toolLabel: "receipt generator",
     paragraphs: [
@@ -89,7 +89,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "how-invoice-numbers-work",
     title: "How invoice numbers work",
-    description: "Why each invoice needs its own number and how the generator increments them.",
+    description: "Why each invoice needs its own number, why quotes and credit notes should not share that sequence, and how the generator stores the next number in your browser.",
     toolHref: "/invoice-generator",
     toolLabel: "invoice generator",
     paragraphs: [
@@ -102,7 +102,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "what-belongs-on-a-quote",
     title: "What belongs on a quote",
-    description: "The lines and assumptions that keep an estimate from drifting.",
+    description: "What to put on a quote: line items, prices, assumptions, validity date and terms that keep an estimate from drifting. A checklist with a free generator.",
     toolHref: "/quote-generator",
     toolLabel: "quote generator",
     paragraphs: [
@@ -115,7 +115,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "partial-payments-on-a-receipt",
     title: "How to record a partial payment",
-    description: "What a receipt should show when the client pays only part of an invoice.",
+    description: "How to record a partial payment on a receipt: show the amount received, the remaining balance, and the invoice number. Do not mark the full invoice as paid.",
     toolHref: "/receipt-generator",
     toolLabel: "receipt generator",
     paragraphs: [
@@ -128,7 +128,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "purchase-order-basics",
     title: "What a purchase order is for",
-    description: "How a purchase order differs from an invoice you send to a customer.",
+    description: "What a purchase order is, when to use one, and how it differs from an invoice. What to include on a PO, with a free purchase order generator.",
     toolHref: "/purchase-order",
     toolLabel: "purchase order",
     paragraphs: [
@@ -141,7 +141,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "credit-note-or-refund",
     title: "Credit note or refund",
-    description: "When reducing an invoice is not the same as handing money back.",
+    description: "Credit note or refund? Learn when to reduce an invoice with a credit note and when to send money back, and what each document should include.",
     toolHref: "/credit-note",
     toolLabel: "credit note",
     paragraphs: [
@@ -154,7 +154,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "delivery-note-and-packing-slip",
     title: "Delivery note and packing slip",
-    description: "What to list when goods leave, before anyone treats the paper as a bill.",
+    description: "What a delivery note or packing slip should list: the address, date, quantities, and a purchase-order number. This version does not show prices.",
     toolHref: "/delivery-note",
     toolLabel: "delivery note",
     paragraphs: [
@@ -167,7 +167,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "billing-hours-on-a-timesheet-invoice",
     title: "Billing hours on a timesheet invoice",
-    description: "How to turn hours and a rate into an invoice line.",
+    description: "How to bill hours on a timesheet invoice: log dates and hours, apply a rate, round time fairly and show totals clearly. With a free timesheet invoice tool.",
     toolHref: "/timesheet-invoice",
     toolLabel: "timesheet invoice",
     paragraphs: [
@@ -180,7 +180,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "profit-margin-and-markup",
     title: "Profit margin and markup",
-    description: "Why a 50 percent markup is not a 50 percent margin.",
+    description: "Profit margin vs markup explained: why a 50% markup is not a 50% margin, the formulas for each, and worked examples. With free calculators for both.",
     toolHref: "/profit-margin-calculator",
     toolLabel: "profit margin calculator",
     paragraphs: [
@@ -193,7 +193,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "adding-or-removing-sales-tax",
     title: "Adding or removing sales tax",
-    description: "How to add VAT, GST, or sales tax, and how to pull it back out of a gross price.",
+    description: "How to add VAT, GST, or sales tax to a net price, and how to remove it from a gross price. Includes a 20 percent example and a free sales tax calculator.",
     toolHref: "/sales-tax-calculator",
     toolLabel: "sales tax calculator",
     paragraphs: [
@@ -206,7 +206,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "setting-a-freelance-hourly-rate",
     title: "Setting a freelance hourly rate",
-    description: "A simple way to turn an income goal and billable hours into a rate.",
+    description: "How to set a freelance hourly rate: start from an income goal, costs and realistic billable hours, then sense-check it. With a free rate calculator.",
     toolHref: "/freelance-rate-calculator",
     toolLabel: "freelance rate calculator",
     paragraphs: [
@@ -219,7 +219,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "merging-csv-files",
     title: "How to merge CSV files",
-    description: "How to combine exports that do not share the same column order.",
+    description: "How to merge CSV files that have different column orders or extra columns, without breaking data. Step-by-step guide plus a free in-browser CSV merger.",
     toolHref: "/csv-merger",
     toolLabel: "CSV merger",
     paragraphs: [
@@ -232,7 +232,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "finding-duplicate-skus",
     title: "Finding duplicate SKUs",
-    description: "How repeated product codes show up in a CSV and what to ignore.",
+    description: "How to find duplicate SKUs in a product CSV, why they break imports, and which repeats are safe to ignore. With a free in-browser duplicate SKU finder.",
     toolHref: "/duplicate-sku-finder",
     toolLabel: "duplicate SKU finder",
     paragraphs: [
@@ -245,7 +245,7 @@ export const articles: GuideArticle[] = [
   {
     slug: "late-fees-on-an-invoice",
     title: "Late fees on an invoice",
-    description: "What to write if a payment is late, and what not to invent.",
+    description: "How to add late fees to an invoice: what to state in your terms, how to calculate a fee, and what not to invent. With a free late fee calculator.",
     toolHref: "/late-fee-calculator",
     toolLabel: "late fee calculator",
     paragraphs: [

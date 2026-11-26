@@ -4,9 +4,9 @@ import CalculatorTool from "@/components/CalculatorTool";
 
 export const metadata: Metadata = {
   title: "Freelance Hourly Rate Calculator",
-  description: "Estimate an hourly rate from an income goal, expenses, weeks, and hours.",
+  description: "Free freelance hourly rate calculator: spread a yearly income goal and business expenses over the weeks and hours you can bill. A planning figure, no sign-up.",
   alternates: { canonical: "/freelance-rate-calculator" },
-  openGraph: { title: "Freelance Hourly Rate Calculator", description: "Estimate an hourly rate from an income goal, expenses, weeks, and hours.", type: "website", url: "/freelance-rate-calculator" },
+  openGraph: { title: "Freelance Hourly Rate Calculator", description: "Free freelance hourly rate calculator: spread a yearly income goal and business expenses over the weeks and hours you can bill. A planning figure, no sign-up.", type: "website", url: "/freelance-rate-calculator" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Freelance Hourly Rate Calculator" path="/freelance-rate-calculator" description="Estimate an hourly rate from an income goal, expenses, weeks, and hours." intro="Add the yearly income you want to the yearly business expenses, then divide by billable hours. Billable hours are working weeks times hours per week." faqs={faqs} headingAbove>
+    <ToolArticle name="Freelance Hourly Rate Calculator" path="/freelance-rate-calculator" description="Free freelance hourly rate calculator: spread a yearly income goal and business expenses over the weeks and hours you can bill. A planning figure, no sign-up." intro="Add the yearly income you want to the yearly business expenses, then divide by billable hours. Billable hours are working weeks times hours per week." faqs={faqs} headingAbove>
       <CalculatorTool slug="freelance-rate" />
     </ToolArticle>
   );

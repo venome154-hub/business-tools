@@ -4,9 +4,9 @@ import DocumentStudio from "@/components/DocumentStudio";
 
 export const metadata: Metadata = {
   title: "Free Credit Note Generator",
-  description: "Create a credit note PDF for an amount credited against an invoice.",
+  description: "Create a free credit note PDF to reduce or cancel an invoice. Reference the original invoice, list credited items and download. No sign-up needed.",
   alternates: { canonical: "/credit-note" },
-  openGraph: { title: "Free Credit Note Generator", description: "Create a credit note PDF for an amount credited against an invoice.", type: "website", url: "/credit-note" },
+  openGraph: { title: "Free Credit Note Generator", description: "Create a free credit note PDF to reduce or cancel an invoice. Reference the original invoice, list credited items and download. No sign-up needed.", type: "website", url: "/credit-note" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Free Credit Note Generator" path="/credit-note" description="Create a credit note PDF for an amount credited against an invoice." intro="Use a credit note when you reduce what a customer owes. Enter the related invoice number, the credited items, and download the PDF." faqs={faqs}>
+    <ToolArticle name="Free Credit Note Generator" path="/credit-note" description="Create a free credit note PDF to reduce or cancel an invoice. Reference the original invoice, list credited items and download. No sign-up needed." intro="Use a credit note when you reduce what a customer owes. Enter the related invoice number, the credited items, and download the PDF." faqs={faqs}>
       <DocumentStudio kind="credit-note" />
     </ToolArticle>
   );

@@ -4,9 +4,9 @@ import CsvWorkbench from "@/components/CsvWorkbench";
 
 export const metadata: Metadata = {
   title: "Split CSV by Rows",
-  description: "Split a CSV into smaller files that keep the header row.",
+  description: "Split a large CSV file into multiple smaller files by row count, keeping the header row in each. Free, private, runs in your browser. No sign-up.",
   alternates: { canonical: "/split-csv" },
-  openGraph: { title: "Split CSV by Rows", description: "Split a CSV into smaller files that keep the header row.", type: "website", url: "/split-csv" },
+  openGraph: { title: "Split CSV by Rows", description: "Split a large CSV file into multiple smaller files by row count, keeping the header row in each. Free, private, runs in your browser. No sign-up.", type: "website", url: "/split-csv" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Split CSV by Rows" path="/split-csv" description="Split a CSV into smaller files that keep the header row." intro="Choose how many data rows each file should hold. Every part keeps the original header. Download each part separately." faqs={faqs}>
+    <ToolArticle name="Split CSV by Rows" path="/split-csv" description="Split a large CSV file into multiple smaller files by row count, keeping the header row in each. Free, private, runs in your browser. No sign-up." intro="Choose how many data rows each file should hold. Every part keeps the original header. Download each part separately." faqs={faqs}>
       <CsvWorkbench mode="split" />
     </ToolArticle>
   );

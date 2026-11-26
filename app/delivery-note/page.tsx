@@ -4,9 +4,9 @@ import DocumentStudio from "@/components/DocumentStudio";
 
 export const metadata: Metadata = {
   title: "Free Delivery Note and Packing Slip",
-  description: "Create a delivery note PDF that lists quantities for a shipment.",
+  description: "Make a free delivery note or packing slip PDF that lists items and quantities in a shipment. Runs in your browser, no account or sign-up needed.",
   alternates: { canonical: "/delivery-note" },
-  openGraph: { title: "Free Delivery Note and Packing Slip", description: "Create a delivery note PDF that lists quantities for a shipment.", type: "website", url: "/delivery-note" },
+  openGraph: { title: "Free Delivery Note and Packing Slip", description: "Make a free delivery note or packing slip PDF that lists items and quantities in a shipment. Runs in your browser, no account or sign-up needed.", type: "website", url: "/delivery-note" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Free Delivery Note and Packing Slip" path="/delivery-note" description="Create a delivery note PDF that lists quantities for a shipment." intro="A delivery note, sometimes called a packing slip, lists what is in a shipment. This version shows descriptions and quantities rather than a request for payment." faqs={faqs}>
+    <ToolArticle name="Free Delivery Note and Packing Slip" path="/delivery-note" description="Make a free delivery note or packing slip PDF that lists items and quantities in a shipment. Runs in your browser, no account or sign-up needed." intro="A delivery note, sometimes called a packing slip, lists what is in a shipment. This version shows descriptions and quantities rather than a request for payment." faqs={faqs}>
       <DocumentStudio kind="delivery-note" />
     </ToolArticle>
   );

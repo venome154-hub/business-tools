@@ -6,7 +6,7 @@ import { AnalyticsSettingsButton } from "@/components/AnalyticsConsent";
 
 export const metadata: Metadata = {
   title: "Privacy & Data Practices",
-  description: "Learn how BizToolsBox handles information entered into its free document and CSV tools.",
+  description: "How BizToolsBox handles information in its free invoice, quote, receipt, and CSV tools. Documents you create stay in your browser. Read what this device stores.",
   alternates: { canonical: "/privacy" },
 };
 

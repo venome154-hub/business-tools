@@ -4,9 +4,9 @@ import CalculatorTool from "@/components/CalculatorTool";
 
 export const metadata: Metadata = {
   title: "Profit Margin Calculator",
-  description: "Calculate profit margin from cost and selling price in your browser.",
+  description: "Free profit margin calculator: enter cost and selling price to see the gross margin percentage. The formula is (price - cost) / price. No sign-up needed.",
   alternates: { canonical: "/profit-margin-calculator" },
-  openGraph: { title: "Profit Margin Calculator", description: "Calculate profit margin from cost and selling price in your browser.", type: "website", url: "/profit-margin-calculator" },
+  openGraph: { title: "Profit Margin Calculator", description: "Free profit margin calculator: enter cost and selling price to see the gross margin percentage. The formula is (price - cost) / price. No sign-up needed.", type: "website", url: "/profit-margin-calculator" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Profit Margin Calculator" path="/profit-margin-calculator" description="Calculate profit margin from cost and selling price in your browser." intro="Margin is the share of the selling price that is left after cost. Enter cost and selling price. The percentage is (price − cost) ÷ price." faqs={faqs} headingAbove>
+    <ToolArticle name="Profit Margin Calculator" path="/profit-margin-calculator" description="Free profit margin calculator: enter cost and selling price to see the gross margin percentage. The formula is (price - cost) / price. No sign-up needed." intro="Margin is the share of the selling price that is left after cost. Enter cost and selling price. The percentage is (price − cost) ÷ price." faqs={faqs} headingAbove>
       <CalculatorTool slug="profit-margin" />
     </ToolArticle>
   );

@@ -4,9 +4,9 @@ import CalculatorTool from "@/components/CalculatorTool";
 
 export const metadata: Metadata = {
   title: "Sales Tax Calculator",
-  description: "Add or remove VAT, GST, or sales tax from an amount.",
+  description: "Free sales tax, VAT and GST calculator: add tax to a net price or remove it from a gross price. Shows net, tax and total. Works in your browser.",
   alternates: { canonical: "/sales-tax-calculator" },
-  openGraph: { title: "Sales Tax Calculator", description: "Add or remove VAT, GST, or sales tax from an amount.", type: "website", url: "/sales-tax-calculator" },
+  openGraph: { title: "Sales Tax Calculator", description: "Free sales tax, VAT and GST calculator: add tax to a net price or remove it from a gross price. Shows net, tax and total. Works in your browser.", type: "website", url: "/sales-tax-calculator" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Sales Tax Calculator" path="/sales-tax-calculator" description="Add or remove VAT, GST, or sales tax from an amount." intro="Enter an amount and a rate to add tax on top, or to pull tax back out of a tax-inclusive price. The rate is capped at 100%." faqs={faqs} headingAbove>
+    <ToolArticle name="Sales Tax Calculator" path="/sales-tax-calculator" description="Free sales tax, VAT and GST calculator: add tax to a net price or remove it from a gross price. Shows net, tax and total. Works in your browser." intro="Enter an amount and a rate to add tax on top, or to pull tax back out of a tax-inclusive price. The rate is capped at 100%." faqs={faqs} headingAbove>
       <CalculatorTool slug="sales-tax" />
     </ToolArticle>
   );

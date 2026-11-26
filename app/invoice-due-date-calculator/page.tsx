@@ -4,9 +4,9 @@ import CalculatorTool from "@/components/CalculatorTool";
 
 export const metadata: Metadata = {
   title: "Invoice Due Date Calculator",
-  description: "Add net days to an invoice issue date.",
+  description: "Free invoice due date calculator: add net 7, net 15, net 30 or custom days to an invoice date to find the exact payment due date. No sign-up.",
   alternates: { canonical: "/invoice-due-date-calculator" },
-  openGraph: { title: "Invoice Due Date Calculator", description: "Add net days to an invoice issue date.", type: "website", url: "/invoice-due-date-calculator" },
+  openGraph: { title: "Invoice Due Date Calculator", description: "Free invoice due date calculator: add net 7, net 15, net 30 or custom days to an invoice date to find the exact payment due date. No sign-up.", type: "website", url: "/invoice-due-date-calculator" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="Invoice Due Date Calculator" path="/invoice-due-date-calculator" description="Add net days to an invoice issue date." intro="Choose the issue date and the number of days, such as 7, 15, or 30. The due date is that many days later on the calendar." faqs={faqs} headingAbove>
+    <ToolArticle name="Invoice Due Date Calculator" path="/invoice-due-date-calculator" description="Free invoice due date calculator: add net 7, net 15, net 30 or custom days to an invoice date to find the exact payment due date. No sign-up." intro="Choose the issue date and the number of days, such as 7, 15, or 30. The due date is that many days later on the calendar." faqs={faqs} headingAbove>
       <CalculatorTool slug="due-date" />
     </ToolArticle>
   );

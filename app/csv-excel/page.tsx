@@ -4,9 +4,9 @@ import CsvWorkbench from "@/components/CsvWorkbench";
 
 export const metadata: Metadata = {
   title: "CSV and Excel Converter",
-  description: "Convert CSV to Excel or Excel to CSV in your browser.",
+  description: "Convert CSV to Excel (XLSX) or Excel to CSV online for free. Files are processed in your browser and never uploaded to a server. No sign-up needed.",
   alternates: { canonical: "/csv-excel" },
-  openGraph: { title: "CSV and Excel Converter", description: "Convert CSV to Excel or Excel to CSV in your browser.", type: "website", url: "/csv-excel" },
+  openGraph: { title: "CSV and Excel Converter", description: "Convert CSV to Excel (XLSX) or Excel to CSV online for free. Files are processed in your browser and never uploaded to a server. No sign-up needed.", type: "website", url: "/csv-excel" },
 };
 
 const faqs = [
@@ -17,7 +17,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <ToolArticle name="CSV and Excel Converter" path="/csv-excel" description="Convert CSV to Excel or Excel to CSV in your browser." intro="Open a CSV or an .xlsx file. Download the other format without uploading the spreadsheet." faqs={faqs}>
+    <ToolArticle name="CSV and Excel Converter" path="/csv-excel" description="Convert CSV to Excel (XLSX) or Excel to CSV online for free. Files are processed in your browser and never uploaded to a server. No sign-up needed." intro="Open a CSV or an .xlsx file. Download the other format without uploading the spreadsheet." faqs={faqs}>
       <CsvWorkbench mode="excel" />
     </ToolArticle>
   );
