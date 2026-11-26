@@ -51,10 +51,12 @@ export default function DocumentStudio({
   kind,
   defaults,
   headingLevel = 1,
+  preferredFormat,
 }: {
   kind: DocumentKind;
   defaults?: { currency?: string; locale?: string; notes?: string; items?: { description: string; quantity: string; price: string }[] };
   headingLevel?: 1 | 2;
+  preferredFormat?: "pdf" | "docx" | "xlsx";
 }) {
   const config = KIND_CONFIG[kind];
   const router = useRouter();
@@ -374,6 +376,12 @@ export default function DocumentStudio({
   }
 
   const dateLabel = displayDate(state.date, state.locale);
+  const preferred = preferredFormat ?? "pdf";
+  const pdfLabel = exporting === "pdf" ? "Preparing PDF…" : "Download PDF";
+  const wordLabel = exporting === "docx" ? "Preparing Word…" : "Download Word";
+  const excelLabel = exporting === "xlsx" ? "Preparing Excel…" : "Download Excel";
+  const fillLine = preferred === "docx" ? "Fill it online, then download as Word." : preferred === "xlsx" ? "Fill it online, then download as Excel." : "Fill it online, then download as PDF.";
+  const downloadClass = (format: "pdf" | "docx" | "xlsx") => (format === preferred ? "download" : "secondary");
 
   return (
     <section className="invoice-layout">
@@ -385,10 +393,13 @@ export default function DocumentStudio({
             <p>{config.lede}</p>
           </div>
           <div className="download-actions">
-            <button className="download" type="button" onClick={downloadPDF} disabled={Boolean(exporting) || !currencyValid}><Download size={18} aria-hidden="true" />{exporting === "pdf" ? "Preparing PDF…" : "Download PDF"}</button>
-            {office && <button className="secondary" type="button" onClick={() => downloadOffice("docx")} disabled={Boolean(exporting) || !currencyValid}>{exporting === "docx" ? "Preparing Word…" : "Download Word"}</button>}
-            {office && <button className="secondary" type="button" onClick={() => downloadOffice("xlsx")} disabled={Boolean(exporting) || !currencyValid}>{exporting === "xlsx" ? "Preparing Excel…" : "Download Excel"}</button>}
+            {office && preferred === "docx" && <button className={downloadClass("docx")} type="button" onClick={() => downloadOffice("docx")} disabled={Boolean(exporting) || !currencyValid}><Download size={18} aria-hidden="true" />{wordLabel}</button>}
+            {office && preferred === "xlsx" && <button className={downloadClass("xlsx")} type="button" onClick={() => downloadOffice("xlsx")} disabled={Boolean(exporting) || !currencyValid}><Download size={18} aria-hidden="true" />{excelLabel}</button>}
+            <button className={downloadClass("pdf")} type="button" onClick={downloadPDF} disabled={Boolean(exporting) || !currencyValid}>{preferred === "pdf" && <Download size={18} aria-hidden="true" />}{pdfLabel}</button>
+            {office && preferred !== "docx" && <button className={downloadClass("docx")} type="button" onClick={() => downloadOffice("docx")} disabled={Boolean(exporting) || !currencyValid}>{wordLabel}</button>}
+            {office && preferred !== "xlsx" && <button className={downloadClass("xlsx")} type="button" onClick={() => downloadOffice("xlsx")} disabled={Boolean(exporting) || !currencyValid}>{excelLabel}</button>}
           </div>
+          {preferredFormat && <p className="field-note">{fillLine}</p>}
         </div>
         {error && <p className="form-error" role="alert">{error}</p>}
         {notice && <p className="field-note">{notice}</p>}
@@ -586,7 +597,19 @@ export default function DocumentStudio({
         </div>
       </aside>
       <AdSlot place="after-result" />
-      <MobileToolBar primaryLabel={exporting === "pdf" ? "Preparing PDF…" : "Download PDF"} onPrimary={downloadPDF} previewOpen={previewOpen} onPreview={() => setPreviewOpen((open) => !open)} disabled={Boolean(exporting) || !currencyValid} wordLabel={office ? (exporting === "docx" ? "Preparing Word…" : "Download Word") : undefined} onWord={office ? () => downloadOffice("docx") : undefined} excelLabel={office ? (exporting === "xlsx" ? "Preparing Excel…" : "Download Excel") : undefined} onExcel={office ? () => downloadOffice("xlsx") : undefined} />
+      <MobileToolBar
+        primaryLabel={preferred === "docx" ? wordLabel : preferred === "xlsx" ? excelLabel : pdfLabel}
+        onPrimary={preferred === "docx" ? () => downloadOffice("docx") : preferred === "xlsx" ? () => downloadOffice("xlsx") : downloadPDF}
+        previewOpen={previewOpen}
+        onPreview={() => setPreviewOpen((open) => !open)}
+        disabled={Boolean(exporting) || !currencyValid}
+        wordLabel={office && preferred !== "docx" ? wordLabel : undefined}
+        onWord={office && preferred !== "docx" ? () => downloadOffice("docx") : undefined}
+        excelLabel={office && preferred !== "xlsx" ? excelLabel : undefined}
+        onExcel={office && preferred !== "xlsx" ? () => downloadOffice("xlsx") : undefined}
+        pdfLabel={preferred !== "pdf" ? pdfLabel : undefined}
+        onPdf={preferred !== "pdf" ? downloadPDF : undefined}
+      />
     </section>
   );
 }

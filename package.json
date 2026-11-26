@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node --experimental-strip-types scripts/build-blank-templates.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --experimental-strip-types --test tests/locales.test.ts tests/sitemap.test.ts tests/embed-snippet.test.ts tests/related.test.ts tests/office-export.test.ts && playwright test",
+    "test": "node --experimental-strip-types --test tests/locales.test.ts tests/sitemap.test.ts tests/embed-snippet.test.ts tests/related.test.ts tests/office-export.test.ts tests/format-templates.test.ts && playwright test",
     "seo:check": "node --experimental-strip-types scripts/seo-check.ts"
   },
   "dependencies": {

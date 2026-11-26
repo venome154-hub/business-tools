@@ -65,6 +65,32 @@ export function breadcrumbLd(items: { name: string; path: string }[]) {
   };
 }
 
+export function digitalDocumentLd(pageName: string, pagePath: string, documentName: string, encodingFormat: string, filePath: string) {
+  const site = getSiteUrl();
+  const publisher = {
+    "@type": "Organization",
+    name: "BizToolsBox",
+    url: site,
+    founder: { "@type": "Person", name: "Georgiy T." },
+  };
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: pageName,
+    url: `${site}${pagePath}`,
+    isAccessibleForFree: true,
+    mainEntity: {
+      "@type": "DigitalDocument",
+      name: documentName,
+      encodingFormat,
+      url: `${site}${filePath}`,
+      isAccessibleForFree: true,
+      author: publisher,
+      publisher,
+    },
+  };
+}
+
 export function articleLd(headline: string, description: string, path: string) {
   return {
     "@context": "https://schema.org",

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { articles } from "../content/articles.ts";
+import { formatPages } from "../content/format-pages.ts";
 import { countryDescription, invoiceCountries } from "../content/countries.ts";
 import { industries } from "../content/industries.ts";
 import { receiptTypes } from "../content/receipt-types.ts";
@@ -22,6 +23,8 @@ function readMeta(file: string) {
 }
 
 function metaFor(path: string) {
+  const format = formatPages.find((item) => item.path === path);
+  if (format) return { title: format.title, description: format.description };
   const article = articles.find((item) => path === `/guides/${item.slug}`);
   if (article) return { title: article.title, description: article.description };
   const industry = path.match(/^\/(invoice|quote)-template\/([^/]+)$/);
@@ -119,6 +122,7 @@ if (htmlFor.size === routes.length) {
   }
 
   const samples = [
+    "/invoice-template/word", "/invoice-template/excel", "/quote-template/pdf",
     "/invoice-template/freelance-designer", "/invoice-template/photographer", "/invoice-template/plumber",
     "/quote-template/consulting", "/quote-template/baker", "/quote-template/architect",
     "/receipt-template/rent-payment", "/receipt-template/freelance-payment", "/receipt-template/security-deposit",

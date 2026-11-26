@@ -49,7 +49,16 @@ const labels: Record<string, string> = {
   "how-to-write-an-invoice": "How to write an invoice",
 };
 
+const formatNames: Record<string, string> = {
+  word: "Word",
+  "google-docs": "Google Docs",
+  excel: "Excel",
+  pdf: "PDF",
+  "google-sheets": "Google Sheets",
+};
+
 function titleFor(segment: string, previous: string) {
+  if ((previous === "invoice-template" || previous === "quote-template" || previous === "receipt-template") && formatNames[segment]) return formatNames[segment];
   if (previous === "invoice-template" || previous === "quote-template") return titled(industries.find((item) => item.slug === segment)?.name ?? segment);
   if (previous === "receipt-template") return titled(receiptTypes.find((item) => item.slug === segment)?.name ?? segment);
   if (previous === "invoice-requirements") return invoiceCountries.find((item) => item.slug === segment)?.name ?? segment;

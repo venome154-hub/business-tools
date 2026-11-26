@@ -194,10 +194,35 @@ function withoutSelf(path: string, links: RelatedLink[]) {
   return links.filter((item) => item.href !== path);
 }
 
+const FORMAT_LABEL: Record<string, string> = {
+  word: "Word",
+  "google-docs": "Google Docs",
+  excel: "Excel",
+  pdf: "PDF",
+};
+
+function sameFormat(hub: "invoice" | "quote" | "receipt", slug: string) {
+  const label = FORMAT_LABEL[slug];
+  if (!label) return [];
+  return [
+    link(`/invoice-template/${slug}`, `Invoice template for ${label}`),
+    link(`/quote-template/${slug}`, `Quote template for ${label}`),
+    link(`/receipt-template/${slug}`, `Receipt template for ${label}`),
+  ].filter((item) => !item.href.startsWith(`/${hub}-template/`));
+}
+
 export function linksFor(path: string): RelatedBlock | null {
   const invoiceTemplate = path.match(/^\/invoice-template\/([^/]+)$/);
   if (invoiceTemplate) {
     const slug = invoiceTemplate[1];
+    if (FORMAT_LABEL[slug]) {
+      return {
+        guides: [writeInvoice, invoiceNumbers],
+        tools: [invoiceTool, quoteTool, receiptTool],
+        templates: [...sameFormat("invoice", slug), invoiceTemplates],
+        moreCsv: [],
+      };
+    }
     return {
       guides: [writeInvoice, invoiceNumbers],
       tools: [invoiceTool, quoteTool],
@@ -208,6 +233,14 @@ export function linksFor(path: string): RelatedBlock | null {
   const quoteTemplate = path.match(/^\/quote-template\/([^/]+)$/);
   if (quoteTemplate) {
     const slug = quoteTemplate[1];
+    if (FORMAT_LABEL[slug]) {
+      return {
+        guides: [quoteBelongs, quoteCompare],
+        tools: [quoteTool, invoiceTool, receiptTool],
+        templates: [...sameFormat("quote", slug), quoteTemplates],
+        moreCsv: [],
+      };
+    }
     return {
       guides: [quoteBelongs, quoteCompare],
       tools: [quoteTool, invoiceTool],
@@ -217,6 +250,15 @@ export function linksFor(path: string): RelatedBlock | null {
   }
   const receiptTemplate = path.match(/^\/receipt-template\/([^/]+)$/);
   if (receiptTemplate) {
+    const slug = receiptTemplate[1];
+    if (FORMAT_LABEL[slug]) {
+      return {
+        guides: [writeReceipt, partialPayment],
+        tools: [receiptTool, invoiceTool, rentTool],
+        templates: [...sameFormat("receipt", slug), receiptTemplates],
+        moreCsv: [],
+      };
+    }
     return {
       guides: [writeReceipt, partialPayment],
       tools: [receiptTool, rentTool, donationTool],

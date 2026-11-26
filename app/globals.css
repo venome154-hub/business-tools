@@ -47,6 +47,7 @@ button:disabled { opacity:.5; cursor:not-allowed; }
 .home-columns article a,.guide-links a,.seo-content a { color:#1d4ed8; text-decoration:underline; text-underline-offset:3px; }
 .seo-content a.btn-primary { color:#fff; text-decoration:none; }
 .guide-links { display:grid; gap:12px; margin-top:18px; }
+.format-actions { display:flex; flex-wrap:wrap; gap:12px; margin:18px 0; }
 .csv-tools-section { margin-top:-34px; }
 .csv-home-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:22px; text-align:left; }
 .home-footer { display:flex; justify-content:space-between; gap:20px; max-width:850px; margin:70px auto 10px; padding:20px 8px; border-top:1px solid var(--line); color:var(--muted); font-size:14px; }

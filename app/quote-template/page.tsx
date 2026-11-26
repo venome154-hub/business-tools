@@ -21,6 +21,13 @@ export default function Page() {
       <article className="seo-content">
         <h1>Quote templates before the invoice</h1>
         <p>A quote prices work the client has not accepted yet. Each page explains what that trade usually includes, excludes, or prices separately, then opens the quote generator with sample lines.</p>
+        <h2>Blank templates by format</h2>
+        <div className="guide-links">
+          <Link href="/quote-template/word">Quote template for Word →</Link>
+          <Link href="/quote-template/google-docs">Quote template for Google Docs →</Link>
+          <Link href="/quote-template/excel">Quote template for Excel →</Link>
+          <Link href="/quote-template/pdf">Quote template for PDF →</Link>
+        </div>
         <div className="guide-links">
           {industries.map((item) => <Link key={item.slug} href={`/quote-template/${item.slug}`}>{titled(item.name)} →</Link>)}
         </div>

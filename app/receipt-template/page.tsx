@@ -21,6 +21,13 @@ export default function Page() {
       <article className="seo-content">
         <h1>Receipt templates for money already received</h1>
         <p>Each template is a receipt, not a bill and not a fake record. It starts from the kind of payment: rent, a deposit, a repair, a lesson block, or an event booking.</p>
+        <h2>Blank templates by format</h2>
+        <div className="guide-links">
+          <Link href="/receipt-template/word">Receipt template for Word →</Link>
+          <Link href="/receipt-template/google-docs">Receipt template for Google Docs →</Link>
+          <Link href="/receipt-template/excel">Receipt template for Excel →</Link>
+          <Link href="/receipt-template/pdf">Receipt template for PDF →</Link>
+        </div>
         <div className="guide-links">
           {receiptTypes.map((item) => <Link key={item.slug} href={`/receipt-template/${item.slug}`}>{titled(item.name)} →</Link>)}
         </div>

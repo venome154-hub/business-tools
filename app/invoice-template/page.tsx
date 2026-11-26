@@ -21,6 +21,13 @@ export default function Page() {
       <article className="seo-content">
         <h1>Invoice templates for specific work</h1>
         <p>Each template opens the invoice generator with example lines for that trade. The descriptions are different because the work is different: a plumber’s call-out is not a tutor’s lesson block. Replace the sample prices with yours.</p>
+        <h2>Blank templates by format</h2>
+        <div className="guide-links">
+          <Link href="/invoice-template/word">Invoice template for Word →</Link>
+          <Link href="/invoice-template/google-docs">Invoice template for Google Docs →</Link>
+          <Link href="/invoice-template/excel">Invoice template for Excel →</Link>
+          <Link href="/invoice-template/pdf">Invoice template for PDF →</Link>
+        </div>
         <div className="guide-links">
           {industries.map((item) => <Link key={item.slug} href={`/invoice-template/${item.slug}`}>{titled(item.name)} →</Link>)}
         </div>

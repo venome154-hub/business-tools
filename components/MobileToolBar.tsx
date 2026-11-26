@@ -10,6 +10,8 @@ export default function MobileToolBar({
   onWord,
   excelLabel,
   onExcel,
+  pdfLabel,
+  onPdf,
 }: {
   primaryLabel: string;
   onPrimary: () => void;
@@ -20,13 +22,16 @@ export default function MobileToolBar({
   onWord?: () => void;
   excelLabel?: string;
   onExcel?: () => void;
+  pdfLabel?: string;
+  onPdf?: () => void;
 }) {
   return (
-    <div className={`mobile-doc-bar${onWord ? " has-office" : ""}`}>
+    <div className={`mobile-doc-bar${onWord || onExcel || onPdf ? " has-office" : ""}`}>
       <button type="button" className="secondary" onClick={onPreview}>{previewOpen ? "Close preview" : "Preview"}</button>
       <button type="button" className="download" onClick={onPrimary} disabled={disabled}>{primaryLabel}</button>
       {onWord && <button type="button" className="secondary" onClick={onWord} disabled={disabled}>{wordLabel}</button>}
       {onExcel && <button type="button" className="secondary" onClick={onExcel} disabled={disabled}>{excelLabel}</button>}
+      {onPdf && <button type="button" className="secondary" onClick={onPdf} disabled={disabled}>{pdfLabel}</button>}
     </div>
   );
 }
