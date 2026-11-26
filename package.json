@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --experimental-strip-types --test tests/locales.test.ts tests/sitemap.test.ts tests/embed-snippet.test.ts tests/related.test.ts && playwright test",
+    "test": "node --experimental-strip-types --test tests/locales.test.ts tests/sitemap.test.ts tests/embed-snippet.test.ts tests/related.test.ts tests/office-export.test.ts && playwright test",
     "seo:check": "node --experimental-strip-types scripts/seo-check.ts"
   },
   "dependencies": {
+    "docx": "^9.16.1",
+    "exceljs": "^4.4.0",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.81.0",
     "next": "^15.5.0",

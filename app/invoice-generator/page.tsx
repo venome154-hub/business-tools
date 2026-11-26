@@ -7,7 +7,7 @@ import { breadcrumbLd, faqLd, webApplicationLd, type FaqItem } from "@/lib/schem
 
 const invoiceFaqs: FaqItem[] = [
   { question: "Is this invoice generator free?", answer: "Yes. You can create and download an invoice PDF for free, without creating an account." },
-  { question: "How do I save my invoice as a PDF?", answer: "Fill in the invoice details, review the preview, and select the Download PDF button. The PDF will be saved through your browser." },
+  { question: "How do I save my invoice as a PDF?", answer: "Fill in the invoice details, review the preview, and select Download PDF. Download Word or Download Excel saves the same invoice in those formats. The file is created in your browser." },
   { question: "Can I add tax and discounts?", answer: "Yes. Enter tax and discount percentages and the invoice preview will update the subtotal and total." },
   { question: "Can I add a due date and payment instructions?", answer: "Yes. Set an optional due date and include payment instructions in the invoice and PDF." },
   { question: "Are my invoice details uploaded?", answer: "The generator uses your entries in this browser to update the preview and create your PDF. See the privacy and data page for details." },
@@ -41,7 +41,7 @@ export default function InvoicePage() {
           <li>Add the invoice number, issue date, and optional payment due date.</li>
           <li>Add each product or service with its quantity and price.</li>
           <li>Select a currency and enter any applicable tax or discount.</li>
-          <li>Add optional payment instructions or a note, review the preview, and select <strong>Download PDF</strong>.</li>
+          <li>Add optional payment instructions or a note, review the preview, and select <strong>Download PDF</strong>, <strong>Download Word</strong>, or <strong>Download Excel</strong>.</li>
         </ol>
         <p>The invoice is created in your browser and downloaded as a PDF. You can review the details before sharing it with your client. After a payment arrives, record it with the <Link href="/receipt-generator">free receipt generator</Link>.</p>
 
@@ -53,7 +53,7 @@ export default function InvoicePage() {
           </details>
           <details>
             <summary>How do I save my invoice as a PDF?</summary>
-            <p>Fill in the invoice details, review the preview, and select the Download PDF button. The PDF will be saved through your browser.</p>
+            <p>Fill in the invoice details, review the preview, and select Download PDF. Download Word or Download Excel saves the same invoice in those formats. The file is created in your browser.</p>
           </details>
           <details>
             <summary>Can I add tax and discounts?</summary>

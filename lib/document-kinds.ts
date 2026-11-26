@@ -37,7 +37,7 @@ export type KindConfig = {
 export const KIND_CONFIG: Record<DocumentKind, KindConfig> = {
   invoice: {
     heading: "Invoice Generator",
-    lede: "Create a detailed PDF invoice. Your entries stay in this browser.",
+    lede: "Create a detailed invoice and download PDF, Word, or Excel. Your entries stay in this browser.",
     pdfTitle: "INVOICE",
     prefix: "INV",
     party: "Bill to",
@@ -53,7 +53,7 @@ export const KIND_CONFIG: Record<DocumentKind, KindConfig> = {
   },
   quote: {
     heading: "Quote Generator",
-    lede: "Create a clear project estimate and download it as a PDF. No signup.",
+    lede: "Create a clear project estimate and download it as PDF, Word, or Excel. No signup.",
     pdfTitle: "QUOTE",
     prefix: "QUO",
     party: "Prepared for",
@@ -67,7 +67,7 @@ export const KIND_CONFIG: Record<DocumentKind, KindConfig> = {
   },
   receipt: {
     heading: "Receipt Generator",
-    lede: "Record a payment you have received and download a clear receipt PDF.",
+    lede: "Record a payment you have received and download a receipt as PDF, Word, or Excel.",
     pdfTitle: "PAYMENT RECEIPT",
     prefix: "RCP",
     party: "Received from",

@@ -14,8 +14,10 @@ import { acceptDecimal, decimalLabel, displayDate, formatMoney, localDate, parse
 import { addDays, isCurrencyCode, LOCALES } from "@/lib/locales";
 import { readLogoFile } from "@/lib/logo";
 import { commitNumber, peekNumber } from "@/lib/numbers";
+import type { OfficeDocument } from "@/lib/office-export";
 import { downloadBusinessPdf } from "@/lib/pdf";
 import { clearProfile, readProfile, writeProfile, type BusinessProfile } from "@/lib/profile";
+import { getSiteUrl } from "@/lib/site";
 
 function LocalImage({ src, alt, className }: { src: string; alt: string; className: string }) {
   return (
@@ -59,7 +61,7 @@ export default function DocumentStudio({
   const [state, setState] = useState<DocumentState>(() => blankDocument(kind));
   const [draftId, setDraftId] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [pdfBusy, setPdfBusy] = useState(false);
+  const [exporting, setExporting] = useState<"" | "pdf" | "docx" | "xlsx">("");
   const [currencyValid, setCurrencyValid] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -190,9 +192,66 @@ export default function DocumentStudio({
     return id;
   }
 
+  const office = kind === "invoice" || kind === "quote" || kind === "receipt";
+
+  function noteList() {
+    return [
+      ...(config.paymentInfo && state.paymentInfo ? [{ title: "Payment instructions", text: state.paymentInfo }] : []),
+      ...(config.lateFee && state.lateFee ? [{ title: "Late fee", text: state.lateFee }] : []),
+      ...(config.termsBlock && state.terms ? [{ title: "Terms and conditions", text: state.terms }] : []),
+      ...(state.notes ? [{ title: "Notes", text: state.notes }] : []),
+      ...(config.note ? [{ title: "Note", text: config.note }] : []),
+      ...(config.method && state.paymentMethod ? [{ title: "Payment method", text: [state.paymentMethod, state.paymentReference].filter(Boolean).join(" · ") }] : []),
+    ];
+  }
+
+  function officeModel(): OfficeDocument {
+    return {
+      filename: state.number || config.prefix,
+      title: config.pdfTitle,
+      template: state.template,
+      accent: state.accent,
+      currency: state.currency,
+      locale: state.locale,
+      meta: [
+        `${config.numberLabel}: ${state.number || "—"}`,
+        `Date: ${displayDate(state.date, state.locale) || "—"}`,
+        ...(config.due && state.dueDate ? [`Due: ${displayDate(state.dueDate, state.locale)}`] : []),
+        ...(config.validity && state.validUntil ? [`Valid until: ${displayDate(state.validUntil, state.locale)}`] : []),
+        ...(config.po && state.poNumber ? [`PO: ${state.poNumber}`] : []),
+        ...(config.related && state.relatedNumber ? [`Related: ${state.relatedNumber}`] : []),
+      ],
+      fromTitle: "From",
+      fromLines: [state.company, state.companyAddress, state.companyEmail].filter(Boolean),
+      toTitle: config.party,
+      toLines: [state.client, state.clientAddress, state.clientEmail, state.property, state.period].filter(Boolean),
+      qtyHeader: config.qty,
+      priceHeader: config.price,
+      lines: figures.lines.map((line) => ({
+        description: line.description,
+        quantity: line.quantity,
+        price: line.price,
+        taxRate: line.taxRate,
+      })),
+      perLineTax: state.perLineTax,
+      discountRate: figures.discountRate,
+      taxRate: state.perLineTax ? 0 : Math.min(100, parseDecimal(state.tax)),
+      shipping: config.shipping ? figures.shipping : null,
+      previouslyPaid: prior > 0 ? prior : null,
+      amountPaid: paidSpecified ? paid : null,
+      paidLabel: config.paidLabel,
+      totalLabel: kind === "credit-note" ? "Amount credited" : "Total",
+      notes: noteList(),
+      signature: state.signature || state.acceptedBy,
+      signatureLabel: state.acceptedBy ? "Accepted by" : "Signature",
+      madeWith,
+      madeWithUrl: getSiteUrl(),
+    };
+  }
+
   async function downloadPDF() {
-    if (pdfBusy || !currencyValid) return;
-    setPdfBusy(true);
+    if (exporting || !currencyValid) return;
+    setExporting("pdf");
     setError("");
     try {
       const money = (amount: number) => formatMoney(amount, state.currency, state.locale);
@@ -243,14 +302,7 @@ export default function DocumentStudio({
           ...(prior > 0 ? [{ label: "Previously paid", value: money(prior) }] : []),
           ...(paidSpecified ? [{ label: config.paidLabel, value: money(paid) }, { label: "Balance", value: money(balance), emphasize: true }] : []),
         ] : [],
-        notes: [
-          ...(config.paymentInfo && state.paymentInfo ? [{ title: "Payment instructions", text: state.paymentInfo }] : []),
-          ...(config.lateFee && state.lateFee ? [{ title: "Late fee", text: state.lateFee }] : []),
-          ...(config.termsBlock && state.terms ? [{ title: "Terms and conditions", text: state.terms }] : []),
-          ...(state.notes ? [{ title: "Notes", text: state.notes }] : []),
-          ...(config.note ? [{ title: "Note", text: config.note }] : []),
-          ...(config.method && state.paymentMethod ? [{ title: "Payment method", text: [state.paymentMethod, state.paymentReference].filter(Boolean).join(" · ") }] : []),
-        ],
+        notes: noteList(),
         footer: "Prepared in your browser. You are responsible for the content of this document.",
         madeWith,
       });
@@ -260,7 +312,28 @@ export default function DocumentStudio({
     } catch {
       setError("The PDF could not be created. Check the details and try again.");
     } finally {
-      setPdfBusy(false);
+      setExporting("");
+    }
+  }
+
+  async function downloadOffice(format: "docx" | "xlsx") {
+    if (exporting || !currencyValid) return;
+    setExporting(format);
+    setError("");
+    try {
+      const { downloadOfficeDocument } = await import("@/lib/office-export");
+      await downloadOfficeDocument(format, officeModel());
+      await persistDraft();
+      trackEvent("document_download", { tool_name: kind, file_format: format });
+      setNotice(format === "docx"
+        ? "Word document downloaded. A copy of this document is saved on this device."
+        : "Excel workbook downloaded. A copy of this document is saved on this device.");
+    } catch {
+      setError(format === "docx"
+        ? "The Word document could not be created. Check the details and try again."
+        : "The Excel workbook could not be created. Check the details and try again.");
+    } finally {
+      setExporting("");
     }
   }
 
@@ -311,7 +384,11 @@ export default function DocumentStudio({
             <HeadingTag>{config.heading}</HeadingTag>
             <p>{config.lede}</p>
           </div>
-          <button className="download" type="button" onClick={downloadPDF} disabled={pdfBusy || !currencyValid}><Download size={18} aria-hidden="true" />{pdfBusy ? "Preparing PDF…" : "Download PDF"}</button>
+          <div className="download-actions">
+            <button className="download" type="button" onClick={downloadPDF} disabled={Boolean(exporting) || !currencyValid}><Download size={18} aria-hidden="true" />{exporting === "pdf" ? "Preparing PDF…" : "Download PDF"}</button>
+            {office && <button className="secondary" type="button" onClick={() => downloadOffice("docx")} disabled={Boolean(exporting) || !currencyValid}>{exporting === "docx" ? "Preparing Word…" : "Download Word"}</button>}
+            {office && <button className="secondary" type="button" onClick={() => downloadOffice("xlsx")} disabled={Boolean(exporting) || !currencyValid}>{exporting === "xlsx" ? "Preparing Excel…" : "Download Excel"}</button>}
+          </div>
         </div>
         {error && <p className="form-error" role="alert">{error}</p>}
         {notice && <p className="field-note">{notice}</p>}
@@ -399,7 +476,7 @@ export default function DocumentStudio({
           </label>
           <label>Accent color<input type="color" value={state.accent} onChange={(event) => patch({ accent: event.target.value })} /></label>
           <label>Logo (PNG, JPG, or SVG)<input type="file" accept="image/png,image/jpeg,image/svg+xml,.png,.jpg,.jpeg,.svg" onChange={(event) => onLogo(event.target.files?.[0])} /></label>
-          <label className="check-line"><input type="checkbox" checked={madeWith} onChange={(event) => { setMadeWith(event.target.checked); localStorage.setItem("biztoolsbox-made-with", event.target.checked ? "on" : "off"); }} /> Made with BizToolsBox on the PDF</label>
+          <label className="check-line"><input type="checkbox" checked={madeWith} onChange={(event) => { setMadeWith(event.target.checked); localStorage.setItem("biztoolsbox-made-with", event.target.checked ? "on" : "off"); }} /> Made with BizToolsBox on the download</label>
         </div>
 
         </details>
@@ -509,7 +586,7 @@ export default function DocumentStudio({
         </div>
       </aside>
       <AdSlot place="after-result" />
-      <MobileToolBar primaryLabel={pdfBusy ? "Preparing PDF…" : "Download PDF"} onPrimary={downloadPDF} previewOpen={previewOpen} onPreview={() => setPreviewOpen((open) => !open)} disabled={pdfBusy || !currencyValid} />
+      <MobileToolBar primaryLabel={exporting === "pdf" ? "Preparing PDF…" : "Download PDF"} onPrimary={downloadPDF} previewOpen={previewOpen} onPreview={() => setPreviewOpen((open) => !open)} disabled={Boolean(exporting) || !currencyValid} wordLabel={office ? (exporting === "docx" ? "Preparing Word…" : "Download Word") : undefined} onWord={office ? () => downloadOffice("docx") : undefined} excelLabel={office ? (exporting === "xlsx" ? "Preparing Excel…" : "Download Excel") : undefined} onExcel={office ? () => downloadOffice("xlsx") : undefined} />
     </section>
   );
 }

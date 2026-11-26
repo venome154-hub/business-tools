@@ -59,7 +59,7 @@ test("an unknown currency disables document actions and keeps the last preview",
   await expect(page.getByText("Unknown currency code")).toBeVisible();
   await expect(page.locator(".summary .grand")).toContainText("¥");
   await expect(page.locator(".summary")).not.toContainText("ABC");
-  for (const name of ["Download PDF", "Save on this device", "Create a receipt for this invoice", "Draft a payment reminder"]) {
+  for (const name of ["Download PDF", "Download Word", "Download Excel", "Save on this device", "Create a receipt for this invoice", "Draft a payment reminder"]) {
     const buttons = page.getByRole("button", { name, exact: true });
     const count = await buttons.count();
     expect(count).toBeGreaterThan(0);
