@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { FileSpreadsheet, Lock, Upload, X } from "lucide-react";
 import type { ChangeEvent } from "react";
 import { cleanCsvRows, downloadCsv, findDuplicateSkus, mergeCsvFiles, preferredDelimiter, type CsvRow } from "@/lib/csv";
 import { readTableFile } from "@/lib/table-file";
@@ -33,6 +34,7 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
   const [documents, setDocuments] = useState<CsvDocument[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [over, setOver] = useState(false);
   const [trimSpaces, setTrimSpaces] = useState(true);
   const [removeBlankRows, setRemoveBlankRows] = useState(true);
   const [removeEmptyColumns, setRemoveEmptyColumns] = useState(true);
@@ -65,9 +67,9 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
     return findDuplicateSkus(firstDocument.rows, Number(selectedSkuColumn), normalizeSku);
   }, [mode, firstDocument, selectedSkuColumn, normalizeSku]);
 
-  async function handleFiles(event: ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files ?? []);
-    event.target.value = "";
+  async function handleFiles(event: ChangeEvent<HTMLInputElement> | File[]) {
+    const files = Array.isArray(event) ? event : Array.from(event.target.files ?? []);
+    if (!Array.isArray(event)) event.target.value = "";
     if (!files.length) return;
     setBusy(true);
     setError("");
@@ -118,21 +120,22 @@ export default function CsvUtility({ mode }: { mode: ToolMode }) {
     <>
       <div className="csv-tool-layout">
         <section className="csv-tool-panel" aria-labelledby="csv-tool-title">
-          <span className="badge">FREE CSV TOOL · FILES STAY ON YOUR DEVICE</span>
+          <span className="badge"><Lock size={14} aria-hidden="true" /> Stays in your browser</span>
           <h1 id="csv-tool-title">{copy.title}</h1>
           <p className="csv-tool-intro">{copy.description}</p>
 
-          <label className="csv-upload">
-            <span>{busy ? "Reading your file…" : mode === "merger" ? "Choose CSV files" : "Choose a CSV file"}</span>
-            <small>{mode === "merger" ? "Select two or more CSV or Excel files" : "CSV or Excel · processed in this browser"}</small>
+          <label className={`csv-upload${over ? " is-over" : ""}`} onDragOver={(event) => { event.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={(event) => { event.preventDefault(); setOver(false); void handleFiles(Array.from(event.dataTransfer.files)); }}>
+            <Upload size={32} aria-hidden="true" />
+            <span>{busy ? "Reading your file…" : "Drop a CSV or Excel file here"}</span>
+            <span className="btn-secondary">Choose file</span>
             <input type="file" accept=".csv,text/csv,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple={mode === "merger"} onChange={handleFiles} disabled={busy} />
           </label>
           {error && <p className="csv-error" role="alert">{error}</p>}
 
           {documents.length > 0 && <div className="csv-file-list" aria-label="Selected files">
             {documents.map((document, index) => <div className="csv-file-row" key={`${document.name}-${index}`}>
-              <span><strong>{document.name}</strong><small>{Math.max(document.rows.length - 1, 0).toLocaleString()} data rows · {document.rows[0]?.length ?? 0} columns</small></span>
-              <button className="csv-remove" type="button" onClick={() => removeDocument(index)} aria-label={`Remove ${document.name}`}>Remove</button>
+              <span><FileSpreadsheet size={18} aria-hidden="true" /> <strong>{document.name}</strong><small>{Math.max(document.rows.length - 1, 0).toLocaleString()} rows · {document.rows[0]?.length ?? 0} columns</small></span>
+              <button className="csv-remove" type="button" onClick={() => removeDocument(index)} aria-label={`Remove ${document.name}`}><X size={16} /></button>
             </div>)}
           </div>}
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import LogoMark from "@/components/LogoMark";
 
 const documents = [
   { href: "/invoice-generator", label: "Invoice" },
@@ -51,7 +52,7 @@ export default function SiteHeader() {
   return (
     <header className="site-header">
       <div className="site-header-inner">
-        <Link href="/" className="site-logo" onClick={() => setOpen(null)}>BizToolsBox</Link>
+        <Link href="/" className="site-logo" onClick={() => setOpen(null)}><LogoMark /><span>BizToolsBox</span></Link>
         <nav className="site-nav" aria-label="Main navigation">
           <div className="nav-drop">
             <button type="button" aria-expanded={open === "documents"} onClick={() => toggle("documents")}>Documents</button>

@@ -1,3 +1,4 @@
+import AdSlot from "@/components/AdSlot";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbLd, faqLd, webApplicationLd, type FaqItem } from "@/lib/schema";
 
@@ -29,6 +30,7 @@ export default function ToolArticle({
         <section className="seo-content">
           <h1>{name}</h1>
           <p>{intro}</p>
+          <AdSlot place="in-article" />
         </section>
       )}
       {children}

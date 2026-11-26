@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Lock } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import CurrencyField from "@/components/CurrencyField";
 import MobileToolBar from "@/components/MobileToolBar";
@@ -133,7 +134,7 @@ export default function PaymentReminderGenerator() {
       <div className="editor">
         <div className="heading">
           <div>
-            <span className="badge">100% FREE</span>
+            <span className="badge"><Lock size={14} aria-hidden="true" /> Stays in your browser</span>
             <h1>Payment Reminder Generator</h1>
             <p>Draft a courteous email about an unpaid invoice. Review it, then copy it into your email app.</p>
           </div>

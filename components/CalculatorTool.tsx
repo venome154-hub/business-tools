@@ -5,15 +5,18 @@ import { useState } from "react";
 import { breakEven, discountPrice, dueDate, freelanceRate, lateFee, markup, profitMargin, salesTax, type CalcSlug } from "@/lib/calculators";
 import { acceptDecimal, displayDate, formatMoney } from "@/lib/format";
 import { getSiteUrl } from "@/lib/site";
-import CopyEmbed from "@/components/CopyEmbed";
+import AdSlot from "@/components/AdSlot";
 
-function NumberField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function NumberField({ label, value, onChange, adorn }: { label: string; value: string; onChange: (value: string) => void; adorn?: "money" | "percent" }) {
+  const field = (
+    <input inputMode="decimal" value={value} onChange={(event) => {
+      const next = acceptDecimal(event.target.value);
+      if (next.value !== undefined) onChange(next.value);
+    }} />
+  );
   return (
     <label>{label}
-      <input inputMode="decimal" value={value} onChange={(event) => {
-        const next = acceptDecimal(event.target.value);
-        if (next.value !== undefined) onChange(next.value);
-      }} />
+      {adorn ? <span className="adorn">{adorn === "money" ? <span>$</span> : null}{field}{adorn === "percent" ? <span>%</span> : null}</span> : field}
     </label>
   );
 }
@@ -45,6 +48,8 @@ export default function CalculatorTool({ slug, embedded = false }: { slug: CalcS
   const [d, setD] = useState("30");
   const [mode, setMode] = useState<"add" | "remove">("add");
   const [issued, setIssued] = useState("");
+  const [embedOpen, setEmbedOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   let result = "";
   if (slug === "profit-margin") {
@@ -73,39 +78,61 @@ export default function CalculatorTool({ slug, embedded = false }: { slug: CalcS
     result = date ? `Due ${displayDate(date)}` : "Choose an issue date.";
   }
 
+  const secondLabel = slug === "freelance-rate" ? "Yearly expenses" : slug === "break-even" ? "Price per unit" : slug === "late-fee" ? "Annual rate %" : slug === "discount" || slug === "sales-tax" ? "Rate %" : "Selling price";
+  const secondAdorn = secondLabel.includes("%") ? "percent" : slug === "due-date" ? undefined : "money";
+  const thirdAdorn = slug === "break-even" ? "money" : undefined;
+  const embedCode = `<iframe src="${getSiteUrl()}/embed/${slug}" title="${embedTitle[slug]}" style="width:100%;max-width:480px;height:460px;border:0"></iframe>`;
+
   return (
-    <section className="seo-content calc-tool">
-      <div className="grid two">
-        {slug === "due-date" ? (
-          <>
-            <label>Issue date<input type="date" value={issued} onChange={(event) => setIssued(event.target.value)} /></label>
-            <NumberField label="Days until due" value={a} onChange={setA} />
-          </>
-        ) : (
-          <>
-            <NumberField label={amountLabel(slug)} value={a} onChange={setA} />
-            <NumberField label={slug === "freelance-rate" ? "Yearly expenses" : slug === "break-even" ? "Price per unit" : slug === "late-fee" ? "Annual rate %" : slug === "discount" || slug === "sales-tax" ? "Rate %" : "Selling price"} value={b} onChange={setB} />
-          </>
-        )}
-        {slug === "sales-tax" && (
-          <label>Mode
-            <select value={mode} onChange={(event) => setMode(event.target.value as "add" | "remove")}>
-              <option value="add">Add tax</option>
-              <option value="remove">Remove tax</option>
-            </select>
-          </label>
-        )}
-        {(slug === "freelance-rate" || slug === "late-fee" || slug === "break-even") && <NumberField label={slug === "freelance-rate" ? "Working weeks" : slug === "late-fee" ? "Days late" : "Variable cost per unit"} value={c} onChange={setC} />}
-        {slug === "freelance-rate" && <NumberField label="Billable hours per week" value={d} onChange={setD} />}
+    <section className="calc-tool">
+      <div className="calc-layout">
+        <div className="grid two">
+          {slug === "due-date" ? (
+            <>
+              <label>Issue date<input type="date" value={issued} onChange={(event) => setIssued(event.target.value)} /></label>
+              <NumberField label="Days until due" value={a} onChange={setA} />
+            </>
+          ) : (
+            <>
+              <NumberField label={amountLabel(slug)} value={a} onChange={setA} adorn="money" />
+              <NumberField label={secondLabel} value={b} onChange={setB} adorn={secondAdorn} />
+            </>
+          )}
+          {slug === "sales-tax" && (
+            <label>Mode
+              <select value={mode} onChange={(event) => setMode(event.target.value as "add" | "remove")}>
+                <option value="add">Add tax</option>
+                <option value="remove">Remove tax</option>
+              </select>
+            </label>
+          )}
+          {(slug === "freelance-rate" || slug === "late-fee" || slug === "break-even") && <NumberField label={slug === "freelance-rate" ? "Working weeks" : slug === "late-fee" ? "Days late" : "Variable cost per unit"} value={c} onChange={setC} adorn={thirdAdorn} />}
+          {slug === "freelance-rate" && <NumberField label="Billable hours per week" value={d} onChange={setD} />}
+        </div>
+        <div className="calc-result-panel">
+          <span>Result</span>
+          <p className="calc-result" role="status">{result}</p>
+          <span>The numbers stay in this browser. This is arithmetic, not tax or legal advice.</span>
+        </div>
       </div>
-      <p className="calc-result" role="status">{result}</p>
-      <p className="quote-note">The numbers stay in this browser. This is arithmetic, not tax or legal advice.</p>
       {embedded ? null : (
         <>
-          <p><Link href={`/embed/${slug}`}>Open the embeddable calculator</Link></p>
-          <CopyEmbed code={`<iframe src="${getSiteUrl()}/embed/${slug}" title="${embedTitle[slug]}" style="width:100%;max-width:480px;height:460px;border:0"></iframe>`} />
+          <button type="button" className="btn-secondary" onClick={() => setEmbedOpen((open) => !open)}>Embed this calculator</button>
+          {embedOpen && (
+            <div className="embed-copy">
+              <label>Embed code<textarea className="embed-code" readOnly rows={4} value={embedCode} /></label>
+              <button className="secondary" type="button" onClick={() => {
+                navigator.clipboard.writeText(embedCode).then(() => {
+                  setCopied(true);
+                  window.setTimeout(() => setCopied(false), 2000);
+                }).catch(() => setCopied(false));
+              }}>{copied ? "Copied" : "Copy"}</button>
+              <p><Link href={`/embed/${slug}`}>Open the embeddable calculator</Link></p>
+            </div>
+          )}
         </>
       )}
+      <AdSlot place="after-result" />
     </section>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { FileSpreadsheet, Lock, Upload, X } from "lucide-react";
 import type { ChangeEvent } from "react";
 import { downloadCsv, type CsvDelimiter, type CsvRow } from "@/lib/csv";
 import { trackEvent } from "@/lib/analytics";
@@ -30,6 +31,7 @@ export default function CsvWorkbench({ mode }: { mode: CsvExtraMode }) {
   const [matchCase, setMatchCase] = useState(false);
   const [leftKey, setLeftKey] = useState("0");
   const [rightKey, setRightKey] = useState("0");
+  const [over, setOver] = useState(false);
 
   const first = tables[0];
   const header = first?.rows[0];
@@ -43,9 +45,9 @@ export default function CsvWorkbench({ mode }: { mode: CsvExtraMode }) {
     return first.rows;
   }, [column, find, first, header, leftKey, matchCase, mode, order, replace, rightKey, tables]);
 
-  async function onFiles(event: ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files ?? []);
-    event.target.value = "";
+  async function onFiles(event: ChangeEvent<HTMLInputElement> | File[]) {
+    const files = Array.isArray(event) ? event : Array.from(event.target.files ?? []);
+    if (!Array.isArray(event)) event.target.value = "";
     if (!files.length) return;
     setBusy(true);
     setError("");
@@ -80,16 +82,17 @@ export default function CsvWorkbench({ mode }: { mode: CsvExtraMode }) {
   return (
     <div className="csv-tool-layout">
       <section className="csv-tool-panel">
-        <span className="badge">FREE CSV TOOL · FILES STAY ON YOUR DEVICE</span>
+        <span className="badge"><Lock size={14} aria-hidden="true" /> Stays in your browser</span>
         <h1>{COPY[mode].title}</h1>
         <p className="csv-tool-intro">{COPY[mode].description}</p>
-        <label className="csv-upload">
-          <span>{busy ? "Reading your file…" : mode === "join" ? "Choose two files" : "Choose a CSV or Excel file"}</span>
-          <small>CSV, Excel, or Windows-1252 text. Nothing is uploaded.</small>
+        <label className={`csv-upload${over ? " is-over" : ""}`} onDragOver={(event) => { event.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={(event) => { event.preventDefault(); setOver(false); void onFiles(Array.from(event.dataTransfer.files)); }}>
+          <Upload size={32} aria-hidden="true" />
+          <span>{busy ? "Reading your file…" : "Drop a CSV or Excel file here"}</span>
+          <span className="btn-secondary">Choose file</span>
           <input type="file" accept=".csv,text/csv,.xlsx,.xls" multiple={mode === "join"} onChange={onFiles} />
         </label>
         {error && <p className="csv-error" role="alert">{error}</p>}
-        {first && <p className="csv-privacy-note">{first.name}: {Math.max(first.rows.length - 1, 0)} data rows</p>}
+        {first && <p className="csv-privacy-note csv-file-row"><FileSpreadsheet size={18} aria-hidden="true" /><span><strong>{first.name}</strong><small>{Math.max(first.rows.length - 1, 0)} rows · {first.rows[0]?.length ?? 0} columns</small></span><button type="button" className="csv-remove" aria-label={`Remove ${first.name}`} onClick={() => setTables([])}><X size={16} /></button></p>}
         {mode === "products" && output.length > 1 && (
           <ul className="issue-list">
             {output.slice(1).map((issue) => (

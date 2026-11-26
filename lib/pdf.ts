@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import { getSiteUrl } from "@/lib/site";
 
-const FONT = "Roboto";
+let FONT = "helvetica";
 const MARGIN = 18;
 
 export type PdfColumn = { header: string; width: number; align: "left" | "right" };
@@ -55,13 +55,18 @@ function accentRgb(value: string): [number, number, number] {
 }
 
 async function createDocument(pageSize: "a4" | "letter") {
-  if (!regularFont) regularFont = await fontBase64("/fonts/Roboto-Regular.ttf");
-  if (!boldFont) boldFont = await fontBase64("/fonts/Roboto-Bold.ttf");
   const doc = new jsPDF({ unit: "mm", format: pageSize });
-  doc.addFileToVFS("Roboto-Regular.ttf", regularFont);
-  doc.addFont("Roboto-Regular.ttf", FONT, "normal");
-  doc.addFileToVFS("Roboto-Bold.ttf", boldFont);
-  doc.addFont("Roboto-Bold.ttf", FONT, "bold");
+  try {
+    if (!regularFont) regularFont = await fontBase64("/fonts/Inter-Regular.ttf");
+    if (!boldFont) boldFont = await fontBase64("/fonts/Inter-Bold.ttf");
+    doc.addFileToVFS("Inter-Regular.ttf", regularFont);
+    doc.addFont("Inter-Regular.ttf", "Inter", "normal");
+    doc.addFileToVFS("Inter-Bold.ttf", boldFont);
+    doc.addFont("Inter-Bold.ttf", "Inter", "bold");
+    FONT = "Inter";
+  } catch {
+    FONT = "helvetica";
+  }
   doc.setFont(FONT, "normal");
   return doc;
 }
@@ -89,10 +94,10 @@ export async function downloadBusinessPdf(model: PdfModel) {
   const left = MARGIN;
   const right = pageWidth - MARGIN;
   const contentWidth = right - left;
-  let y = template === "modern" ? 24 : 20;
+  let y = template === "minimal" ? 28 : 22;
   if (template === "modern") {
     doc.setFillColor(accent[0], accent[1], accent[2]);
-    doc.rect(0, 0, pageWidth, 8, "F");
+    doc.rect(0, 0, pageWidth, 2.12, "F");
   }
 
   const preparePage = () => {
@@ -114,15 +119,36 @@ export async function downloadBusinessPdf(model: PdfModel) {
   if (model.logoDataUrl?.startsWith("data:image/")) {
     try {
       const format = model.logoDataUrl.includes("image/png") ? "PNG" : "JPEG";
-      doc.addImage(model.logoDataUrl, format, left, y - 6, 16, 16);
-      titleX = left + 20;
+      const props = doc.getImageProperties(model.logoDataUrl);
+      const boxW = 49.4;
+      const boxH = 19.8;
+      const scale = Math.min(boxW / props.width, boxH / props.height);
+      const logoW = props.width * scale;
+      const logoH = props.height * scale;
+      doc.addImage(model.logoDataUrl, format, left, y - 4, logoW, logoH);
+      titleX = left + logoW + 4;
     } catch {
       titleX = left;
     }
   }
+  const dueLine = model.meta.find((line) => /^due\s*:/i.test(line));
+  const sideMeta = model.meta.filter((line) => line !== dueLine);
+  const amountDue = [...model.totals].reverse().find((item) => item.emphasize)?.value || model.totals.at(-1)?.value || "";
+  doc.setFont(FONT, "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(100, 116, 139);
+  doc.text("AMOUNT DUE", right, y, { align: "right" });
+  doc.setFont(FONT, "bold");
+  doc.setFontSize(20);
+  doc.setTextColor(accent[0], accent[1], accent[2]);
+  doc.text(amountDue, right, y + 8, { align: "right" });
+  doc.setFont(FONT, "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  if (dueLine) doc.text(dueLine.replace(/^due\s*:\s*/i, "Due "), right, y + 14, { align: "right" });
+  doc.setTextColor(17, 24, 39);
   doc.setFont(FONT, "bold");
   doc.setFontSize(template === "minimal" ? 16 : 22);
-  doc.setTextColor(accent[0], accent[1], accent[2]);
   const titleWidth = doc.getTextWidth(model.title);
   doc.setTextColor(17, 24, 39);
   doc.setFont(FONT, "normal");
@@ -133,13 +159,12 @@ export async function downloadBusinessPdf(model: PdfModel) {
   if (sideBySide) {
     doc.setFont(FONT, "bold");
     doc.setFontSize(template === "minimal" ? 16 : 22);
-    doc.setTextColor(accent[0], accent[1], accent[2]);
-    doc.text(model.title, titleX, y);
     doc.setTextColor(17, 24, 39);
+    doc.text(model.title, titleX, y);
     doc.setFont(FONT, "normal");
     doc.setFontSize(10);
-    let metaY = y - 1;
-    for (const line of model.meta) {
+    let metaY = y + 16;
+    for (const line of sideMeta) {
       for (const part of wrap(line, metaWidth)) {
         doc.text(part, right, metaY, { align: "right" });
         metaY += 5;
@@ -149,13 +174,12 @@ export async function downloadBusinessPdf(model: PdfModel) {
   } else {
     doc.setFont(FONT, "bold");
     doc.setFontSize(template === "minimal" ? 16 : 22);
-    doc.setTextColor(accent[0], accent[1], accent[2]);
-    doc.text(model.title, titleX, y);
     doc.setTextColor(17, 24, 39);
+    doc.text(model.title, titleX, y);
     y += 10;
     doc.setFont(FONT, "normal");
     doc.setFontSize(10);
-    for (const line of model.meta) {
+    for (const line of sideMeta) {
       for (const part of wrap(line, contentWidth)) {
         doc.text(part, left, y);
         y += 5;
@@ -198,30 +222,32 @@ export async function downloadBusinessPdf(model: PdfModel) {
   const widths = model.columns.map((column) => (column.width / fractionTotal) * contentWidth);
   widths[widths.length - 1] = contentWidth - widths.slice(0, -1).reduce((sum, width) => sum + width, 0);
 
+  const rowUnit = 7.76;
   const drawTableHeader = () => {
-    if (y + 16 > pageHeight - MARGIN) nextPage();
+    if (y + rowUnit > pageHeight - MARGIN) nextPage();
+    const rowTop = y;
     if (template === "modern") {
       doc.setFillColor(accent[0], accent[1], accent[2]);
-      doc.rect(left, y - 5, contentWidth, 10, "F");
+      doc.rect(left, rowTop, contentWidth, rowUnit, "F");
       doc.setTextColor(255, 255, 255);
-    } else if (template === "classic") {
-      doc.setFillColor(241, 245, 249);
-      doc.rect(left, y - 5, contentWidth, 10, "F");
-      doc.setTextColor(17, 24, 39);
     } else {
-      doc.setTextColor(accent[0], accent[1], accent[2]);
+      doc.setTextColor(template === "minimal" ? 100 : 15, template === "minimal" ? 116 : 23, template === "minimal" ? 139 : 42);
     }
     doc.setFont(FONT, "bold");
-    doc.setFontSize(10);
+    doc.setFontSize(template === "minimal" ? 8 : 10);
     let x = left;
     model.columns.forEach((column, index) => {
+      const label = template === "minimal" ? column.header.toUpperCase() : column.header;
       const textX = column.align === "right" ? x + widths[index] - 2 : x + 2;
-      doc.text(column.header, textX, y + 1, { align: column.align });
+      doc.text(label, textX, rowTop + 5, { align: column.align });
       x += widths[index];
     });
     doc.setFont(FONT, "normal");
     doc.setTextColor(17, 24, 39);
-    y += 12;
+    y = rowTop + rowUnit;
+    doc.setDrawColor(template === "minimal" ? 226 : 148, template === "minimal" ? 232 : 163, template === "minimal" ? 240 : 184);
+    doc.setLineWidth(0.2);
+    if (template !== "modern") doc.line(left, y, right, y);
   };
 
   drawTableHeader();
@@ -231,7 +257,7 @@ export async function downloadBusinessPdf(model: PdfModel) {
       const text = raw || (index === 0 ? "—" : "");
       return wrap(text, widths[index] - 4);
     });
-    const rowHeight = Math.max(...cells.map((lines) => lines.length), 1) * 5 + 4;
+    const rowHeight = Math.max(...cells.map((lines) => lines.length), 1) * 7.76;
     if (y + rowHeight > pageHeight - MARGIN && y > 40) {
       nextPage();
       drawTableHeader();
@@ -241,12 +267,13 @@ export async function downloadBusinessPdf(model: PdfModel) {
       const align = model.columns[index].align;
       lines.forEach((line, lineIndex) => {
         const textX = align === "right" ? x + widths[index] - 2 : x + 2;
-        doc.text(line, textX, y + lineIndex * 5, { align });
+        doc.text(line, textX, y + 5 + lineIndex * 4.5, { align });
       });
     });
     y += rowHeight;
-    doc.setDrawColor(226, 232, 240);
-    doc.line(left, y - 2, right, y - 2);
+    doc.setDrawColor(template === "classic" ? 148 : 226, template === "classic" ? 163 : 232, template === "classic" ? 184 : 240);
+    doc.setLineWidth(0.2);
+    doc.line(left, y, right, y);
   }
 
   y += 6;
@@ -259,9 +286,18 @@ export async function downloadBusinessPdf(model: PdfModel) {
     const lineCount = Math.max(labelLines.length, valueLines.length);
     if (y + (total.emphasize ? 2 : 0) + lineCount * 5 > pageHeight - MARGIN) nextPage();
     if (total.emphasize) {
-      doc.setDrawColor(15, 23, 42);
       doc.setFont(FONT, "bold");
-      doc.line(left + contentWidth * 0.42, y - 1, right, y - 1);
+      doc.setFontSize(12);
+      if (template === "modern") {
+        doc.setFillColor(accent[0], accent[1], accent[2]);
+        doc.rect(left + contentWidth * 0.42, y - 4, contentWidth * 0.58, 8, "F");
+        doc.setTextColor(255, 255, 255);
+      } else {
+        doc.setDrawColor(15, 23, 42);
+        doc.setLineWidth(0.35);
+        doc.line(left + contentWidth * 0.42, y - 2, right, y - 2);
+        doc.setTextColor(17, 24, 39);
+      }
       y += 2;
     }
     labelLines.forEach((line, index) => doc.text(line, left + contentWidth * 0.42, y + index * 5));

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { FileText, FolderOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { DOC_PATHS, writeHandoff, type DocumentKind } from "@/lib/document-model";
 import { KIND_CONFIG } from "@/lib/document-kinds";
@@ -48,11 +50,22 @@ export default function MyDocuments() {
       <h1>My documents</h1>
       <p>The latest 20 documents you saved or downloaded stay in this browser. They are not sent to BizToolsBox.</p>
       {error && <p className="form-error" role="alert">{error}</p>}
-      {rows.length === 0 && !error && <p>No documents saved on this device yet.</p>}
+      {rows.length === 0 && !error && (
+        <div className="empty-docs">
+          <FolderOpen size={40} aria-hidden="true" />
+          <h2>No saved documents yet</h2>
+          <p>Documents you save or download stay in this browser.</p>
+          <div className="hero-actions">
+            <Link className="btn-primary" href="/invoice-generator">Create an invoice</Link>
+            <Link className="btn-secondary" href="/quote-generator">Create a quote</Link>
+          </div>
+        </div>
+      )}
       <ul className="doc-list">
         {rows.map((row) => (
-          <li key={row.id}>
-            <div><strong>{KIND_CONFIG[row.kind as DocumentKind]?.heading || row.kind}</strong><span>{row.number} · {row.label}</span></div>
+          <li className="tool-card" key={row.id}>
+            <span className="tool-icon"><FileText size={20} /></span>
+            <div><strong>{KIND_CONFIG[row.kind as DocumentKind]?.heading || row.kind}</strong><span>{row.number} · {row.payload.client || row.label} · {row.payload.date || ""}</span></div>
             <div className="profile-actions">
               <button type="button" className="secondary" onClick={() => open(row)}>Open</button>
               <button type="button" className="secondary" onClick={() => duplicate(row)}>Duplicate</button>

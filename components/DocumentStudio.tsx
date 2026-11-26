@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Download, FileText, Landmark, Lock, Palette, Receipt, Trash2, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
+import AdSlot from "@/components/AdSlot";
 import CurrencyField from "@/components/CurrencyField";
 import MobileToolBar from "@/components/MobileToolBar";
 import { KIND_CONFIG } from "@/lib/document-kinds";
@@ -305,16 +307,17 @@ export default function DocumentStudio({
       <div className="editor">
         <div className="heading">
           <div>
-            <span className="badge">100% FREE</span>
+            <span className="badge"><Lock size={14} aria-hidden="true" /> Stays in your browser</span>
             <HeadingTag>{config.heading}</HeadingTag>
             <p>{config.lede}</p>
           </div>
-          <button className="download" type="button" onClick={downloadPDF} disabled={pdfBusy || !currencyValid}>{pdfBusy ? "Preparing PDF…" : "Download PDF"}</button>
+          <button className="download" type="button" onClick={downloadPDF} disabled={pdfBusy || !currencyValid}><Download size={18} aria-hidden="true" />{pdfBusy ? "Preparing PDF…" : "Download PDF"}</button>
         </div>
         {error && <p className="form-error" role="alert">{error}</p>}
         {notice && <p className="field-note">{notice}</p>}
 
-        <h2>Your business</h2>
+        <details className="field-card" open>
+        <summary><span className="tool-icon"><UserRound size={20} /></span><h2>Your business</h2></summary>
         <div className="grid two">
           <label>Business or name<input value={state.company} onChange={(event) => patch({ company: event.target.value })} /></label>
           <label>Business email<input type="email" value={state.companyEmail} onChange={(event) => patch({ companyEmail: event.target.value })} /></label>
@@ -322,10 +325,12 @@ export default function DocumentStudio({
         </div>
         <div className="profile-actions">
           <button type="button" className="secondary" onClick={() => { writeProfile(profileFromState()); setNotice("Business details saved in this browser."); }}>Save business details</button>
-          <button type="button" className="secondary" onClick={() => { clearProfile(); setNotice("Saved business details were removed from this browser."); }}>Clear saved details</button>
+          <button type="button" className="btn-ghost" onClick={() => { clearProfile(); setNotice("Saved business details were removed from this browser."); }}>Clear saved details</button>
         </div>
 
-        <h2>{config.party}</h2>
+        </details>
+        <details className="field-card" open>
+        <summary><span className="tool-icon"><FileText size={20} /></span><h2>{config.party}</h2></summary>
         <div className="grid two">
           <label>Name<input value={state.client} onChange={(event) => patch({ client: event.target.value })} /></label>
           <label>Email<input type="email" value={state.clientEmail} onChange={(event) => patch({ clientEmail: event.target.value })} /></label>
@@ -334,7 +339,9 @@ export default function DocumentStudio({
           {config.property && <label>Rent period<input value={state.period} onChange={(event) => patch({ period: event.target.value })} placeholder="March 2026" /></label>}
         </div>
 
-        <h2>Document</h2>
+        </details>
+        <details className="field-card" open>
+        <summary><span className="tool-icon"><Receipt size={20} /></span><h2>Document details</h2></summary>
         <div className="grid two">
           <label>{config.numberLabel}<input value={state.number} onChange={(event) => patch({ number: event.target.value })} /></label>
           <label>Date<input type="date" value={state.date} onChange={(event) => patch({ date: event.target.value })} /></label>
@@ -373,7 +380,9 @@ export default function DocumentStudio({
           {config.method && <label>Payment reference<input value={state.paymentReference} onChange={(event) => patch({ paymentReference: event.target.value })} /></label>}
         </div>
 
-        <h2>Appearance</h2>
+        </details>
+        <details className="field-card" open>
+        <summary><span className="tool-icon"><Palette size={20} /></span><h2>Appearance</h2></summary>
         <div className="grid two">
           <label>Template
             <select value={state.template} onChange={(event) => patch({ template: event.target.value as DocumentState["template"] })}>
@@ -393,17 +402,21 @@ export default function DocumentStudio({
           <label className="check-line"><input type="checkbox" checked={madeWith} onChange={(event) => { setMadeWith(event.target.checked); localStorage.setItem("biztoolsbox-made-with", event.target.checked ? "on" : "off"); }} /> Made with BizToolsBox on the PDF</label>
         </div>
 
-        <h2>{config.lines ? "Line items" : "Amount"}</h2>
+        </details>
+        <details className="field-card" open>
+        <summary><span className="tool-icon"><FileText size={20} /></span><h2>{config.lines ? "Line items" : "Amount"}</h2></summary>
         {config.lines ? (
           <>
             <div className="items">
+              <div className={`line-head${state.perLineTax ? " with-tax" : ""}`} aria-hidden="true"><span>Description</span><span>Qty</span>{config.prices && <span>Price</span>}{state.perLineTax && <span>Tax</span>}{config.prices && <span>Amount</span>}<span /></div>
               {state.items.map((item, index) => (
                 <div className={`item${state.perLineTax ? " with-tax" : ""}`} key={index}>
                   <input aria-label={`Description for item ${index + 1}`} value={item.description} onChange={(event) => updateLine(index, "description", event.target.value)} />
                   <input aria-label={`${config.qty} for item ${index + 1}`} inputMode="decimal" value={item.quantity} onChange={(event) => updateLine(index, "quantity", event.target.value)} />
                   {config.prices && <input aria-label={`${config.price} for item ${index + 1}`} inputMode="decimal" value={item.price} onChange={(event) => updateLine(index, "price", event.target.value)} />}
                   {state.perLineTax && <input aria-label={`Tax percent for item ${index + 1}`} inputMode="decimal" value={item.tax} placeholder="Tax %" onChange={(event) => updateLine(index, "tax", event.target.value)} />}
-                  <button className="icon" type="button" onClick={() => patch({ items: state.items.filter((_, itemIndex) => itemIndex !== index) })} aria-label="Remove item">×</button>
+                  {config.prices && <span className="line-amount">{formatMoney(figures.lines[index]?.amount || 0, state.currency, state.locale)}</span>}
+                  <button className="icon" type="button" onClick={() => patch({ items: state.items.filter((_, itemIndex) => itemIndex !== index) })} aria-label="Remove item"><Trash2 size={16} /></button>
                 </div>
               ))}
             </div>
@@ -413,6 +426,9 @@ export default function DocumentStudio({
           <label>{config.price}<input inputMode="decimal" value={state.items[0]?.price || ""} onChange={(event) => updateLine(0, "price", event.target.value)} /></label>
         )}
         {config.perLine && <label className="check-line"><input type="checkbox" checked={state.perLineTax} onChange={(event) => patch({ perLineTax: event.target.checked })} /> Tax each line separately</label>}
+        </details>
+        <details className="field-card" open>
+        <summary><span className="tool-icon"><Landmark size={20} /></span><h2>Totals</h2></summary>
         <div className="grid two totals-inputs">
           {config.tax && !state.perLineTax && <label>Tax %<input inputMode="decimal" value={state.tax} onChange={(event) => updateAmount("tax", event.target.value)} /></label>}
           {config.discount && <label>Discount %<input inputMode="decimal" value={state.discount} onChange={(event) => updateAmount("discount", event.target.value)} /></label>}
@@ -425,6 +441,19 @@ export default function DocumentStudio({
           }} /></label>}
           {config.paid && <label>{config.paidLabel}<input inputMode="decimal" value={state.amountPaid} onChange={(event) => updateAmount("amountPaid", event.target.value)} /></label>}
         </div>
+        {config.prices && (
+          <div className="totals-readout">
+            <div>Subtotal <span>{formatMoney(figures.subtotal, state.currency, state.locale)}</span></div>
+            <div>Discount <span>{formatMoney(figures.discountAmount, state.currency, state.locale)}</span></div>
+            <div>Tax <span>{formatMoney(figures.taxAmount, state.currency, state.locale)}</span></div>
+            <div>Shipping <span>{formatMoney(figures.shipping, state.currency, state.locale)}</span></div>
+            <div className="grand">Total <span>{formatMoney(figures.total, state.currency, state.locale)}</span></div>
+            <div className="balance-due">Balance due <span>{formatMoney(Math.max(0, balance), state.currency, state.locale)}</span></div>
+          </div>
+        )}
+        </details>
+        <details className="field-card" open>
+        <summary><span className="tool-icon"><Receipt size={20} /></span><h2>Payment</h2></summary>
         <div className="grid two">
           {config.paymentInfo && <label className="full-field">Payment instructions<textarea rows={3} value={state.paymentInfo} onChange={(event) => patch({ paymentInfo: event.target.value })} /></label>}
           {config.paymentLink && <label className="full-field">Payment link<textarea rows={2} value={state.paymentLink} onChange={(event) => patch({ paymentLink: event.target.value })} placeholder="https://" /></label>}
@@ -439,6 +468,7 @@ export default function DocumentStudio({
           <button type="button" className="secondary" onClick={async () => { if (!currencyValid) return; await persistDraft(); setNotice("Saved in My documents on this device."); }} disabled={!currencyValid}>Save on this device</button>
           {config.chain.map((link) => <button key={link.to} type="button" className="secondary" onClick={() => sendTo(link.to)} disabled={!currencyValid}>{link.label}</button>)}
         </div>
+        </details>
       </div>
 
       <aside className={`preview${previewOpen ? " is-open" : ""}`}>
@@ -478,6 +508,7 @@ export default function DocumentStudio({
           {(state.signature || state.acceptedBy) && <p className="sign-line">{state.acceptedBy ? "Accepted by" : "Signature"}: {state.signature || state.acceptedBy}</p>}
         </div>
       </aside>
+      <AdSlot place="after-result" />
       <MobileToolBar primaryLabel={pdfBusy ? "Preparing PDF…" : "Download PDF"} onPrimary={downloadPDF} previewOpen={previewOpen} onPreview={() => setPreviewOpen((open) => !open)} disabled={pdfBusy || !currencyValid} />
     </section>
   );

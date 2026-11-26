@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { AnalyticsSettingsButton } from "@/components/AnalyticsConsent";
+import LogoMark from "@/components/LogoMark";
 import { SUPPORT_EMAIL } from "@/lib/site";
 
 export default function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="site-footer-inner">
+        <div className="footer-brand">
+          <LogoMark />
+          <p>Free browser tools for invoices, quotes, receipts, and spreadsheets.</p>
+        </div>
         <div>
           <strong>Tools</strong>
           <details className="footer-group">
