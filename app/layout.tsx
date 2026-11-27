@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { getSiteUrl } from "@/lib/site";
-import AnalyticsConsent from "@/components/AnalyticsConsent";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-inter" });
@@ -29,13 +25,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body>
-        <SiteHeader />
-        <Breadcrumbs />
-        {children}
-        <SiteFooter />
-        <AnalyticsConsent />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

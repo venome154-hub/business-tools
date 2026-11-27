@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ToolArticle from "@/components/ToolArticle";
 import CalculatorTool from "@/components/CalculatorTool";
+import EmbedPanel from "@/components/EmbedPanel";
 
 export const metadata: Metadata = {
   title: "Profit Margin Calculator",
@@ -19,6 +20,7 @@ export default function Page() {
   return (
     <ToolArticle name="Profit Margin Calculator" path="/profit-margin-calculator" description="Free profit margin calculator: enter cost and selling price to see the gross margin percentage. The formula is (price - cost) / price. No sign-up needed." intro="Margin is the share of the selling price that is left after cost. Enter cost and selling price. The percentage is (price − cost) ÷ price." faqs={faqs} headingAbove>
       <CalculatorTool slug="profit-margin" />
+      <EmbedPanel slug="profit-margin" />
     </ToolArticle>
   );
 }

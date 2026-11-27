@@ -16,5 +16,17 @@ test("buildEmbedSnippet adds a followed attribution link", () => {
   assert.match(page, /target="_blank"/);
   assert.match(page, /rel="noopener"/);
   assert.match(page, /index:\s*false/);
+  assert.doesNotMatch(page, /Embed code/);
+  assert.doesNotMatch(page, /EmbedCode/);
   assert.match(config, /X-Robots-Tag/);
+  const layout = fs.readFileSync("app/layout.tsx", "utf8");
+  const site = fs.readFileSync("app/(site)/layout.tsx", "utf8");
+  assert.doesNotMatch(layout, /SiteHeader|SiteFooter|AnalyticsConsent/);
+  assert.match(site, /SiteHeader/);
+  assert.match(site, /SiteFooter/);
+  assert.match(site, /AnalyticsConsent/);
+  const sales = fs.readFileSync("app/(site)/sales-tax-calculator/page.tsx", "utf8");
+  const markup = fs.readFileSync("app/(site)/markup-calculator/page.tsx", "utf8");
+  assert.match(sales, /EmbedPanel/);
+  assert.match(markup, /EmbedPanel/);
 });

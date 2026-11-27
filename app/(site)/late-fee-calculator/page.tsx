@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ToolArticle from "@/components/ToolArticle";
 import CalculatorTool from "@/components/CalculatorTool";
+import EmbedPanel from "@/components/EmbedPanel";
 
 export const metadata: Metadata = {
   title: "Late Payment Fee Calculator",
@@ -19,6 +20,7 @@ export default function Page() {
   return (
     <ToolArticle name="Late Payment Fee Calculator" path="/late-fee-calculator" description="Free late fee calculator for unpaid invoices: enter amount, annual rate and days overdue to estimate a simple late payment fee. No sign-up needed." intro="The fee is the unpaid amount times the annual rate times days late, divided by 365. It is a simple estimate, not a statutory interest calculation." faqs={faqs} headingAbove>
       <CalculatorTool slug="late-fee" />
+      <EmbedPanel slug="late-fee" />
     </ToolArticle>
   );
 }

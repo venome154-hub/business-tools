@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ToolArticle from "@/components/ToolArticle";
 import CalculatorTool from "@/components/CalculatorTool";
+import EmbedPanel from "@/components/EmbedPanel";
 
 export const metadata: Metadata = {
   title: "Break-even Calculator",
@@ -19,6 +20,7 @@ export default function Page() {
   return (
     <ToolArticle name="Break-even Calculator" path="/break-even-calculator" description="Free break-even calculator: enter fixed costs, price and variable cost per unit to find how many units you must sell to break even. With examples." intro="Break-even units equal fixed costs divided by the amount left from the price after variable cost. Example: fixed costs of 1,000, a price of 50, and a variable cost of 30 break even at 50 units. If the price is not higher than the variable cost, there is no break-even point." faqs={faqs} headingAbove>
       <CalculatorTool slug="break-even" />
+      <EmbedPanel slug="break-even" />
     </ToolArticle>
   );
 }

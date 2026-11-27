@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ToolArticle from "@/components/ToolArticle";
 import CalculatorTool from "@/components/CalculatorTool";
+import EmbedPanel from "@/components/EmbedPanel";
 
 export const metadata: Metadata = {
   title: "Invoice Due Date Calculator",
@@ -19,6 +20,7 @@ export default function Page() {
   return (
     <ToolArticle name="Invoice Due Date Calculator" path="/invoice-due-date-calculator" description="Free invoice due date calculator: add net 7, net 15, net 30 or custom days to an invoice date to find the exact payment due date. No sign-up." intro="Choose the issue date and the number of days, such as 7, 15, or 30. The due date is that many days later on the calendar." faqs={faqs} headingAbove>
       <CalculatorTool slug="due-date" />
+      <EmbedPanel slug="due-date" />
     </ToolArticle>
   );
 }

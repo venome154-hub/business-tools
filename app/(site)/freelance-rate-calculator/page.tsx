@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ToolArticle from "@/components/ToolArticle";
 import CalculatorTool from "@/components/CalculatorTool";
+import EmbedPanel from "@/components/EmbedPanel";
 
 export const metadata: Metadata = {
   title: "Freelance Hourly Rate Calculator",
@@ -19,6 +20,7 @@ export default function Page() {
   return (
     <ToolArticle name="Freelance Hourly Rate Calculator" path="/freelance-rate-calculator" description="Free freelance hourly rate calculator: spread a yearly income goal and business expenses over the weeks and hours you can bill. A planning figure, no sign-up." intro="Add the yearly income you want to the yearly business expenses, then divide by billable hours. Billable hours are working weeks times hours per week." faqs={faqs} headingAbove>
       <CalculatorTool slug="freelance-rate" />
+      <EmbedPanel slug="freelance-rate" />
     </ToolArticle>
   );
 }

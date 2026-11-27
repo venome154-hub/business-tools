@@ -958,7 +958,7 @@ export function getEstimate(slug: string) {
 }
 
 export function estimateMetaTitle(name: string) {
-  const titled = name.charAt(0).toUpperCase() + name.slice(1);
+  const titled = name.split(/\s+/).map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
   return `Free ${titled} Estimate Template — PDF, Word & Excel`;
 }
 

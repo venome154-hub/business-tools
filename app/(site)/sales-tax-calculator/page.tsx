@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ToolArticle from "@/components/ToolArticle";
 import CalculatorTool from "@/components/CalculatorTool";
+import EmbedPanel from "@/components/EmbedPanel";
 
 export const metadata: Metadata = {
   title: "Sales Tax Calculator",
@@ -19,6 +20,7 @@ export default function Page() {
   return (
     <ToolArticle name="Sales Tax Calculator" path="/sales-tax-calculator" description="Free sales tax, VAT and GST calculator: add tax to a net price or remove it from a gross price. Shows net, tax and total. Works in your browser." intro="Enter an amount and a rate to add tax on top, or to pull tax back out of a tax-inclusive price. The rate is capped at 100%." faqs={faqs} headingAbove>
       <CalculatorTool slug="sales-tax" />
+      <EmbedPanel slug="sales-tax" />
     </ToolArticle>
   );
 }

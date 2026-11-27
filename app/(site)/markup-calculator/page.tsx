@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ToolArticle from "@/components/ToolArticle";
 import CalculatorTool from "@/components/CalculatorTool";
+import EmbedPanel from "@/components/EmbedPanel";
 
 export const metadata: Metadata = {
   title: "Markup Calculator",
@@ -19,6 +20,7 @@ export default function Page() {
   return (
     <ToolArticle name="Markup Calculator" path="/markup-calculator" description="Free markup calculator: enter cost and selling price to see the markup percentage. Markup divides profit by cost, which is not the same as margin. No sign-up." intro="Markup is the amount added to cost, divided by that cost. A 50% markup on a 100 cost is a 150 selling price." faqs={faqs} headingAbove>
       <CalculatorTool slug="markup" />
+      <EmbedPanel slug="markup" />
     </ToolArticle>
   );
 }

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { estimateMetaTitle } from "../content/estimates.ts";
 import { updatedAt } from "../content/updated-at.ts";
 import { guideGroups, guidePaths, linksFor, toolPaths, type RelatedBlock } from "../lib/related.ts";
 
@@ -96,6 +97,11 @@ test("minimum tool and guide pairs are linked both ways", () => {
   has("/quote-template/plumber", "/invoice-template/plumber");
   has("/invoice-template/plumber", "/invoice-generator");
   has("/quote-template/plumber", "/quote-generator");
+});
+
+test("estimate titles use title case for each word of the trade", () => {
+  assert.equal(estimateMetaTitle("dog walker"), "Free Dog Walker Estimate Template — PDF, Word & Excel");
+  assert.equal(estimateMetaTitle("social media manager"), "Free Social Media Manager Estimate Template — PDF, Word & Excel");
 });
 
 test("guide topics cover each guide once", () => {
