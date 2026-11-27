@@ -274,11 +274,8 @@ html,body { max-width:100%; overflow-x:clip; }
 .embed-app { max-width:480px; margin:0 auto; padding:16px; }
 .embed-code { width:100%; margin-top:6px; }
 .embed-copy { display:grid; gap:8px; margin-top:16px; }
-body:has(.embed-app) .site-header,
-body:has(.embed-app) .site-footer,
-body:has(.embed-app) .crumbs,
-body:has(.embed-app) .related-links,
-body:has(.embed-app) .analytics-consent { display:none; }
+.embed-copy summary { list-style:none; width:fit-content; }
+.embed-copy summary::-webkit-details-marker { display:none; }
 @media (max-width: 767px) {
   .related-links { grid-template-columns:1fr; }
 }

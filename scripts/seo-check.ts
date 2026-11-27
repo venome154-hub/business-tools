@@ -12,6 +12,13 @@ function unescape(value: string) {
   return JSON.parse(`"${value}"`) as string;
 }
 
+function pageFile(route: string) {
+  const rel = route === "/" ? "page.tsx" : `${route.slice(1)}/page.tsx`;
+  const grouped = `app/(site)/${rel}`;
+  if (fs.existsSync(grouped)) return grouped;
+  return `app/${rel}`;
+}
+
 function readMeta(file: string) {
   const text = fs.readFileSync(file, "utf8");
   const description = text.match(/description:\s*"((?:\\.|[^"\\])*)"/);
@@ -43,19 +50,18 @@ function metaFor(path: string) {
     return { title: `${titled(item.name)} ${industry[1]} template`, description: intro.slice(0, 155) };
   }
   const receipt = path.match(/^\/receipt-template\/([^/]+)$/);
-  if (receipt && receipt[1] !== undefined && !fs.existsSync(`app${path}/page.tsx`)) {
+  if (receipt && receipt[1] !== undefined && !fs.existsSync(pageFile(path))) {
     const item = receiptTypes.find((entry) => entry.slug === receipt[1]);
     if (!item) return { title: "", description: "" };
     return { title: `${titled(item.name)} receipt template`, description: item.intro.slice(0, 155) };
   }
   const country = path.match(/^\/invoice-requirements\/([^/]+)$/);
-  if (country && !fs.existsSync(`app${path}/page.tsx`)) {
+  if (country && !fs.existsSync(pageFile(path))) {
     const item = invoiceCountries.find((entry) => entry.slug === country[1]);
     if (!item) return { title: "", description: "" };
     return { title: `Common invoice fields for ${item.name}`, description: countryDescription(item.name) };
   }
-  const file = path === "/" ? "app/page.tsx" : `app${path}/page.tsx`;
-  return readMeta(file);
+  return readMeta(pageFile(path));
 }
 
 const problems: string[] = [];
@@ -71,7 +77,7 @@ for (const path of Object.keys(updatedAt)) {
   else titles.set(meta.title, path);
 }
 
-const refund = readMeta("app/refund-policy/page.tsx").description;
+const refund = readMeta(pageFile("/refund-policy")).description;
 if (refund.length < 140 || refund.length > 160) problems.push(`/refund-policy description is ${refund.length} characters`);
 
 const routes = Object.keys(updatedAt);

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ToolArticle from "@/components/ToolArticle";
 import CalculatorTool from "@/components/CalculatorTool";
+import EmbedPanel from "@/components/EmbedPanel";
 
 export const metadata: Metadata = {
   title: "Discount Calculator",
@@ -19,6 +20,7 @@ export default function Page() {
   return (
     <ToolArticle name="Discount Calculator" path="/discount-calculator" description="Free discount calculator: take a percentage off a price and see the sale price and the amount saved. Fast, works in your browser, no sign-up needed." intro="Enter the original price and a discount percent from 0 to 100. The result is the amount off and the price after the discount." faqs={faqs} headingAbove>
       <CalculatorTool slug="discount" />
+      <EmbedPanel slug="discount" />
     </ToolArticle>
   );
 }

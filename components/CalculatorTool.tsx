@@ -1,12 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { breakEven, discountPrice, dueDate, freelanceRate, lateFee, markup, profitMargin, salesTax, type CalcSlug } from "@/lib/calculators";
 import { acceptDecimal, displayDate, formatMoney } from "@/lib/format";
 import AdSlot from "@/components/AdSlot";
-import { buildEmbedSnippet } from "@/lib/embed-snippet";
-import { getSiteUrl } from "@/lib/site";
 
 function NumberField({ label, value, onChange, adorn }: { label: string; value: string; onChange: (value: string) => void; adorn?: "money" | "percent" }) {
   const field = (
@@ -21,17 +18,6 @@ function NumberField({ label, value, onChange, adorn }: { label: string; value: 
     </label>
   );
 }
-
-const embedTarget: Record<CalcSlug, { title: string; path: string }> = {
-  "profit-margin": { title: "Profit margin calculator", path: "/profit-margin-calculator" },
-  markup: { title: "Markup calculator", path: "/markup-calculator" },
-  "sales-tax": { title: "Sales tax calculator", path: "/sales-tax-calculator" },
-  "freelance-rate": { title: "Freelance rate calculator", path: "/freelance-rate-calculator" },
-  "late-fee": { title: "Late fee calculator", path: "/late-fee-calculator" },
-  "break-even": { title: "Break-even calculator", path: "/break-even-calculator" },
-  discount: { title: "Discount calculator", path: "/discount-calculator" },
-  "due-date": { title: "Invoice due date calculator", path: "/invoice-due-date-calculator" },
-};
 
 function amountLabel(slug: CalcSlug) {
   if (slug === "freelance-rate") return "Yearly income goal";
@@ -49,8 +35,6 @@ export default function CalculatorTool({ slug, embedded = false }: { slug: CalcS
   const [d, setD] = useState("30");
   const [mode, setMode] = useState<"add" | "remove">("add");
   const [issued, setIssued] = useState("");
-  const [embedOpen, setEmbedOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   let result = "";
   if (slug === "profit-margin") {
@@ -82,7 +66,6 @@ export default function CalculatorTool({ slug, embedded = false }: { slug: CalcS
   const secondLabel = slug === "freelance-rate" ? "Yearly expenses" : slug === "break-even" ? "Price per unit" : slug === "late-fee" ? "Annual rate %" : slug === "discount" || slug === "sales-tax" ? "Rate %" : "Selling price";
   const secondAdorn = secondLabel.includes("%") ? "percent" : slug === "due-date" ? undefined : "money";
   const thirdAdorn = slug === "break-even" ? "money" : undefined;
-  const embedCode = buildEmbedSnippet(slug, embedTarget[slug].title, embedTarget[slug].path, getSiteUrl());
 
   return (
     <section className="calc-tool">
@@ -116,24 +99,7 @@ export default function CalculatorTool({ slug, embedded = false }: { slug: CalcS
           <span>The numbers stay in this browser. This is arithmetic, not tax or legal advice.</span>
         </div>
       </div>
-      {embedded ? null : (
-        <>
-          <button type="button" className="btn-secondary" onClick={() => setEmbedOpen((open) => !open)}>Embed this calculator</button>
-          {embedOpen && (
-            <div className="embed-copy">
-              <label>Embed code<textarea className="embed-code" readOnly rows={4} value={embedCode} /></label>
-              <button className="secondary" type="button" onClick={() => {
-                navigator.clipboard.writeText(embedCode).then(() => {
-                  setCopied(true);
-                  window.setTimeout(() => setCopied(false), 2000);
-                }).catch(() => setCopied(false));
-              }}>{copied ? "Copied" : "Copy"}</button>
-              <p><Link href={`/embed/${slug}`}>Open the embeddable calculator</Link></p>
-            </div>
-          )}
-        </>
-      )}
-      <AdSlot place="after-result" />
+      {embedded ? null : <AdSlot place="after-result" />}
     </section>
   );
 }

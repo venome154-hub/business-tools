@@ -30,20 +30,38 @@ test("format pages have unique copy, sitemap dates, and descriptions in range", 
     assert.equal(titles.has(page.title), false, page.title);
     titles.add(page.title);
     assert.ok(page.faqs.length >= 4 && page.faqs.length <= 6, page.path);
-    assert.equal(fs.existsSync(`app${page.path}/page.tsx`), true, page.path);
+    assert.equal(fs.existsSync(`app/(site)${page.path}/page.tsx`) || fs.existsSync(`app${page.path}/page.tsx`), true, page.path);
   }
   assert.match(fs.readFileSync("lib/site.ts", "utf8"), /export const GOOGLE_DOCS_COPY_URL = ""/);
 });
 
-test("blank templates exist and the download control does not post the form", () => {
+test("blank templates exist and the download control does not post the form", async () => {
   for (const name of ["invoice", "quote", "receipt"]) {
     for (const ext of ["docx", "xlsx", "pdf"]) {
       const file = `public/templates/${name}-blank.${ext}`;
       const size = fs.statSync(file).size;
       assert.ok(size > 500, `${file} is ${size} bytes`);
       const bytes = fs.readFileSync(file);
-      if (ext === "pdf") assert.equal(bytes.subarray(0, 4).toString(), "%PDF");
-      else assert.equal(bytes[0], 0x50);
+      if (ext === "pdf") {
+        assert.equal(bytes.subarray(0, 4).toString(), "%PDF");
+        if (name === "receipt") assert.equal(bytes.includes(Buffer.from("Unit amount")), true, file);
+      } else assert.equal(bytes[0], 0x50);
+      if (name === "receipt" && ext === "docx") {
+        const JSZip = (await import("jszip")).default;
+        const zip = await JSZip.loadAsync(bytes);
+        const xml = await zip.file("word/document.xml")?.async("string");
+        assert.match(xml ?? "", /Unit amount/);
+        assert.match(xml ?? "", />Qty</);
+      }
+      if (name === "receipt" && ext === "xlsx") {
+        const ExcelJS = (await import("exceljs")).default;
+        const book = new ExcelJS.Workbook();
+        await book.xlsx.load(bytes);
+        const values: string[] = [];
+        book.eachSheet((sheet) => sheet.eachRow((row) => row.eachCell((cell) => values.push(String(cell.value ?? "")))));
+        assert.ok(values.includes("Unit amount"), file);
+        assert.ok(values.includes("Qty"), file);
+      }
     }
   }
   const button = fs.readFileSync("components/BlankTemplateButton.tsx", "utf8");

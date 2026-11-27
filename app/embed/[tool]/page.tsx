@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CalculatorTool from "@/components/CalculatorTool";
-import EmbedCode from "@/components/EmbedCode";
 import type { CalcSlug } from "@/lib/calculators";
-import { buildEmbedSnippet } from "@/lib/embed-snippet";
 import { getSiteUrl } from "@/lib/site";
 
 const embeds: Record<string, { slug: CalcSlug; title: string; path: string }> = {
@@ -32,13 +30,11 @@ export default async function Page({ params }: { params: Promise<{ tool: string 
   const { tool } = await params;
   const item = embeds[tool];
   if (!item) notFound();
-  const code = buildEmbedSnippet(tool, item.title, item.path, getSiteUrl());
   return (
     <main className="embed-app">
       <h1>{item.title}</h1>
       <CalculatorTool slug={item.slug} embedded />
       <p className="embed-credit"><a href={`${getSiteUrl()}${item.path}`} target="_blank" rel="noopener">Powered by BizToolsBox</a></p>
-      <EmbedCode code={code} />
     </main>
   );
 }

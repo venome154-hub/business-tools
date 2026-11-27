@@ -16,7 +16,7 @@ type Kind = {
 const kinds: Kind[] = [
   { id: "invoice", title: "Invoice", from: "From", to: "Bill to", price: "Price", note: "Replace this note with payment details.", shipping: 0, pdfNote: "" },
   { id: "quote", title: "Quote", from: "From", to: "Prepared for", price: "Price", note: "Replace this note with the scope of work.", shipping: null, pdfNote: "An estimate for approval, not a request for payment." },
-  { id: "receipt", title: "Receipt", from: "Received by", to: "Received from", price: "Amount", note: "Replace this note with the payment method and reference.", shipping: 0, pdfNote: "Records a payment you report as received." },
+  { id: "receipt", title: "Receipt", from: "Received by", to: "Received from", price: "Unit amount", note: "Replace this note with the payment method and reference.", shipping: 0, pdfNote: "Records a payment you report as received." },
 ];
 
 function model(kind: Kind): OfficeDocument {
@@ -83,17 +83,18 @@ function pdfBytes(kind: Kind) {
   doc.setFillColor(17, 24, 39);
   doc.rect(14, table, 182, 8, "F");
   doc.setTextColor(255, 255, 255);
+  const columns = kind.id === "receipt" ? { qty: 108, price: 128, amount: 172 } : { qty: 120, price: 145, amount: 175 };
   doc.text("Description", 16, table + 5);
-  doc.text("Qty", 120, table + 5);
-  doc.text(kind.price, 145, table + 5);
-  doc.text("Amount", 175, table + 5);
+  doc.text("Qty", columns.qty, table + 5);
+  doc.text(kind.price, columns.price, table + 5);
+  doc.text("Amount", columns.amount, table + 5);
   doc.setTextColor(17, 24, 39);
   for (let row = 0; row < 4; row += 1) {
     const y = table + 14 + row * 8;
     doc.text("Description", 16, y);
-    doc.text("1", 120, y);
-    doc.text("0.00", 145, y);
-    doc.text("0.00", 175, y);
+    doc.text("1", columns.qty, y);
+    doc.text("0.00", columns.price, y);
+    doc.text("0.00", columns.amount, y);
   }
   const totals = table + 50;
   doc.text("Subtotal", 145, totals);
